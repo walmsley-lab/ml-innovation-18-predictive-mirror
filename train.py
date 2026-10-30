@@ -11,7 +11,8 @@ import numpy as np
 
 from src.model import init, loss, predict
 from src.checkpoint import load as load_checkpoint, save as save_checkpoint
-from src.world import batch, sequence
+from src.world import batch, sequence, curriculum_batch
+from src.curriculum import schedule
 
 
 def adamw(params, grads, first, second, step_number, rate=0.002):
@@ -27,7 +28,7 @@ def adamw(params, grads, first, second, step_number, rate=0.002):
 
 
 def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=False,
-          checkpoint_every=25, resume=False):
+          checkpoint_every=25, resume=False, curriculum="baseline", replay_fraction=0.10):
     devices = jax.devices()
     if require_gpu and not any(device.platform == "gpu" for device in devices):
         raise RuntimeError(f"GPU requested but not available: {devices}")
@@ -51,11 +52,16 @@ def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=Fal
         p, m, v = adamw(p, gradients, m, v, i)
         return p, m, v, error
 
+    if curriculum != "baseline":
+        training_seeds, training_stages = schedule(seed, steps, batch_size, curriculum, replay_fraction)
     history = []
     for n in range(start_step + 1, steps + 1):
         # Unique simulation seeds per update; fixed seed makes experiments reproducible.
-        seeds = seed * 1_000_000 + n * batch_size + np.arange(batch_size)
-        x, a = batch(seeds, steps=12)
+        if curriculum == "baseline":
+            seeds = seed * 1_000_000 + n * batch_size + np.arange(batch_size)
+            x, a = batch(seeds, steps=12)
+        else:
+            x, a = curriculum_batch(training_seeds[n - 1], training_stages[n - 1], steps=12)
         params, first, second, err = update(params, first, second, jnp.asarray(x), jnp.asarray(a), n)
         if checkpoint_every > 0 and (n % checkpoint_every == 0 or n == steps):
             save_checkpoint(checkpoint_path, params, first, second, n, seed, batch_size)
@@ -82,6 +88,7 @@ def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=Fal
         "test_object_pixel_mse": float(np.mean(((y - truth) ** 2)[visible_masks])) if visible_masks.any() else None,
         "device": [str(d) for d in devices],
         "seed": seed, "steps": steps, "batch_size": batch_size,
+        "curriculum": curriculum, "replay_fraction": replay_fraction,
         "status": "pilot_only_not_evidence_of_emergence",
         "history": history,
     }
@@ -98,12 +105,14 @@ def main():
     parser.add_argument("--steps", type=int, default=int(os.getenv("STEPS", "120")))
     parser.add_argument("--batch-size", type=int, default=int(os.getenv("BATCH_SIZE", "8")))
     parser.add_argument("--output", default=os.getenv("OUTPUT", "runs/pilot"))
+    parser.add_argument("--curriculum", choices=("baseline", "staged", "shuffled"), default=os.getenv("CURRICULUM", "baseline"))
+    parser.add_argument("--replay-fraction", type=float, default=float(os.getenv("REPLAY_FRACTION", "0.10")))
     parser.add_argument("--checkpoint-every", type=int, default=int(os.getenv("CHECKPOINT_EVERY", "25")))
     parser.add_argument("--resume", action="store_true", default=os.getenv("RESUME", "0") == "1")
     parser.add_argument("--require-gpu", action="store_true", default=os.getenv("REQUIRE_GPU", "0") == "1")
     args = parser.parse_args()
     train(args.seed, args.steps, args.batch_size, args.output, args.require_gpu,
-          args.checkpoint_every, args.resume)
+          args.checkpoint_every, args.resume, args.curriculum, args.replay_fraction)
 
 
 if __name__ == "__main__":
