@@ -30,8 +30,14 @@ def groups_of(rows):
 
 
 def fmt(value):
-    # Signed curriculum differences are valid, even though absolute errors cannot be negative.
-    return f"{value:.4f}" if type(value) in (int, float) and math.isfinite(value) else "NA"
+    return f"{value:.4f}" if valid(value) else "NA"
+
+
+def fmt_signed(value):
+    """Format a finite contrast, which may legitimately be negative."""
+    if type(value) in (int, float) and math.isfinite(value):
+        return f"{value:.4f}"
+    return "NA"
 
 
 def markdown(rows, provenance=None):
@@ -61,7 +67,7 @@ def markdown(rows, provenance=None):
         deltas = [x["reappearance_location_mae_px"] - y["reappearance_location_mae_px"]
                   for x, y in pairs if x["reappearance_count"] and y["reappearance_count"]]
         lines.append(f"- {architecture}, {loss}: {len(deltas)}/{len(pairs)} pairs with events; "
-                     f"mean staged−shuffled MAE = {fmt(sum(deltas)/len(deltas) if deltas else None)} px.")
+                     f"mean staged−shuffled MAE = {fmt_signed(sum(deltas)/len(deltas) if deltas else None)} px.")
         contrasts += 1
     if not contrasts:
         lines.append("No paired, eligible staged/shuffled outcomes.")
