@@ -14,6 +14,7 @@ from src.world import sequence
 
 REGIMES = {
     "still_object_still_camera": dict(object_motion=False, camera=False),
+    "still_object_moving_camera": dict(object_motion=False, camera=True),
     "moving_object_still_camera": dict(object_motion=True, camera=False),
     "moving_object_moving_camera": dict(object_motion=True, camera=True),
 }
