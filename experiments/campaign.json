@@ -1,0 +1,25 @@
+{
+  "seeds": [
+    31,
+    37,
+    41,
+    43,
+    47
+  ],
+  "architectures": [
+    "recurrent",
+    "feedforward",
+    "multisheet"
+  ],
+  "curricula": [
+    "staged",
+    "shuffled"
+  ],
+  "steps": 240,
+  "batch_size": 8,
+  "episodes": 64,
+  "checkpoint_every": 25,
+  "loss_mode": "plain",
+  "primary_metric": "reappearance_location_mae_px",
+  "replay_fraction": 0.1
+}
