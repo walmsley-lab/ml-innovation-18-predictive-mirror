@@ -19,6 +19,10 @@ jobs:
       - run: python -m train --steps 2 --batch-size 2 --output runs/ci-smoke
       - run: python -m sweep --steps 2 --batch-size 2 --seeds 1 --architectures recurrent --curricula baseline --episodes 2 --output runs/ci-sweep
       - run: python -m sweep --steps 2 --batch-size 2 --seeds 1 --architectures recurrent --curricula baseline --episodes 2 --output runs/ci-sweep --resume
+      - run: python -m compileall -q src experiments deploy
+      - run: python -m sweep --steps 2 --batch-size 2 --seeds 11 --architectures recurrent feedforward multisheet --curricula staged shuffled --episodes 2 --checkpoint-every 1 --output runs/integration
+      - run: python -m sweep --steps 2 --batch-size 2 --seeds 11 --architectures recurrent feedforward multisheet --curricula staged shuffled --episodes 2 --checkpoint-every 1 --output runs/integration --resume
+      - run: python -m deploy.verify_matrix runs/integration --seeds 11 --architectures recurrent feedforward multisheet --curricula staged shuffled
   publish:
     if: github.event_name == 'push'
     needs: test
