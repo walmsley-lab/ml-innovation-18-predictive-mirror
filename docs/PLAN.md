@@ -43,7 +43,25 @@ This repo is a computational testbed for selected hypotheses from `ml-innovation
 
 **Before substantive paid Akash training:** Publish and pull-test the actual image by immutable digest, validate the SDL and deployment dry run, verify GPU execution with a tiny paid smoke, and establish off-provider checkpoint export/recovery. The current pilot saves only at completion and serves artifacts from a lease that continues billing: this is insufficient for long runs. Move the minimal durable-checkpoint/export gate ahead of PR #8; PR #8 can later harden automation. Review bids, set a manual spending/time cap and close the lease.
 
-## PR sequence and indicative effort
+## Implementation status and actual GitHub PR stack
+
+The initial numbered table below is a **historical scope/effort sketch**, not the actual sequence of GitHub pull request numbers. The current review stack is:
+
+| GitHub PR | Implementation |
+|---|---|
+| #1 | Bootstrap and Akash configuration |
+| #2 | Atomic checkpoint and resumed training |
+| #3 | Synthetic motion cases and staged/shuffled curriculum |
+| #4 | Matched-history feedforward and reappearance baseline |
+| #5 | Capacity-matched dual-sheet recurrent model |
+| #6 | Exploratory frozen-network probes and feedback cut |
+| #7 | Analytical active gaze sandbox with optimized-fixed control |
+| #8 | Separate Hebbian/homeostatic local-plasticity toy |
+| #9 | Seed × architecture × curriculum training/evaluation sweep |
+
+These are stacked draft PRs; review in order, retarget each child PR to `main` after merging its parent, and do not treat the presence of the code as evidence of a biological mechanism. The live webcam demo is the **next distinct milestone**, after the GPU training pilot and review.
+
+## Proposed scope and indicative effort (historical sketch)
 
 Estimates below are **engineering effort after dependency gates**, not promises of calendar completion. A hackathon can prioritize PRs 1–2; robust emergence experiments extend beyond it.
 

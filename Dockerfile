@@ -4,7 +4,8 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1 PYTHONPATH=/app
 RUN pip install --no-cache-dir 'jax[cuda12]==0.9.0.1' 'numpy==2.3.5'
 COPY src/ src/
-COPY train.py ./
+COPY train.py evaluate.py sweep.py ./
+COPY experiments/ experiments/
 COPY deploy/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 EXPOSE 8080

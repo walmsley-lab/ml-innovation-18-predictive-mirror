@@ -25,3 +25,15 @@ python -m train --steps 120 --batch-size 8 --output runs/pilot
 - Physics/simulation ground truth is held out of the model's training inputs.
 - Split by complete sequences and random seeds, not individual neighboring frames.
 - No claim of emergence without meaningful ablations, generalization and causal tests.
+
+
+## Stacked implementation PRs
+
+Review and merge PRs #1–#9 in order, retargeting each stacked PR to `main` once its parent is merged. PR #2 covers durability, #3 curriculum, #4 strong feedforward control, #5 a two-sheet model, #6 exploratory representation probes, #7 analytical gaze, #8 plasticity toy, and #9 GPU sweep harness. The original PR estimates in `docs/PLAN.md` were a scope sketch, not actual GitHub PR numbering.
+
+```bash
+python -m unittest discover -s tests -v
+python -m sweep --steps 2 --batch-size 2 --seeds 3 --architectures recurrent feedforward multisheet --curricula baseline --episodes 2 --output runs/sweep-smoke
+```
+
+**No GPU lease has run**. Before Akash, verify Docker build, NVIDIA JAX, immutable GHCR image pull, SDL validity, checkpoint off-provider export, and closed lease readback; see `docs/TRAINING.md`.
