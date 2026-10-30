@@ -20,6 +20,17 @@ class TestPilot(unittest.TestCase):
         self.assertEqual(truth["visible_mask"].shape, x.shape)
         np.testing.assert_array_equal(truth["visible_mask"], x == 1.0)
 
+    def test_training_loss_is_plain_observation_mse(self):
+        from src.model import loss
+
+        frames, actions = batch([11, 12], steps=5)
+        p = init(jax.random.PRNGKey(1))
+        forecasts = np.stack([
+            np.asarray(predict(p, frames[i], actions[i])) for i in range(2)
+        ])
+        expected = np.mean((forecasts - frames[:, 1:]) ** 2)
+        self.assertAlmostEqual(float(loss(p, frames, actions)), float(expected), places=6)
+
     def test_prediction_is_causal_and_finite(self):
         x, actions = batch([101, 102], steps=6)
         p = init(jax.random.PRNGKey(0))
