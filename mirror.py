@@ -8,7 +8,7 @@ from pathlib import Path
 import jax.numpy as jnp
 import numpy as np
 
-from src import model as recurrent, multisheet
+from src import model as recurrent, multisheet, video_residual
 
 
 def preprocess(bgr, size, cv2):
@@ -23,19 +23,21 @@ def preprocess(bgr, size, cv2):
 
 
 def initial_state(architecture, size):
+    if architecture == "video_residual":
+        return jnp.zeros((1, size, size, video_residual.CHANNELS), jnp.float32)
     if architecture == "recurrent":
         return jnp.zeros((1, size, size, 8), jnp.float32)
     if architecture == "multisheet":
         return (jnp.zeros((1, size, size, multisheet.FAST_CHANNELS), jnp.float32),
                 jnp.zeros((1, size, size, multisheet.SLOW_CHANNELS), jnp.float32))
-    raise ValueError("The live camera adapter supports recurrent and multisheet only")
+    raise ValueError("Unsupported live model architecture")
 
 
 def predict_next(params, architecture, state, observed):
     """Only the current observation and known action=unknown/zero are inputs."""
     x = jnp.asarray(observed[None], dtype=jnp.float32)
     a = jnp.zeros((1, 1), jnp.float32)  # unknown camera action placeholder
-    network = {"recurrent": recurrent, "multisheet": multisheet}[architecture]
+    network = {"recurrent": recurrent, "multisheet": multisheet, "video_residual": video_residual}[architecture]
     next_state, forecast = network.step(params, state, x, a)
     return next_state, np.asarray(forecast[0])
 
@@ -119,7 +121,7 @@ def panel(result, scale, cv2):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--parameters", required=True, help="Previously trained parameters.npz")
-    parser.add_argument("--architecture", choices=("recurrent", "multisheet"), default="recurrent")
+    parser.add_argument("--architecture", choices=("recurrent", "multisheet", "video_residual"), default="recurrent")
     parser.add_argument("--camera", type=int, default=0)
     parser.add_argument("--size", type=int, default=16)
     parser.add_argument("--fps", type=float, default=10)

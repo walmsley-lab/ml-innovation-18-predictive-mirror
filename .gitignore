@@ -5,3 +5,4 @@ runs/
 *.pyc
 .DS_Store
 deploy/generated.yaml
+recordings/
