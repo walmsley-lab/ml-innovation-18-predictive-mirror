@@ -55,6 +55,8 @@ def predict(params, frames, actions, feedback_strength=1.0):
     return trace(params, frames, actions, feedback_strength)[0]
 
 
-def loss(params, frames, actions):
+def loss(params, frames, actions, loss_mode="plain"):
     forecast = jax.vmap(predict, in_axes=(None, 0, 0))(params, frames, actions)
-    return jnp.mean((forecast - frames[:, 1:]) ** 2)
+    target = frames[:, 1:]
+    return (jnp.mean((1.0 + 32.0 * (target > 0.9)) * (forecast - target) ** 2)
+            if loss_mode == "contrast" else jnp.mean((forecast - target) ** 2))
