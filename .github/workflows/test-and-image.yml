@@ -17,6 +17,7 @@ jobs:
       - run: python -m pip install 'jax==0.9.0.1' 'numpy==2.3.5'
       - run: python -m unittest discover -s tests -v
       - run: python -m train --steps 2 --batch-size 2 --output runs/ci-smoke
+      - run: python -m sweep --steps 2 --batch-size 2 --seeds 1 --architectures recurrent --curricula baseline --episodes 2 --output runs/ci-sweep
   publish:
     if: github.event_name == 'push'
     needs: test
