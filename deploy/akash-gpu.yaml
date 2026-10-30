@@ -8,6 +8,7 @@ services:
       - RUN_MODE=train
       - LOSS_MODE=plain # compare with contrast after the initial GPU smoke # choose sweep for an experiment matrix
       - CHECKPOINT_EVERY=25
+      - RESUME=0 # change to 1 only when same container still has prior checkpoints
       - SEED=42
       - STEPS=120
       - BATCH_SIZE=8
