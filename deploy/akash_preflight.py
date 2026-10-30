@@ -32,7 +32,7 @@ def render(template, image, steps=3, batch_size=2):
         raise ValueError("Maximum provider bid must not exceed 2500 uact/block")
     if not re.search(r"^\s+gpu:\s*\n\s+units:\s*1\s*$", template, re.MULTILINE):
         raise ValueError("Smoke configuration must request exactly one GPU")
-    if not re.search(r"^\s+port:\s*8080\s*$", template, re.MULTILINE):
+    if not re.search(r"^\s+-\s+port:\s*8080\s*$", template, re.MULTILINE):
         raise ValueError("Expected synthetic artifact endpoint on port 8080")
     result = replace_once(template, "image", r"^(\s+image:\s*)\S+(?:\s+#.*)?$",
                           lambda match: match.group(1) + image)
