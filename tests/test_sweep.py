@@ -15,7 +15,7 @@ class SweepTests(unittest.TestCase):
         ]
         result = aggregate(sample)
         self.assertEqual(result["recurrent:staged:plain"]["seeds"], [1, 2])
-        self.assertEqual(result["recurrent:staged"]["moving_camera_reappearance_mae_mean_px"], 4.0)
+        self.assertEqual(result["recurrent:staged:plain"]["moving_camera_reappearance_mae_mean_px"], 4.0)
         self.assertIsNone(result["multisheet:staged:plain"]["moving_camera_reappearance_mae_mean_px"])
 
 
