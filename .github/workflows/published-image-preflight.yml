@@ -1,0 +1,41 @@
+name: Published GPU image CPU preflight
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: "Public immutable GHCR image (ghcr.io/...@sha256:<digest>)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  image-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate immutable image and render disposable smoke SDL
+        env:
+          IMAGE: ${{ inputs.image }}
+        run: python -m deploy.akash_preflight --image "$IMAGE" --out runs/akash-smoke.yaml
+      - name: Anonymous image pull and CPU training check
+        env:
+          IMAGE: ${{ inputs.image }}
+        run: |
+          docker pull "$IMAGE"
+          docker run --rm -e JAX_PLATFORMS=cpu --entrypoint python "$IMAGE"             -m train --steps 2 --batch-size 2 --output /tmp/cpu-smoke
+      - name: Verify GPU-required run rejects CPU-only environment
+        env:
+          IMAGE: ${{ inputs.image }}
+        run: |
+          if docker run --rm -e JAX_PLATFORMS=cpu --entrypoint python "$IMAGE"               -m train --require-gpu --steps 1 --batch-size 1 --output /tmp/reject-gpuless; then
+            echo "ERROR: GPU-required mode silently ran without a GPU"
+            exit 1
+          fi
+      - name: Upload reviewed SDL without deploying
+        uses: actions/upload-artifact@v4
+        with:
+          name: akash-smoke-manifest
+          path: runs/akash-smoke.yaml
