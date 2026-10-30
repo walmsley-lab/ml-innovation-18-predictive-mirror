@@ -5,7 +5,9 @@ services:
   trainer:
     image: ghcr.io/walmsley-lab/ml-innovation-18-predictive-mirror:bootstrap-1
     env:
-      - RUN_MODE=train
+      - RUN_MODE=train # safe default: tiny single training job
+      - CAMPAIGN_APPROVED=0 # must be changed manually for RUN_MODE=campaign
+      - CAMPAIGN_MAX_RUNS=1 # must explicitly cover planned experiment count
       - LOSS_MODE=plain # compare with contrast after the initial GPU smoke # choose sweep for an experiment matrix
       - CHECKPOINT_EVERY=25
       - RESUME=0 # change to 1 only when same container still has prior checkpoints
