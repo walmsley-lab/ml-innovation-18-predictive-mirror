@@ -9,7 +9,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-from src import model as recurrent, feedforward
+from src import model as recurrent, feedforward, multisheet
 from src.checkpoint import load as load_checkpoint, save as save_checkpoint
 from src.world import batch, sequence, curriculum_batch
 from src.curriculum import schedule
@@ -35,7 +35,7 @@ def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=Fal
         raise RuntimeError(f"GPU requested but not available: {devices}")
     out = Path(output)
     out.mkdir(parents=True, exist_ok=True)
-    model = {"recurrent": recurrent, "feedforward": feedforward}[architecture]
+    model = {"recurrent": recurrent, "feedforward": feedforward, "multisheet": multisheet}[architecture]
     params = model.init(jax.random.PRNGKey(seed))
     first = jax.tree.map(jnp.zeros_like, params)
     second = jax.tree.map(jnp.zeros_like, params)
@@ -112,7 +112,7 @@ def main():
     parser.add_argument("--steps", type=int, default=int(os.getenv("STEPS", "120")))
     parser.add_argument("--batch-size", type=int, default=int(os.getenv("BATCH_SIZE", "8")))
     parser.add_argument("--output", default=os.getenv("OUTPUT", "runs/pilot"))
-    parser.add_argument("--architecture", choices=("recurrent", "feedforward"), default=os.getenv("ARCHITECTURE", "recurrent"))
+    parser.add_argument("--architecture", choices=("recurrent", "feedforward", "multisheet"), default=os.getenv("ARCHITECTURE", "recurrent"))
     parser.add_argument("--curriculum", choices=("baseline", "staged", "shuffled"), default=os.getenv("CURRICULUM", "baseline"))
     parser.add_argument("--replay-fraction", type=float, default=float(os.getenv("REPLAY_FRACTION", "0.10")))
     parser.add_argument("--checkpoint-every", type=int, default=int(os.getenv("CHECKPOINT_EVERY", "25")))
