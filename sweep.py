@@ -16,13 +16,13 @@ def aggregate(rows):
     """Keep individual runs visible; summarize only identical configurations."""
     grouped = {}
     for row in rows:
-        key = (row["architecture"], row["curriculum"])
+        key = (row["architecture"], row["curriculum"], row.get("loss_mode", "plain"))
         grouped.setdefault(key, []).append(row)
     result = {}
-    for (architecture, curriculum), values in grouped.items():
+    for (architecture, curriculum, loss_mode), values in grouped.items():
         scores = [v["reappearance_location_mae_px"] for v in values
                   if v["reappearance_location_mae_px"] is not None]
-        result[f"{architecture}:{curriculum}"] = {
+        result[f"{architecture}:{curriculum}:{loss_mode}"] = {
             "seeds": [v["seed"] for v in values],
             "n": len(values),
             "moving_camera_reappearance_mae_mean_px": float(np.mean(scores)) if scores else None,
@@ -32,7 +32,7 @@ def aggregate(rows):
     return result
 
 
-def run(output, seeds, architectures, curricula, steps, batch_size, episodes, require_gpu):
+def run(output, seeds, architectures, curricula, steps, batch_size, episodes, require_gpu, loss_mode="plain"):
     """Train/evaluate each condition on untouched deterministic holdout episodes."""
     root = Path(output)
     root.mkdir(parents=True, exist_ok=True)
@@ -43,14 +43,14 @@ def run(output, seeds, architectures, curricula, steps, batch_size, episodes, re
                 name = f"{architecture}-{curriculum}-seed{seed}"
                 directory = root / name
                 train(seed=seed, steps=steps, batch_size=batch_size, output=directory,
-                      require_gpu=require_gpu, curriculum=curriculum, architecture=architecture)
+                      require_gpu=require_gpu, curriculum=curriculum, architecture=architecture, loss_mode=loss_mode)
                 with np.load(directory / "parameters.npz", allow_pickle=False) as archive:
                     params = {key: jnp.asarray(archive[key]) for key in archive.files}
                 evaluation = evaluate(params, range(30_000_000, 30_000_000 + episodes),
                                       architecture=architecture)
                 (directory / "evaluation.json").write_text(json.dumps(evaluation, indent=2) + "\n")
                 moving = evaluation["moving_object_moving_camera"]["model"]
-                rows.append({"architecture": architecture, "curriculum": curriculum,
+                rows.append({"architecture": architecture, "curriculum": curriculum, "loss_mode": loss_mode,
                              "seed": seed, "test_mse": moving["mse"],
                              "reappearance_location_mae_px": moving["reappearance_location_mae_px"],
                              "reappearance_count": moving["reappearance_count"]})
@@ -67,6 +67,7 @@ def main():
                         default=["recurrent", "feedforward", "multisheet"])
     parser.add_argument("--curricula", nargs="+", choices=("baseline", "staged", "shuffled"),
                         default=["staged", "shuffled"])
+    parser.add_argument("--loss-mode", choices=("plain", "contrast"), default=os.getenv("LOSS_MODE", "plain"))
     parser.add_argument("--steps", type=int, default=int(os.getenv("STEPS", "120")))
     parser.add_argument("--batch-size", type=int, default=int(os.getenv("BATCH_SIZE", "8")))
     parser.add_argument("--episodes", type=int, default=32)
@@ -75,7 +76,7 @@ def main():
     if args.steps < 1 or args.batch_size < 1 or args.episodes < 1:
         parser.error("Training steps, batch size and evaluation episodes must be positive")
     run(args.output, args.seeds, args.architectures, args.curricula,
-        args.steps, args.batch_size, args.episodes, args.require_gpu)
+        args.steps, args.batch_size, args.episodes, args.require_gpu, args.loss_mode)
 
 
 if __name__ == "__main__":
