@@ -3,7 +3,7 @@
 import numpy as np
 
 
-def sequence(seed, steps=12, size=16, occlusion=True, camera=True):
+def sequence(seed, steps=12, size=16, occlusion=True, camera=True, object_motion=True):
     """Return observable frames [T+1,H,W,1], camera deltas [T,1], hidden truth.
 
     A dot moves in world coordinates, sometimes behind a fixed vertical wall.
@@ -12,7 +12,7 @@ def sequence(seed, steps=12, size=16, occlusion=True, camera=True):
     rng = np.random.default_rng(seed)
     width = size + 6
     x = int(rng.integers(3, width - 3))
-    direction = int(rng.choice([-1, 1]))
+    direction = int(rng.choice([-1, 1])) if object_motion else 0
     y = int(rng.integers(3, size - 3))
     view = 3
     wall_x = width // 2
@@ -51,3 +51,15 @@ def batch(seeds, steps=12, size=16, occlusion=True, camera=True):
     runs = [sequence(int(s), steps, size, occlusion, camera) for s in seeds]
     return (np.stack([r[0] for r in runs]),
             np.stack([r[1] for r in runs]))
+
+def curriculum_batch(seeds, stages, steps=12, size=16):
+    """A curriculum restricts experience, never supplies hidden state to a model."""
+    settings = (
+        dict(object_motion=False, occlusion=False, camera=False),
+        dict(object_motion=True, occlusion=False, camera=False),
+        dict(object_motion=True, occlusion=True, camera=False),
+        dict(object_motion=True, occlusion=True, camera=True),
+    )
+    episodes = [sequence(int(seed), steps=steps, size=size, **settings[int(stage)])
+                for seed, stage in zip(seeds, stages)]
+    return np.stack([episode[0] for episode in episodes]), np.stack([episode[1] for episode in episodes])
