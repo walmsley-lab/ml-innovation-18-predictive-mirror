@@ -39,7 +39,7 @@ def load(path, seed, batch_size,
                 or abs(float(archive["replay_fraction"]) - replay_fraction) > 1e-12
                 or int(archive["total_updates"]) != total_updates):
             raise ValueError("Checkpoint architecture/curriculum/horizon differs")
-        names = ("local", "readout", "bias")
+        names = tuple(item[2:] for item in archive.files if item.startswith("p_"))
         states = [{name: jnp.asarray(archive[f"{prefix}_{name}"]) for name in names}
                   for prefix in ("p", "m", "v")]
         step = int(archive["step"])

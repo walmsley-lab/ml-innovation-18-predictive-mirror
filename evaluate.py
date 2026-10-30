@@ -8,7 +8,7 @@ import jax.numpy as jnp
 import numpy as np
 
 from src.baselines import persistence, velocity
-from src import model as recurrent, feedforward
+from src import model as recurrent, feedforward, multisheet
 from src.world import sequence
 
 
@@ -44,7 +44,7 @@ def score(forecast, truth, visible_mask):
 
 
 def evaluate(params, seeds, steps=12, architecture="recurrent"):
-    model = {"recurrent": recurrent, "feedforward": feedforward}[architecture]
+    model = {"recurrent": recurrent, "feedforward": feedforward, "multisheet": multisheet}[architecture]
     results = {}
     for regime, options in REGIMES.items():
         buckets = {key: [] for key in ("model", "persistence", "velocity")}
@@ -75,7 +75,7 @@ def main():
     parser.add_argument("--parameters", default="runs/pilot/parameters.npz")
     parser.add_argument("--output", default="runs/evaluation.json")
     parser.add_argument("--episodes", type=int, default=32)
-    parser.add_argument("--architecture", choices=("recurrent", "feedforward"), default="recurrent")
+    parser.add_argument("--architecture", choices=("recurrent", "feedforward", "multisheet"), default="recurrent")
     args = parser.parse_args()
     with np.load(args.parameters, allow_pickle=False) as file:
         params = {key: jnp.asarray(file[key]) for key in file.files}
