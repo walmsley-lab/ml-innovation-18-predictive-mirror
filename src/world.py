@@ -3,12 +3,14 @@
 import numpy as np
 
 
-def sequence(seed, steps=12, size=16, occlusion=True, camera=True, object_motion=True):
+def sequence(seed, steps=12, size=16, occlusion=True, camera=True, object_motion=True, wall_width=1):
     """Return observable frames [T+1,H,W,1], camera deltas [T,1], hidden truth.
 
     A dot moves in world coordinates, sometimes behind a fixed vertical wall.
     The sensor can translate horizontally; only its movement command is observed.
     """
+    if not 1 <= wall_width <= size // 2:
+        raise ValueError('wall_width must fit within half a frame')
     rng = np.random.default_rng(seed)
     width = size + 6
     x = int(rng.integers(3, width - 3))
@@ -16,16 +18,18 @@ def sequence(seed, steps=12, size=16, occlusion=True, camera=True, object_motion
     y = int(rng.integers(3, size - 3))
     view = 3
     wall_x = width // 2
+    wall_left = wall_x - (wall_width - 1) // 2
+    wall_right = wall_left + wall_width
     positions, views, frames, actions, visible_masks, occluded, in_view = [], [], [], [], [], [], []
     for t in range(steps + 1):
         frame = np.zeros((size, size, 1), np.float32)
         visible_mask = np.zeros((size, size, 1), bool)
         if occlusion:
-            wx = wall_x - view
-            if 0 <= wx < size:
-                frame[:, wx, 0] = 0.35
+            left, right = max(0, wall_left - view), min(size, wall_right - view)
+            if left < right:
+                frame[:, left:right, 0] = 0.35
         px = x - view
-        behind_wall = occlusion and x == wall_x
+        behind_wall = occlusion and wall_left <= x < wall_right
         on_sensor = 0 <= px < size
         # Truth fields below are never returned by batch() to training.
         occluded.append(bool(behind_wall and on_sensor))
