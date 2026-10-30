@@ -16,9 +16,10 @@ def sequence(seed, steps=12, size=16, occlusion=True, camera=True):
     y = int(rng.integers(3, size - 3))
     view = 3
     wall_x = width // 2
-    positions, views, frames, actions = [], [], [], []
+    positions, views, frames, actions, visible_masks = [], [], [], [], []
     for t in range(steps + 1):
         frame = np.zeros((size, size, 1), np.float32)
+        visible_mask = np.zeros((size, size, 1), bool)
         if occlusion:
             wx = wall_x - view
             if 0 <= wx < size:
@@ -27,7 +28,9 @@ def sequence(seed, steps=12, size=16, occlusion=True, camera=True):
         behind_wall = occlusion and x == wall_x
         if 0 <= px < size and not behind_wall:
             frame[y, px, 0] = 1.0
+            visible_mask[y, px, 0] = True
         frames.append(frame)
+        visible_masks.append(visible_mask)
         positions.append(x)
         views.append(view)
         if t < steps:
@@ -40,7 +43,8 @@ def sequence(seed, steps=12, size=16, occlusion=True, camera=True):
                 direction = -direction
                 x += 2 * direction
     return (np.stack(frames), np.asarray(actions, np.float32),
-            {"world_x": np.asarray(positions), "camera_x": np.asarray(views)})
+            {"world_x": np.asarray(positions), "camera_x": np.asarray(views),
+             "visible_mask": np.stack(visible_masks)})
 
 
 def batch(seeds, steps=12, size=16, occlusion=True, camera=True):
