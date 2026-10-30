@@ -40,6 +40,18 @@ def predict_next(params, architecture, state, observed):
     return next_state, np.asarray(forecast[0])
 
 
+def activity_maps(state):
+    """Activity at prediction time, fixed [0,1] visualization scale."""
+    if state is None:  # allows fake-predictor tests without requiring a model
+        return None, None
+    if isinstance(state, tuple):
+        fast, slow = state
+    else:
+        fast, slow = state[..., :4], state[..., 4:]
+    return (np.clip(np.asarray(jnp.mean(jnp.abs(fast[0]), axis=-1)), 0, 1),
+            np.clip(np.asarray(jnp.mean(jnp.abs(slow[0]), axis=-1)), 0, 1))
+
+
 def forecast_pairs(observations, state, predictor, clock=time.monotonic_ns):
     """Commit each forecast before requesting the corresponding next frame."""
     stream = iter(observations)
@@ -51,6 +63,7 @@ def forecast_pairs(observations, state, predictor, clock=time.monotonic_ns):
     while True:
         started = clock()
         state, prediction = predictor(state, current)
+        fast_activity, slow_activity = activity_maps(state)
         committed = clock()
         try:
             actual, arrived = next(stream)
@@ -61,6 +74,7 @@ def forecast_pairs(observations, state, predictor, clock=time.monotonic_ns):
         extrapolated = np.clip(current + (current - previous), 0, 1) if previous is not None else current
         yield {
             "actual": actual, "predicted": prediction, "last_frame": current,
+            "fast_activity": fast_activity, "slow_activity": slow_activity,
             "extrapolated": extrapolated,
             "prediction_committed_ns": committed,
             "frame_arrived_ns": arrived,
@@ -88,7 +102,10 @@ def camera_frames(cap, size, fps, cv2):
 def panel(result, scale, cv2):
     frames = [result["actual"], result["predicted"],
               np.abs(result["predicted"] - result["actual"])]
-    labels = ("Observed", "Predicted", "Absolute error")
+    labels = ["Observed", "Predicted", "Absolute error"]
+    if result.get("fast_activity") is not None:
+        frames += [result["fast_activity"][..., None], result["slow_activity"][..., None]]
+        labels += ["Fast / units A", "Slow / units B"]
     panels = []
     for label, array in zip(labels, frames):
         gray = (255 * np.clip(array[..., 0], 0, 1)).astype(np.uint8)
@@ -134,6 +151,8 @@ def main():
                    "persistence_mse": float(np.mean((record["last_frame"] - actual) ** 2)),
                    "frame_difference_extrapolation_mse": float(np.mean((record["extrapolated"] - actual) ** 2)),
                    "inference_ms": record["inference_ms"],
+                   "fast_activity_mean": float(np.mean(record["fast_activity"])) if record["fast_activity"] is not None else None,
+                   "slow_activity_mean": float(np.mean(record["slow_activity"])) if record["slow_activity"] is not None else None,
                    "prediction_committed_ns": record["prediction_committed_ns"],
                    "frame_arrived_ns": record["frame_arrived_ns"]}
             report["frames"].append(row)
