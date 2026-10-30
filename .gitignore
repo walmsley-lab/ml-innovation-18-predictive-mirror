@@ -4,4 +4,4 @@ __pycache__/
 runs/
 *.pyc
 .DS_Store
-deploy/generated.yaml
+deploy/generated.yaml\nrecordings/\n
