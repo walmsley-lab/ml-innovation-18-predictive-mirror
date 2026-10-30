@@ -23,12 +23,14 @@ def preprocess(bgr, size, cv2):
 
 
 def initial_state(architecture, size):
-    if architecture == "video_residual":\n        return jnp.zeros((1, size, size, video_residual.CHANNELS), jnp.float32)\n    if architecture == "recurrent":
+    if architecture == "video_residual":
+        return jnp.zeros((1, size, size, video_residual.CHANNELS), jnp.float32)
+    if architecture == "recurrent":
         return jnp.zeros((1, size, size, 8), jnp.float32)
     if architecture == "multisheet":
         return (jnp.zeros((1, size, size, multisheet.FAST_CHANNELS), jnp.float32),
                 jnp.zeros((1, size, size, multisheet.SLOW_CHANNELS), jnp.float32))
-    raise ValueError("The live camera adapter supports recurrent and multisheet only")
+    raise ValueError("Unsupported live model architecture")
 
 
 def predict_next(params, architecture, state, observed):
