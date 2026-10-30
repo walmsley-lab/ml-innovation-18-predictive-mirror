@@ -29,7 +29,7 @@ def adamw(params, grads, first, second, step_number, rate=0.002):
 
 def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=False,
           checkpoint_every=25, resume=False, curriculum="baseline", replay_fraction=0.10,
-          architecture="recurrent", loss_mode="plain"):
+          architecture="recurrent", loss_mode="plain", save_milestones=False):
     devices = jax.devices()
     if require_gpu and not any(device.platform == "gpu" for device in devices):
         raise RuntimeError(f"GPU requested but not available: {devices}")
@@ -59,6 +59,7 @@ def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=Fal
 
     if curriculum != "baseline":
         training_seeds, training_stages = schedule(seed, steps, batch_size, curriculum, replay_fraction)
+    milestones = set(max(1, steps * i // 4) for i in range(1, 5)) if save_milestones else set()
     history = []
     for n in range(start_step + 1, steps + 1):
         # Unique simulation seeds per update; fixed seed makes experiments reproducible.
@@ -72,6 +73,18 @@ def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=Fal
             save_checkpoint(checkpoint_path, params, first, second, n, seed, batch_size,
                             architecture, curriculum, replay_fraction,
                             steps if curriculum != "baseline" else 0, loss_mode)
+        if n in milestones:
+            folder = out / "snapshots"
+            folder.mkdir(parents=True, exist_ok=True)
+            snapshot = folder / f"step-{n:06d}.npz"
+            if snapshot.exists():
+                raise FileExistsError(f"Refusing to overwrite developmental snapshot: {snapshot}")
+            temporary = snapshot.with_suffix(".part")
+            with temporary.open("wb") as handle:
+                np.savez_compressed(handle, **jax.tree.map(np.asarray, params))
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temporary, snapshot)
         if n == start_step + 1 or n % max(1, steps // 10) == 0:
             history.append({"step": n, "loss": float(err)})
             print(f"step={n} loss={float(err):.5f}", flush=True)
@@ -117,12 +130,14 @@ def main():
     parser.add_argument("--architecture", choices=("recurrent", "feedforward", "multisheet", "multisheet_no_feedback"), default=os.getenv("ARCHITECTURE", "recurrent"))
     parser.add_argument("--curriculum", choices=("baseline", "staged", "shuffled"), default=os.getenv("CURRICULUM", "baseline"))
     parser.add_argument("--replay-fraction", type=float, default=float(os.getenv("REPLAY_FRACTION", "0.10")))
+    parser.add_argument("--save-milestones", action="store_true")
     parser.add_argument("--checkpoint-every", type=int, default=int(os.getenv("CHECKPOINT_EVERY", "25")))
     parser.add_argument("--resume", action="store_true", default=os.getenv("RESUME", "0") == "1")
     parser.add_argument("--require-gpu", action="store_true", default=os.getenv("REQUIRE_GPU", "0") == "1")
     args = parser.parse_args()
     train(args.seed, args.steps, args.batch_size, args.output, args.require_gpu,
-          args.checkpoint_every, args.resume, args.curriculum, args.replay_fraction, args.architecture, args.loss_mode)
+          args.checkpoint_every, args.resume, args.curriculum, args.replay_fraction,
+          args.architecture, args.loss_mode, args.save_milestones)
 
 
 if __name__ == "__main__":
