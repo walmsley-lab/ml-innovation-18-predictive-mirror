@@ -16,7 +16,7 @@ def sequence(seed, steps=12, size=16, occlusion=True, camera=True, object_motion
     y = int(rng.integers(3, size - 3))
     view = 3
     wall_x = width // 2
-    positions, views, frames, actions, visible_masks = [], [], [], [], []
+    positions, views, frames, actions, visible_masks, occluded, in_view = [], [], [], [], [], [], []
     for t in range(steps + 1):
         frame = np.zeros((size, size, 1), np.float32)
         visible_mask = np.zeros((size, size, 1), bool)
@@ -26,7 +26,11 @@ def sequence(seed, steps=12, size=16, occlusion=True, camera=True, object_motion
                 frame[:, wx, 0] = 0.35
         px = x - view
         behind_wall = occlusion and x == wall_x
-        if 0 <= px < size and not behind_wall:
+        on_sensor = 0 <= px < size
+        # Truth fields below are never returned by batch() to training.
+        occluded.append(bool(behind_wall and on_sensor))
+        in_view.append(bool(on_sensor))
+        if on_sensor and not behind_wall:
             frame[y, px, 0] = 1.0
             visible_mask[y, px, 0] = True
         frames.append(frame)
@@ -44,7 +48,9 @@ def sequence(seed, steps=12, size=16, occlusion=True, camera=True, object_motion
                 x += 2 * direction
     return (np.stack(frames), np.asarray(actions, np.float32),
             {"world_x": np.asarray(positions), "camera_x": np.asarray(views),
-             "visible_mask": np.stack(visible_masks)})
+             "visible_mask": np.stack(visible_masks),
+             "occluded": np.asarray(occluded, bool),
+             "in_view": np.asarray(in_view, bool)})
 
 
 def batch(seeds, steps=12, size=16, occlusion=True, camera=True):

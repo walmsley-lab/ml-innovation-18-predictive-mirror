@@ -35,7 +35,8 @@ class CurriculumTests(unittest.TestCase):
         self.assertEqual(velocity(frames, actions).shape, (8, 16, 16, 1))
         result = evaluate(init(jax.random.PRNGKey(3)), [3000], steps=8)
         self.assertEqual(set(result), {
-            "still_object_still_camera", "moving_object_still_camera", "moving_object_moving_camera"
+            "still_object_still_camera", "moving_object_still_camera",
+            "still_object_moving_camera", "moving_object_moving_camera"
         })
 
 

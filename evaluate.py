@@ -15,18 +15,21 @@ from src.world import sequence
 REGIMES = {
     "still_object_still_camera": dict(object_motion=False, camera=False),
     "moving_object_still_camera": dict(object_motion=True, camera=False),
+    "still_object_moving_camera": dict(object_motion=False, camera=True),
     "moving_object_moving_camera": dict(object_motion=True, camera=True),
 }
 
 
-def score(forecast, truth, visible_mask):
-    """Scores use simulator visible-object masks only after predictions are made."""
+def score(forecast, truth, visible_mask, occluded):
+    """Score actual barrier occlusion, never mere sensor-field disappearance."""
     mask = visible_mask[1:]
     diff = (forecast - truth[1:]) ** 2
     reappearance_errors = []
     had_object = bool(visible_mask[0].any())
     for t in range(1, len(visible_mask)):
-        if had_object and not visible_mask[t - 1].any() and visible_mask[t].any():
+        # Require actual barrier occlusion *and* a prior sighting. Off-screen
+        # excursions are a different task and must not inflate this metric.
+        if had_object and bool(occluded[t - 1]) and visible_mask[t].any():
             target_position = np.argwhere(visible_mask[t, ..., 0])[0]
             estimate = forecast[t - 1, ..., 0]
             if float(estimate.max()) < 0.5:
@@ -38,6 +41,7 @@ def score(forecast, truth, visible_mask):
     return {
         "reappearance_sum_abs_error_px": float(sum(reappearance_errors)),
         "reappearance_count": len(reappearance_errors),
+        "occluded_frame_count": int(np.count_nonzero(occluded)),
         "mse": float(np.mean(diff)),
         "visible_object_pixel_mse": float(np.mean(diff[mask])) if np.any(mask) else None,
     }
@@ -56,7 +60,8 @@ def evaluate(params, seeds, steps=12, architecture="recurrent"):
                 "velocity": velocity(frames, actions),
             }
             for name, forecast in forecasts.items():
-                buckets[name].append(score(forecast, frames, hidden["visible_mask"]))
+                buckets[name].append(score(forecast, frames, hidden["visible_mask"],
+                                           hidden["occluded"]))
         results[regime] = {}
         for name, values in buckets.items():
             n = sum(v["reappearance_count"] for v in values)
@@ -67,6 +72,8 @@ def evaluate(params, seeds, steps=12, architecture="recurrent"):
             results[regime][name]["reappearance_location_mae_px"] = (
                 sum(v["reappearance_sum_abs_error_px"] for v in values) / n if n else None)
             results[regime][name]["reappearance_count"] = n
+            results[regime][name]["occluded_frame_count"] = sum(
+                v["occluded_frame_count"] for v in values)
     return results
 
 
