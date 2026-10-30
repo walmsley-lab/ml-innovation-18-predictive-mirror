@@ -1,5 +1,6 @@
 """Atomic, restartable checkpoints for deterministic JAX training runs."""
 
+import hashlib
 import os
 from pathlib import Path
 
@@ -27,12 +28,24 @@ def save(path, params, first, second, step, seed, batch_size,
         handle.flush()
         os.fsync(handle.fileno())
     os.replace(temp, path)
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    sidecar = path.with_name(path.name + ".sha256")
+    checksum_temp = sidecar.with_name(sidecar.name + ".part")
+    checksum_temp.write_text(f"{digest}  {path.name}\n")
+    os.replace(checksum_temp, sidecar)
 
 
 def load(path, seed, batch_size,
          architecture="recurrent", curriculum="baseline", replay_fraction=0.10,
          total_updates=0, loss_mode="plain"):
     """Return (params, first, second, step), rejecting incompatible runs."""
+    path = Path(path)
+    sidecar = path.with_name(path.name + ".sha256")
+    if sidecar.exists():
+        expected = sidecar.read_text().split()[0]
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        if expected != actual:
+            raise ValueError(f"Checkpoint SHA-256 mismatch: {path}")
     with np.load(path, allow_pickle=False) as archive:
         if int(archive["seed"]) != seed or int(archive["batch_size"]) != batch_size:
             raise ValueError("Checkpoint seed/batch-size differs; start a new run")
