@@ -30,7 +30,8 @@ def groups_of(rows):
 
 
 def fmt(value):
-    return f"{value:.4f}" if valid(value) else "NA"
+    # Signed curriculum differences are valid, even though absolute errors cannot be negative.
+    return f"{value:.4f}" if type(value) in (int, float) and math.isfinite(value) else "NA"
 
 
 def markdown(rows, provenance=None):
