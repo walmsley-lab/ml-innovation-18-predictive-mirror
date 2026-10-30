@@ -45,5 +45,5 @@ def predict(params, frames, actions):
 def loss(params, frames, actions):
     forecast = jax.vmap(predict, in_axes=(None, 0, 0))(params, frames, actions)
     target = frames[:, 1:]
-    weights = 1.0 + 8.0 * (target >= 0.9)
-    return jnp.mean(weights * (forecast - target) ** 2)
+    # A plain observation-only loss; simulator foreground masks are evaluation-only.
+    return jnp.mean((forecast - target) ** 2)
