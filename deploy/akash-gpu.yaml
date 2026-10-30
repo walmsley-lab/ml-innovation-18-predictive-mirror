@@ -5,6 +5,8 @@ services:
   trainer:
     image: ghcr.io/walmsley-lab/ml-innovation-18-predictive-mirror:bootstrap-1
     env:
+      - RUN_MODE=train # choose sweep for an experiment matrix
+      - CHECKPOINT_EVERY=25
       - SEED=42
       - STEPS=120
       - BATCH_SIZE=8
