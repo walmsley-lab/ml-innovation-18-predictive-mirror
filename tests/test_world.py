@@ -17,6 +17,8 @@ class TestPilot(unittest.TestCase):
         np.testing.assert_array_equal(actions, actions2)
         np.testing.assert_array_equal(truth["world_x"], truth2["world_x"])
         self.assertTrue(np.all((actions >= -1) & (actions <= 1)))
+        self.assertEqual(truth["visible_mask"].shape, x.shape)
+        np.testing.assert_array_equal(truth["visible_mask"], x == 1.0)
 
     def test_prediction_is_causal_and_finite(self):
         x, actions = batch([101, 102], steps=6)
