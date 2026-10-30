@@ -41,7 +41,8 @@ def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=Fal
     if resume:
         if not checkpoint_path.exists():
             raise FileNotFoundError(f"No checkpoint to resume: {checkpoint_path}")
-        params, first, second, start_step = load_checkpoint(checkpoint_path, seed, batch_size)
+        params, first, second, start_step = load_checkpoint(
+            checkpoint_path, seed, batch_size, "recurrent", "baseline", 0.10, 0)
         if start_step > steps:
             raise ValueError("Checkpoint is beyond requested total steps")
 
@@ -58,7 +59,8 @@ def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=Fal
         x, a = batch(seeds, steps=12)
         params, first, second, err = update(params, first, second, jnp.asarray(x), jnp.asarray(a), n)
         if checkpoint_every > 0 and (n % checkpoint_every == 0 or n == steps):
-            save_checkpoint(checkpoint_path, params, first, second, n, seed, batch_size)
+            save_checkpoint(checkpoint_path, params, first, second, n, seed, batch_size,
+                            "recurrent", "baseline", 0.10, 0)
         if n == start_step + 1 or n % max(1, steps // 10) == 0:
             history.append({"step": n, "loss": float(err)})
             print(f"step={n} loss={float(err):.5f}", flush=True)
