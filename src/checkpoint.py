@@ -30,16 +30,18 @@ def save(path, params, first, second, step, seed, batch_size,
 
 
 def load(path, seed, batch_size,
-         architecture="recurrent", curriculum="baseline", replay_fraction=0.10, total_updates=0):
+         architecture="recurrent", curriculum="baseline", replay_fraction=0.10,
+         total_updates=0, loss_mode="plain"):
     """Return (params, first, second, step), rejecting incompatible runs."""
     with np.load(path, allow_pickle=False) as archive:
         if int(archive["seed"]) != seed or int(archive["batch_size"]) != batch_size:
             raise ValueError("Checkpoint seed/batch-size differs; start a new run")
+        stored_loss_mode = str(archive["loss_mode"]) if "loss_mode" in archive.files else "plain"
         if (str(archive["architecture"]) != architecture
                 or str(archive["curriculum"]) != curriculum
                 or abs(float(archive["replay_fraction"]) - replay_fraction) > 1e-12
                 or int(archive["total_updates"]) != total_updates
-                or str(archive["loss_mode"]) != loss_mode):
+                or stored_loss_mode != loss_mode):
             raise ValueError("Checkpoint architecture/curriculum/horizon differs")
         names = tuple(item[2:] for item in archive.files if item.startswith("p_"))
         states = [{name: jnp.asarray(archive[f"{prefix}_{name}"]) for name in names}
