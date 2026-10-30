@@ -10,6 +10,7 @@ import jax.numpy as jnp
 import numpy as np
 
 from src.model import init, loss, predict
+from src.checkpoint import load as load_checkpoint, save as save_checkpoint
 from src.world import batch, sequence
 
 
@@ -25,7 +26,8 @@ def adamw(params, grads, first, second, step_number, rate=0.002):
     return params, first, second
 
 
-def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=False):
+def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=False,
+          checkpoint_every=25, resume=False):
     devices = jax.devices()
     if require_gpu and not any(device.platform == "gpu" for device in devices):
         raise RuntimeError(f"GPU requested but not available: {devices}")
@@ -34,6 +36,15 @@ def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=Fal
     params = init(jax.random.PRNGKey(seed))
     first = jax.tree.map(jnp.zeros_like, params)
     second = jax.tree.map(jnp.zeros_like, params)
+    checkpoint_path = out / "checkpoint.npz"
+    start_step = 0
+    if resume:
+        if not checkpoint_path.exists():
+            raise FileNotFoundError(f"No checkpoint to resume: {checkpoint_path}")
+        params, first, second, start_step = load_checkpoint(
+            checkpoint_path, seed, batch_size, "recurrent", "baseline", 0.10, 0)
+        if start_step > steps:
+            raise ValueError("Checkpoint is beyond requested total steps")
 
     @jax.jit
     def update(p, m, v, x, a, i):
@@ -42,12 +53,15 @@ def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=Fal
         return p, m, v, error
 
     history = []
-    for n in range(1, steps + 1):
+    for n in range(start_step + 1, steps + 1):
         # Unique simulation seeds per update; fixed seed makes experiments reproducible.
         seeds = seed * 1_000_000 + n * batch_size + np.arange(batch_size)
         x, a = batch(seeds, steps=12)
         params, first, second, err = update(params, first, second, jnp.asarray(x), jnp.asarray(a), n)
-        if n == 1 or n % max(1, steps // 10) == 0:
+        if checkpoint_every > 0 and (n % checkpoint_every == 0 or n == steps):
+            save_checkpoint(checkpoint_path, params, first, second, n, seed, batch_size,
+                            "recurrent", "baseline", 0.10, 0)
+        if n == start_step + 1 or n % max(1, steps // 10) == 0:
             history.append({"step": n, "loss": float(err)})
             print(f"step={n} loss={float(err):.5f}", flush=True)
 
@@ -86,9 +100,12 @@ def main():
     parser.add_argument("--steps", type=int, default=int(os.getenv("STEPS", "120")))
     parser.add_argument("--batch-size", type=int, default=int(os.getenv("BATCH_SIZE", "8")))
     parser.add_argument("--output", default=os.getenv("OUTPUT", "runs/pilot"))
+    parser.add_argument("--checkpoint-every", type=int, default=int(os.getenv("CHECKPOINT_EVERY", "25")))
+    parser.add_argument("--resume", action="store_true", default=os.getenv("RESUME", "0") == "1")
     parser.add_argument("--require-gpu", action="store_true", default=os.getenv("REQUIRE_GPU", "0") == "1")
     args = parser.parse_args()
-    train(args.seed, args.steps, args.batch_size, args.output, args.require_gpu)
+    train(args.seed, args.steps, args.batch_size, args.output, args.require_gpu,
+          args.checkpoint_every, args.resume)
 
 
 if __name__ == "__main__":
