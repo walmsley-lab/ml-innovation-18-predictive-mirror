@@ -27,6 +27,18 @@ next_pixels = readout(h_(t+1))
 
 The first model is one locally connected recurrent sheet with shared update weights and no online plasticity. Later PRs add a second sheet with different timescale/receptive field and *sparse* reciprocal connections. A separate ablation introduces activity-dependent plasticity (e.g., decaying per-edge traces). The developmental world supports scripted camera motions from day one, then selectable gaze actions in a controlled comparison.
 
+## Start gates and relationship to Neural Dynamics (#17)
+
+This repo is a computational testbed for selected hypotheses from `ml-innovation-17-neural-dynamics`; it does not replace that repo's biological evidence, observability analysis or claims ledger. Cite the exact #17 experiment and distinguish simulated behavior from evidence about brains. In particular, #17 H2 (memory and prediction), H3 (self-generated sensation) and H4 (plasticity/stability) supply useful controls.
+
+**Before PR #2:** Review/merge the draft bootstrap PR after CPU CI and a reproducible train/evaluate run. Treat the synthetic predictor as an untrained pilot until a meaningful comparison is run. The live mirror must make and timestamp each prediction *before* the target webcam frame arrives. Include a simple real-video persistence/velocity baseline; synthetic-to-webcam transfer is a separate empirical question, not an assumption.
+
+**Before claiming self/world discrimination (PR #3):** Generate a crossed set of object-still/object-moving × camera-still/camera-moving episodes, including held-out rates and camera-action delays. The present bootstrap world always moves the object; it does **not** yet test discrimination between self-generated and external motion. Only pixel observations and action commands enter training; hidden truth is for evaluation.
+
+**Before claiming reconciliation (PRs #4–5):** Compare matched-capacity single-sheet and dual-sheet models; fit diagnostic decoders *after* training, measure predictive compatibility across recurrent iterations, and compare temporary feedback disconnection with networks trained without feedback. Separate results for visible motion, occlusion and ego-motion; do not infer functional specialization from attractive activation maps.
+
+**Before substantive paid Akash training:** Publish and pull-test the actual image by immutable digest, validate the SDL and deployment dry run, verify GPU execution with a tiny paid smoke, and establish off-provider checkpoint export/recovery. The current pilot saves only at completion and serves artifacts from a lease that continues billing: this is insufficient for long runs. Move the minimal durable-checkpoint/export gate ahead of PR #8; PR #8 can later harden automation. Review bids, set a manual spending/time cap and close the lease.
+
 ## PR sequence and indicative effort
 
 Estimates below are **engineering effort after dependency gates**, not promises of calendar completion. A hackathon can prioritize PRs 1–2; robust emergence experiments extend beyond it.
@@ -34,13 +46,13 @@ Estimates below are **engineering effort after dependency gates**, not promises 
 | PR | Scope / files | Estimated effort | Acceptance gate |
 |---|---|---:|---|
 | **#1 Bootstrap + Akash smoke** | `src/world.py`, `src/model.py`, `train.py`, `tests/`, `Dockerfile`, `deploy/`, `docs/PLAN.md`, CI | 3–5 h | Local seeded simulation, train/evaluate and artifact output; GPU image recipe and valid SDL. No paid deployment. |
-| **#2 Honest mirror MVP** | `mirror.py` plus webcam adapter and UI | 3–6 h | 16–32 px causal forecast, timestamps, actual/predicted/error displayed; CPU fallback; latency logged. |
-| **#3 Evaluation + curriculum** | `evaluate.py`, `curriculum.py`, tests | 4–8 h | Persistence, constant-velocity and recurrent controls; staged vs shuffled equal exposure; 5 seeds, CIs, fresh holdout scenes. |
+| **#2 Honest mirror MVP** | `mirror.py` plus webcam adapter and UI | 3–6 h | Causal webcam forecast with timestamps, actual/predicted/error displayed; persistence/velocity real-video controls, CPU fallback and latency logged. Synthetic-to-camera transfer is measured. |
+| **#3 Evaluation + curriculum** | `evaluate.py`, `curriculum.py`, tests | 4–8 h | Persistence, constant-velocity, matched-history feedforward and recurrent controls; crossed object/camera motion cases; staged vs shuffled equal exposure; 5 seeds, CIs, fresh holdout scenes. |
 | **#4 Regional scaffold** | `src/model.py`, `experiments/regions.py` | 6–10 h | Matched-parameter single-sheet vs two-sheet network, sparse feedback, timescale and receptive-field ablations. |
-| **#5 Reconciliation test** | `experiments/reconciliation.py` | 6–10 h | Probe-only post-hoc decoders; compatibility improves with inference; disconnect-feedback and randomized-coupling controls. |
+| **#5 Reconciliation test** | `experiments/reconciliation.py` | 6–10 h | Post-hoc decoders and compatibility across inference steps; visible/occluded/ego-motion dissociation; inference-time disconnection and feedback-free-trained control. |
 | **#6 Active perception** | `src/world.py`, `experiments/gaze.py` | 6–10 h | Fixed/random/selected gaze, equal sensor and action budgets, performance on unseen scenes. |
 | **#7 Cellular plasticity** | `src/plasticity.py`, `experiments/plasticity.py` | 6–12 h | Fixed vs plastic local links with otherwise identical architecture and budget, plus forgetting/stability tests. |
-| **#8 Reproducibility / scale** | `deploy/`, `reports/`, updated CI | 4–8 h | Immutable image, reliable checkpoint export, Akash GPU smoke, cost/seed manifests and published negative results. |
+| **#8 Reproducibility / scale** | `deploy/`, `reports/`, updated CI | 4–8 h | Harden already-gated image and checkpoint procedures, automate recovery, repeat Akash GPU runs, preserve cost/seed manifests and negative results. |
 
 **Calendar sketch:** Oct 30: PR 1 and, if possible, PR 2; Oct 31–Nov 1: PRs 3–4; Nov 2–4: PRs 5–7; Nov 5 onward: PR 8 and replication. Dependencies and debugging may extend this. Minimum credible mirror: PRs 1–2. Minimum *reconciliation* evidence: PRs 1, 3, 4, 5. Stronger developmental + embodied investigation: PRs 1–7.
 
