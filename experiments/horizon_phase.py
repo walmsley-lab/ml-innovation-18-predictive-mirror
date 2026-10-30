@@ -121,8 +121,9 @@ def run(input_path, output, seed=41, steps=100, batch_size=8,
     def updater(arm):
         @jax.jit
         def update(p, m, v, batch, i):
-            error, gradient = jax.value_and_grad(horizon_loss)(
-                p, batch, context, horizon, arm, coupling)
+            objective = lambda weights: horizon_loss(
+                weights, batch, context, horizon, arm, coupling)
+            error, gradient = jax.value_and_grad(objective)(p)
             p, m, v = adamw(p, gradient, m, v, i)
             return p, m, v, error
         return update
