@@ -21,12 +21,17 @@ def init(key):
     }
 
 
-def step(params, state, frame, action, feedback_strength=1.0):
+def step(params, state, frame, action, feedback_strength=1.0, mean_messages=None):
     """One recurrent update. Feedback can be cut after training for ablations."""
     fast, slow = state
     pan = jnp.ones_like(frame) * action.reshape(1, 1, 1, 1)
-    fast_in = jnp.concatenate((frame, pan, fast, feedback_strength * slow), axis=-1)
-    slow_in = jnp.concatenate((frame, pan, slow, feedback_strength * fast), axis=-1)
+    if mean_messages is None:
+        from_fast, from_slow = feedback_strength * fast, feedback_strength * slow
+    else:
+        from_fast = jnp.broadcast_to(mean_messages[0], fast.shape)
+        from_slow = jnp.broadcast_to(mean_messages[1], slow.shape)
+    fast_in = jnp.concatenate((frame, pan, fast, from_slow), axis=-1)
+    slow_in = jnp.concatenate((frame, pan, slow, from_fast), axis=-1)
     next_fast = 0.6 * fast + 0.4 * jnp.tanh(conv(fast_in, params["fast"]))
     next_slow = 0.85 * slow + 0.15 * jnp.tanh(jax.lax.conv_general_dilated(
         slow_in, params["slow"], (1, 1), "SAME", rhs_dilation=(2, 2),
@@ -36,7 +41,7 @@ def step(params, state, frame, action, feedback_strength=1.0):
     return (next_fast, next_slow), forecast
 
 
-def trace(params, frames, actions, feedback_strength=1.0):
+def trace(params, frames, actions, feedback_strength=1.0, mean_messages=None):
     """Return next-frame predictions, fast states and slow states for probes."""
     h, w = frames.shape[1:3]
     start = (jnp.zeros((1, h, w, FAST_CHANNELS), jnp.float32),
@@ -44,7 +49,7 @@ def trace(params, frames, actions, feedback_strength=1.0):
 
     def update(state, inputs):
         frame, action = inputs
-        state, forecast = step(params, state, frame[None], action, feedback_strength)
+        state, forecast = step(params, state, frame[None], action, feedback_strength, mean_messages)
         return state, (forecast[0], state[0][0], state[1][0])
 
     _, history = jax.lax.scan(update, start, (frames[:-1], actions))
