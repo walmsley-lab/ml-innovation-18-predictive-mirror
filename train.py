@@ -52,16 +52,22 @@ def train(seed=42, steps=120, batch_size=8, output="runs/pilot", require_gpu=Fal
             print(f"step={n} loss={float(err):.5f}", flush=True)
 
     # Untouched, disjoint test trajectories and visible baselines.
-    test_frames, test_actions = batch(10_000_000 + np.arange(64), steps=12)
+    # Ground-truth masks are held by the evaluator only, never used to train.
+    test_episodes = [sequence(int(s), steps=12) for s in 10_000_000 + np.arange(64)]
+    test_frames = np.stack([episode[0] for episode in test_episodes])
+    test_actions = np.stack([episode[1] for episode in test_episodes])
+    visible_masks = np.stack([episode[2]["visible_mask"][1:] for episode in test_episodes])
     y = np.asarray(jax.vmap(predict, in_axes=(None, 0, 0))(
         params, jnp.asarray(test_frames), jnp.asarray(test_actions)))
     truth = test_frames[:, 1:]
     persistence = test_frames[:, :-1]
-    weighted = 1 + 8 * (truth >= 0.9)
+    weighted = 1.0 + 8.0 * visible_masks
     metrics = {
+        "test_mse": float(np.mean((y - truth) ** 2)),
+        "persistence_mse": float(np.mean((persistence - truth) ** 2)),
         "test_weighted_mse": float(np.mean(weighted * (y - truth) ** 2)),
         "persistence_weighted_mse": float(np.mean(weighted * (persistence - truth) ** 2)),
-        "test_object_pixel_mse": float(np.mean(((y - truth) ** 2)[truth >= 0.9])) if np.any(truth >= 0.9) else None,
+        "test_object_pixel_mse": float(np.mean(((y - truth) ** 2)[visible_masks])) if visible_masks.any() else None,
         "device": [str(d) for d in devices],
         "seed": seed, "steps": steps, "batch_size": batch_size,
         "status": "pilot_only_not_evidence_of_emergence",
