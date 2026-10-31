@@ -85,10 +85,17 @@ def rollout_and_activity(params, observed_context, horizon, ticks=2):
         raise ValueError("Require at least two observed context frames")
     state = initial_state(params, batch, height, width)
 
-    def absorb(s, frame):
-        return observe(params, s, frame, ticks), None
+    def absorb_and_dream(s, frame):
+        # Commit a prediction before the next observation arrives, so
+        # observe() corrects *prediction error*, not mere frame difference.
+        corrected = observe(params, s, frame, ticks)
+        predicted_state, _ = dream(params, corrected, ticks)
+        return predicted_state, None
 
-    state, _ = jax.lax.scan(absorb, state, jnp.swapaxes(observed_context, 0, 1))
+    state, _ = jax.lax.scan(
+        absorb_and_dream, state,
+        jnp.swapaxes(observed_context[:, :-1], 0, 1))
+    state = observe(params, state, observed_context[:, -1], ticks)
 
     def predict(s, _):
         s, frame = dream(params, s, ticks)
