@@ -273,13 +273,12 @@ def main():
             or args.max_frames < 0 or not args.leads
             or args.leads[0] < 1 or args.leads[-1] > args.horizon):
         p.error("Invalid FPS, context, size, coupling, panel size, or lead times")
-    if not args.no_display:
+    cv2 = None
+    if args.source == "live" or not args.no_display:
         try:
             import cv2
         except ImportError:
-            p.error("Install opencv-python to display comparison")
-    else:
-        import cv2  # preprocess uses OpenCV for live capture; also supplied to replay
+            p.error("Install opencv-python for live capture or display")
     models = load_models(args.parameters_dir)
     predict = predictors(models, args.horizon, args.coupling)
     if args.source == "live":
