@@ -5,7 +5,6 @@ from types import SimpleNamespace
 
 import jax
 import numpy as np
-import cv2
 
 from experiments.compare_horizons import (
     ARMS, add_score, draw_grid, forecast_all, load_models,
@@ -58,6 +57,10 @@ class CompareHorizonTests(unittest.TestCase):
         self.assertEqual(len(pending), 0)
 
     def test_render_is_synchronized_and_headless(self):
+        try:
+            import cv2
+        except ImportError:
+            self.skipTest('Optional opencv-python is not installed in CI')
         current = np.full((12, 12, 1), .4, np.float32)
         predictions = {arm: np.repeat(current[None], 3, axis=0)
                        for arm in ARMS}
