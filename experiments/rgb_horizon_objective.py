@@ -57,9 +57,15 @@ def run(output="runs/rgb-horizon-objective", seeds=(11,23,41), steps=100,
     cases=[]
     for seed in seeds:
         init=nca.init(jax.random.PRNGKey(int(seed)),channels)
+        # An untrained RGB NCA is exact persistence: it must remain an
+        # eligible checkpoint, or we can hide failed learning.
+        initial_forecast=np.asarray(nca.rollout(
+            init,jnp.asarray(val[:,:context]),horizon,ticks))
+        initial_val=float(np.square(
+            initial_forecast[:,-1]-val[:,context+horizon-1]).mean())
         blank=lambda:jax.tree.map(jnp.zeros_like,init)
         arms={name:{"p":init,"m":blank(),"v":blank(),"best":init,
-                    "best_step":0,"best_val":float("inf")}
+                    "best_step":0,"best_val":initial_val}
               for name in MODES}
         history=[]
         rng=np.random.default_rng(int(seed)+1000)
