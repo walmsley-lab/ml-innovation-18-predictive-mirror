@@ -130,6 +130,8 @@ def fit(input_path="recordings/rgb-webcam.npz", output="runs/rgb-nca",
     base_score = evaluate(params, heldout, context, horizon, ticks)
     best_metric = float(np.mean([base_score[str(lead)]["model_mse"]
                                  for lead in (1, horizon)]))
+    persistence_metric = float(np.mean([base_score[str(lead)]["persistence_mse"]
+                                        for lead in (1, horizon)]))
     best_params = params
     best_step = 0
     rng_steps = []
@@ -148,6 +150,25 @@ def fit(input_path="recordings/rgb-webcam.npz", output="runs/rgb-nca",
             print(f"step={i} training_loss={float(error):.6f} val={metric:.6f}", flush=True)
 
     results = evaluate(best_params, heldout, context, horizon, ticks)
+    selection_gain = persistence_metric - best_metric
+    if best_step == 0:
+        selection_status = "failed_untrained_checkpoint_selected"
+        selection_warning = (
+            "The selected checkpoint is step 0. Because RGB readout initialization "
+            "is persistence, this run does not demonstrate learned prediction."
+        )
+    elif selection_gain <= 0:
+        selection_status = "failed_not_better_than_persistence"
+        selection_warning = (
+            "The selected trained checkpoint did not beat persistence on the "
+            "validation-selection metric; do not present it as learned anticipation."
+        )
+    else:
+        selection_status = "candidate_beats_persistence"
+        selection_warning = (
+            "Validation improvement over persistence is a candidate result only; "
+            "confirm it on an independent recording or synthetic holdout."
+        )
     out = Path(output)
     out.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(out / "parameters.npz", **jax.tree.map(np.asarray, best_params))
@@ -156,6 +177,11 @@ def fit(input_path="recordings/rgb-webcam.npz", output="runs/rgb-nca",
         "nca_ticks_per_observation_and_dream": ticks,
         "context_frames": context, "forecast_horizon_frames": horizon,
         "training_steps": steps, "best_validation_step": best_step,
+        "selection_status": selection_status,
+        "selection_model_mse": best_metric,
+        "selection_persistence_mse": persistence_metric,
+        "selection_gain_vs_persistence": selection_gain,
+        "selection_warning": selection_warning,
         "seed": seed, "validation_windows": len(val_idx),
         "recording_sha256": hashlib.sha256(Path(input_path).read_bytes()).hexdigest(),
         "horizons": results, "training_history": rng_steps,
