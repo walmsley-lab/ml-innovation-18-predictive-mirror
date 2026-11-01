@@ -79,6 +79,13 @@ class RGBPredictiveNCATests(unittest.TestCase):
             self.assertEqual(report["forecast_horizon_frames"], 3)
             self.assertTrue((Path(directory) / "out" / "parameters.npz").exists())
             self.assertIn("3", report["horizons"])
+            self.assertIn(report["selection_status"], {
+                "failed_untrained_checkpoint_selected",
+                "failed_not_better_than_persistence",
+                "candidate_beats_persistence",
+            })
+            self.assertIn("selection_warning", report)
+            self.assertIn("selection_gain_vs_persistence", report)
 
     @unittest.skipIf(cv2 is None, "OpenCV optional")
     def test_rgb_render_and_metric(self):
