@@ -6,7 +6,6 @@ Validation selects checkpoints; previously unseen *test* scenes score models
 and observed-frame persistence / centroid constant-velocity baselines.
 """
 import argparse
-import hashlib
 import json
 from pathlib import Path
 
@@ -150,10 +149,26 @@ def measure(predicted, examples, context, leads, threshold=.03):
         forecast = predicted[:, lead-1]
         squared = np.square(forecast - target).mean(axis=-1)
         changed = np.abs(target - anchors).mean(axis=-1) > threshold
+        location_errors = []
+        for predicted_frame, true_frame in zip(forecast, target):
+            true_center = center(true_frame)
+            if true_center is None:
+                continue  # Invisible object: no position ground truth in pixels.
+            predicted_center = center(predicted_frame)
+            if predicted_center is None:
+                # Explicit failed-detection penalty, not a silent skip.
+                location_errors.append(float(np.hypot(*true_frame.shape[:2])))
+            else:
+                location_errors.append(float(np.hypot(
+                    predicted_center[0] - true_center[0],
+                    predicted_center[1] - true_center[1])))
         scores[str(lead)] = {
             "mse": float(squared.mean()),
             "motion_mse": float(squared[changed].mean()) if changed.any() else None,
             "motion_pixels": int(changed.sum()),
+            "visible_location_mae_px": (
+                float(np.mean(location_errors)) if location_errors else None),
+            "visible_object_frames": len(location_errors),
         }
     return scores
 
