@@ -9,7 +9,7 @@ class OcclusionProbeTests(unittest.TestCase):
     def test_visibility_after_foreground_mask(self):
         size=20
         obj={"position":np.asarray((10.,10.),np.float32),
-             "radius":1,"color":np.asarray((1.,0.,0.),np.float32)}
+             "radius":0,"color":np.asarray((1.,0.,0.),np.float32)}
         frame,visible=world._render([obj],np.zeros(2,np.float32),
                                     size,size,occlusion=True)
         self.assertFalse(bool(visible[0]))
