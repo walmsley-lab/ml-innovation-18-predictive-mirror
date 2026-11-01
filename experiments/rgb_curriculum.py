@@ -91,7 +91,7 @@ def run(output="runs/rgb-curriculum", seeds=(11, 23, 41), steps=100,
                       flush=True)
 
         entry = {"seed": int(seed), "arms": {}, "history": history}
-        leads = tuple(h for h in benchmark.LEADS if h <= horizon)
+        leads = tuple(sorted({horizon, *(h for h in benchmark.LEADS if h <= horizon)}))
         for name, arm in arms.items():
             forecast = np.asarray(nca.rollout(arm["best"],
                                   jnp.asarray(test[:, :context]), horizon, ticks))
