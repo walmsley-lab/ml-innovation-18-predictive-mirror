@@ -81,7 +81,9 @@ def render_grid(context_last, forecasts, activity, leads, cv2, fps=10,
 def replay(frames, predict, args, cv2):
     """Holdout context and targets stay strictly within final 20%."""
     start = int(.8 * len(frames)) + args.context - 1
-    end = len(frames) - args.horizon
+    # A forecast at anchor i needs frames[i + horizon] to exist.
+    # The last valid anchor is therefore len(frames) - horizon - 1.
+    end = len(frames) - args.horizon - 1
     if start > end:
         raise ValueError("Not enough frames in held-out replay")
     scores = {str(h): [] for h in args.leads}
