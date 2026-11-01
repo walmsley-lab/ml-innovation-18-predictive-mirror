@@ -32,7 +32,7 @@ constant-velocity extrapolation at +10 frames.
 - Validation MSE selects checkpoint, including step 0. Report step-0 picks
   conspicuously; only untouched test scenes determine results.
 - Report +1/+3/+5/+10-frame full RGB MSE, changed-region MSE,
-  changed pixel counts, +10 seed wins against both controls, and separate
+  changed pixel counts, visible-object position error in pixels, +10 seed wins against both controls, and separate
   single/distribution checkpoints.
 
 A shifted foreground can fail on occlusion/edge cases; that is an informative
