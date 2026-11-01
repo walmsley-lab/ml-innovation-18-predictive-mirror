@@ -73,6 +73,10 @@ class RGBMotionDistributionTests(unittest.TestCase):
             self.assertEqual(report["results"][0]["seed"], 3)
             for arm in ("single", "distribution"):
                 self.assertIn("3", report["results"][0]["arms"][arm]["test"])
+                self.assertIn("visible_location_mae_px",
+                              report["results"][0]["arms"][arm]["test"]["3"])
+            self.assertIn("visible_location_mae_px",
+                          report["baselines"]["constant_velocity"]["3"])
 
 
 if __name__ == "__main__":
