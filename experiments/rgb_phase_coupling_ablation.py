@@ -26,9 +26,18 @@ def run(output="runs/rgb-phase-coupling", seeds=(11,23,41), steps=60,
     for seed in seeds:
         initial=base.init(jax.random.PRNGKey(int(seed)),channels)
         zeros=lambda:jax.tree.map(jnp.zeros_like,initial)
-        arms={mode:{"params":initial,"m":zeros(),"v":zeros(),
-                    "best":initial,"step":0,"val":float("inf")}
-              for mode in phase.MODES}
+        def validation_mse(params,mode):
+            prediction=np.asarray(phase.rollout(
+                params,jnp.asarray(validation[:,:context]),horizon,ticks,mode))
+            return float(np.square(prediction-validation[:,context:]).mean())
+        # Untrained persistence (step 0) stays eligible so failed learning
+        # is reported as best_step=0 rather than hidden.
+        arms={}
+        for mode in phase.MODES:
+            zero_val=validation_mse(initial,mode)
+            arms[mode]={"params":initial,"m":zeros(),"v":zeros(),
+                        "best":initial,"step":0,"val":zero_val,
+                        "step_zero_val":zero_val}
         def make_update(mode):
             @jax.jit
             def update(p,m,v,x,step):
@@ -48,10 +57,7 @@ def run(output="runs/rgb-phase-coupling", seeds=(11,23,41), steps=60,
                     arm["params"],arm["m"],arm["v"],examples,step)
             if step==steps or step%max(1,steps//5)==0:
                 for mode,arm in arms.items():
-                    prediction=np.asarray(phase.rollout(
-                        arm["params"],jnp.asarray(validation[:,:context]),
-                        horizon,ticks,mode))
-                    metric=float(np.square(prediction-validation[:,context:]).mean())
+                    metric=validation_mse(arm["params"],mode)
                     if metric<arm["val"]:
                         arm["best"],arm["val"],arm["step"]=arm["params"],metric,step
         outcomes={}
@@ -61,6 +67,7 @@ def run(output="runs/rgb-phase-coupling", seeds=(11,23,41), steps=60,
                                jnp.asarray(test[:,:context]),horizon,ticks,mode))
             duration=(time.perf_counter()-before)*1000
             outcomes[mode]={"best_step":arm["step"],"validation_mse":arm["val"],
+                            "step_zero_validation_mse":arm["step_zero_val"],
                             "test":benchmark.score(prediction,test,context,leads),
                             "batch_eval_wall_ms":duration}
             np.savez_compressed(folder/f"seed-{seed}-{mode}.npz",

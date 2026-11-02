@@ -1,9 +1,11 @@
 """Phase state must be nontrivial, causal and parameter-budget matched."""
+import tempfile
 import unittest
 import jax
 import jax.numpy as jnp
 import numpy as np
 from src import predictive_rgb_nca as nca, rgb_phase_nca as phase
+from experiments.rgb_phase_coupling_ablation import run
 
 
 class RGBPhaseNCATests(unittest.TestCase):
@@ -21,3 +23,12 @@ class RGBPhaseNCATests(unittest.TestCase):
             future=np.asarray(phase.rollout(params,jnp.asarray(x),3,1,mode))
             np.testing.assert_allclose(future,np.repeat(x[:,-1:],3,axis=1),
                                        atol=1e-6)
+
+    def test_step_zero_checkpoint_stays_eligible(self):
+        with tempfile.TemporaryDirectory() as folder:
+            report=run(folder,seeds=(3,),steps=1,context=3,horizon=2,
+                       ticks=1,size=16,channels=4)
+        for arm in report["results"][0]["arms"].values():
+            self.assertIn(arm["best_step"],(0,1))
+            self.assertLessEqual(arm["validation_mse"],
+                                 arm["step_zero_validation_mse"])
