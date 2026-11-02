@@ -78,7 +78,10 @@ def run(out="runs/rgb-phase-entrainment", seeds=(11, 23, 37), steps=40,
                 "step_zero_validation_mse": state["step_zero_val"],
                 "selected_validation_mse": state["best_val"],
                 "test": bench.score(forecast, test, context, leads),
-                "phase_global_order": float(phase.phase_order(final_phase)),
+                # The plain arm has no oscillator; a zero phase field would
+                # report spurious perfect coherence.
+                "phase_global_order": (None if mode == "plain" else
+                                       float(phase.phase_order(final_phase))),
                 "batch_eval_wall_ms_includes_compilation": elapsed}
             np.savez_compressed(target/f"seed-{seed}-{mode}.npz",
                                 **jax.tree.map(np.asarray, state["best"]))

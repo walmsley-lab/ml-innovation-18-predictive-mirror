@@ -39,6 +39,7 @@ class EntrainmentTests(unittest.TestCase):
             result=run(folder,seeds=(3,),steps=1,context=4,horizon=2,size=16,ticks=1,channels=4)
             self.assertEqual(set(result["results"][0]["arms"]),set(phase.MODES))
             self.assertTrue((Path(folder)/"seed-3-entrained.npz").exists())
+            self.assertIsNone(result["results"][0]["arms"]["plain"]["phase_global_order"])
             for arm in result["results"][0]["arms"].values():
                 self.assertLessEqual(arm["selected_validation_mse"],arm["step_zero_validation_mse"])
 
