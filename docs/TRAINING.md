@@ -1,6 +1,6 @@
-# PR 9 — Training matrix and Akash handoff
+# Optional GPU training matrix and Akash handoff
 
-The GPU image now contains all training models, the evaluator, lightweight experiments and `sweep.py`. It is still intentionally a Python/JAX executable experiment, not an experiment-management framework.
+The optional GPU image contains all training models, the evaluator, lightweight experiments and `sweep.py`. It is still intentionally a Python/JAX executable experiment, not an experiment-management framework.
 
 Local smoke (also in CI):
 
