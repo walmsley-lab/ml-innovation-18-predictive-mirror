@@ -28,9 +28,19 @@ def run(output="runs/rgb-selector-benchmark", seeds=(11,23,41), steps=60,
     for seed in seeds:
         initial=nca.init(jax.random.PRNGKey(int(seed)),channels)
         zeros=lambda:jax.tree.map(jnp.zeros_like,initial)
-        arms={mode:{"params":initial,"m":zeros(),"v":zeros(),
-                    "best":initial,"best_step":0,"best_val":float("inf")}
-              for mode in nca.MODES}
+        def validation_mse(params,mode):
+            ref=refs if mode=="reference" else None
+            pred=np.asarray(nca.rollout(params,jnp.asarray(validation[:,:context]),
+                                       horizon,ticks,mode,ref))
+            return float(np.square(pred-validation[:,context:]).mean())
+        # Untrained persistence (step 0) stays eligible so failed learning
+        # is reported as selected_step=0 rather than hidden.
+        arms={}
+        for mode in nca.MODES:
+            zero_val=validation_mse(initial,mode)
+            arms[mode]={"params":initial,"m":zeros(),"v":zeros(),
+                        "best":initial,"best_step":0,"best_val":zero_val,
+                        "step_zero_val":zero_val}
 
         def make_update(mode):
             ref=refs if mode=="reference" else None
@@ -56,11 +66,7 @@ def run(output="runs/rgb-selector-benchmark", seeds=(11,23,41), steps=60,
                 row={"step":step}
                 for mode in nca.MODES:
                     arm=arms[mode]
-                    ref=refs if mode=="reference" else None
-                    pred=np.asarray(nca.rollout(arm["params"],
-                                               jnp.asarray(validation[:,:context]),
-                                               horizon,ticks,mode,ref))
-                    metric=float(np.square(pred-validation[:,context:]).mean())
+                    metric=validation_mse(arm["params"],mode)
                     row[mode]=metric
                     if metric<arm["best_val"]:
                         arm["best"],arm["best_val"],arm["best_step"]=(
@@ -73,6 +79,7 @@ def run(output="runs/rgb-selector-benchmark", seeds=(11,23,41), steps=60,
                 arm["best"],jnp.asarray(test[:,:context]),horizon,ticks,mode,ref))
             outcomes[mode]={"selected_step":arm["best_step"],
                             "validation_mse":arm["best_val"],
+                            "step_zero_validation_mse":arm["step_zero_val"],
                             "test":benchmark.score(forecast,test,context,leads)}
             np.savez_compressed(output/f"seed-{seed}-{mode}.npz",
                                 **jax.tree.map(np.asarray,arm["best"]))
