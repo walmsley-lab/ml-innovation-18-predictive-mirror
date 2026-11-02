@@ -46,5 +46,16 @@ class ParticleTests(unittest.TestCase):
             self.assertTrue((Path(folder)/"seed-3-messages.npz").exists())
 
 
+class DisjointSplitTests(unittest.TestCase):
+    def test_default_seeds_are_disjoint(self):
+        from experiments.particle_nca_motion import check_disjoint
+        check_disjoint((11, 23, 37), 100, 4, 16)
+
+    def test_overlapping_seed_is_refused(self):
+        from experiments.particle_nca_motion import check_disjoint
+        with self.assertRaisesRegex(ValueError, "overlap"):
+            check_disjoint((0, 599), 1, 4, 16)
+
+
 if __name__ == "__main__":
     unittest.main()

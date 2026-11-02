@@ -62,5 +62,16 @@ class GraphSkeletonHorizonTests(unittest.TestCase):
             self.assertTrue((Path(folder)/"metrics.json").exists())
 
 
+class DisjointSplitTests(unittest.TestCase):
+    def test_default_seeds_are_disjoint(self):
+        from experiments.graph_skeleton_horizons import check_disjoint
+        check_disjoint((11, 23, 37), 100, 4, 16)
+
+    def test_overlapping_seed_is_refused(self):
+        from experiments.graph_skeleton_horizons import check_disjoint
+        with self.assertRaisesRegex(ValueError, "overlap"):
+            check_disjoint((0, 499), 1, 4, 16)
+
+
 if __name__ == "__main__":
     unittest.main()

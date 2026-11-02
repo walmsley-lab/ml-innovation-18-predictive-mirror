@@ -75,12 +75,31 @@ def render_gif(context, predictions, truth, output, world_pixels=48):
     return str(destination)
 
 
+def train_seeds(seed, step, batch_size):
+    return 100_000+seed*100_000+step*batch_size+np.arange(batch_size)
+
+
+def eval_seeds(seed, heldout):
+    return 60_000_000+seed*1000+np.arange(heldout)
+
+
+def check_disjoint(seeds, steps, batch_size, heldout):
+    """Refuse settings where any training world seed is also a held-out seed."""
+    training = np.concatenate([train_seeds(int(s), i, batch_size)
+                               for s in seeds for i in range(1, steps+1)])
+    testing = np.concatenate([eval_seeds(int(s), heldout) for s in seeds])
+    if np.intersect1d(training, testing).size:
+        raise ValueError("Training and held-out world seeds overlap; "
+                         "use smaller seeds or fewer steps")
+
+
 def run(output="runs/particle-nca-motion", seeds=(11, 23, 37), steps=100,
         batch_size=4, heldout=16, context=8, horizon=10,
         size=32, particles=2, channels=12, preview=False):
     if (not seeds or steps < 1 or batch_size < 1 or heldout < 1
             or context < 2 or horizon < 1 or size < 16 or particles < 1):
         raise ValueError("Invalid particle or training settings")
+    check_disjoint(seeds, steps, batch_size, heldout)
     folder = Path(output)
     folder.mkdir(parents=True, exist_ok=True)
     leads = tuple(sorted({h for h in (1, 3, 5, 10, horizon) if h <= horizon}))
@@ -105,17 +124,18 @@ def run(output="runs/particle-nca-motion", seeds=(11, 23, 37), steps=100,
                    "no_messages": make_update(False)}
 
         for i in range(1, steps+1):
-            sample_seeds = 100_000+seed*100_000+i*batch_size+np.arange(batch_size)
+            sample_seeds = train_seeds(seed, i, batch_size)
             batch = jnp.asarray(dataset(sample_seeds, context, horizon, size, particles))
+            losses = {}
             for name in arms:
-                arms[name], first[name], second[name], loss = updates[name](
+                arms[name], first[name], second[name], losses[name] = updates[name](
                     arms[name], first[name], second[name], batch, i)
             if i == steps or i % max(1, steps//5) == 0:
-                print(f"seed={seed} step={i} particle_loss={float(loss):.6f}",
+                print(f"seed={seed} step={i} "
+                      + " ".join(f"{k}_loss={float(v):.6f}" for k, v in losses.items()),
                       flush=True)
 
-        eval_seeds = 60_000_000+seed*1000+np.arange(heldout)
-        heldout_frames = dataset(eval_seeds, context, horizon, size, particles)
+        heldout_frames = dataset(eval_seeds(seed, heldout), context, horizon, size, particles)
         prefix = heldout_frames[:, :context]
         future = heldout_frames[:, context:context+horizon]
         predictions = controls(prefix, horizon)
@@ -138,6 +158,8 @@ def run(output="runs/particle-nca-motion", seeds=(11, 23, 37), steps=100,
         "seeds": list(map(int, seeds)), "train_steps": steps,
         "context": context, "horizon": horizon, "particles": particles,
         "size": size, "leads": list(leads), "runs": report_rows,
+        "checkpoint_selection": "none: metrics use final-step weights, so "
+                                "held-out scenes never influence selection",
         "caveats": "Independent structured-input pilot. Particle identities and "
                    "2D coordinates are supplied by synthetic world. "
                    "Model never sees RGB pixels or future coordinates during inference. "
