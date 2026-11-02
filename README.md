@@ -32,12 +32,11 @@ python -m pip install 'jax==0.9.0.1' 'numpy==2.3.5'
 python -m unittest discover -s tests -v
 ```
 
-To see the RGB NCA, first train a small model:
+To see the RGB NCA, first train a small model on the same synthetic-world\nfamily used by the visual gallery:
 
 ```bash
-python -m experiments.rgb_motion_distribution \
+python -m experiments.rgb_curriculum \
   --seeds 11 --steps 30 --batch-size 2 \
-  --train-trajectories 24 --validation-trajectories 6 --test-trajectories 6 \
   --context 8 --horizon 10 --out runs/rgb-intro
 ```
 
@@ -47,8 +46,8 @@ The gallery needs Pillow (not needed for CPU training/tests):
 ```bash
 python -m pip install pillow
 python -m experiments.rgb_prediction_gallery \
-  --parameters runs/rgb-intro/seed-11-distribution.npz \
-  --context 8 --horizon 10 --seed 71000 --episodes 3 \
+  --parameters runs/rgb-intro/seed-11-curriculum.npz \
+  --context 8 --horizon 10 --seed 73000 --episodes 3 \
   --out runs/rgb-intro-gallery
 ```
 
