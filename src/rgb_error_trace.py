@@ -41,10 +41,14 @@ def rollout(params, context, horizon=10, ticks=2, mode="local_trace",
     state = nca.initial_state(params, batch, height, width)
     trace = jnp.zeros((batch, height, width, 3), jnp.float32)
 
-    def observed_then_predict(carry, observed):
+    def observed_then_predict(carry, inputs):
+        observed, first = inputs
         state, trace = carry
         # Surprise is predicted-before-observed, without a future label.
-        trace = update_trace(trace, observed - state[1], decay)
+        # The first frame has no prior prediction (state[1] is a blank
+        # image), so it carries no prediction error and leaves the trace.
+        trace = jnp.where(first, trace,
+                          update_trace(trace, observed - state[1], decay))
         state = nca.observe(params, state, observed, ticks)
         state, predicted = nca.dream(params, state, ticks)
         state = (state[0], adapt(predicted, trace, mode, strength))
@@ -52,7 +56,8 @@ def rollout(params, context, horizon=10, ticks=2, mode="local_trace",
 
     (state, trace), _ = jax.lax.scan(
         observed_then_predict, (state, trace),
-        jnp.swapaxes(context[:, :-1], 0, 1))
+        (jnp.swapaxes(context[:, :-1], 0, 1),
+         jnp.arange(context.shape[1] - 1) == 0))
     last = context[:, -1]
     trace = update_trace(trace, last - state[1], decay)
     state = nca.observe(params, state, last, ticks)

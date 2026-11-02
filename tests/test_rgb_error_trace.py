@@ -37,6 +37,14 @@ class RGBErrorTraceTests(unittest.TestCase):
         np.testing.assert_allclose(np.asarray(trace.rollout(
             self.params, x, 3, 1, "local_trace", strength=0.)), plain)
 
+    def test_first_frame_is_not_prediction_error(self):
+        # Untrained model on a static scene predicts perfectly after the
+        # first frame, so no prediction error exists for the trace to store.
+        still = jnp.asarray(np.repeat(self.images[:, :1], 5, axis=1))
+        frozen = np.asarray(trace.rollout(self.params, still, 3, 1, "frozen"))
+        local = np.asarray(trace.rollout(self.params, still, 3, 1, "local_trace"))
+        np.testing.assert_allclose(local, frozen, atol=1e-7)
+
     def test_frozen_checkpoint_report(self):
         with tempfile.TemporaryDirectory() as folder:
             checkpoint = Path(folder) / "parameters.npz"
