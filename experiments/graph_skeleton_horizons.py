@@ -100,6 +100,24 @@ def score(predicted, truth, masks, previous_visibility, leads, pixel_scale=32):
     return result
 
 
+def train_ids(seed, step, batch_size):
+    return 100_000+seed*100_000+step*batch_size+np.arange(batch_size)
+
+
+def test_ids(seed, heldout):
+    return 50_000_000+seed*1000+np.arange(heldout)
+
+
+def check_disjoint(seeds, steps, batch_size, heldout):
+    """Refuse settings where any training episode id is also a test id."""
+    training = np.concatenate([train_ids(int(s), i, batch_size)
+                               for s in seeds for i in range(1, steps+1)])
+    testing = np.concatenate([test_ids(int(s), heldout) for s in seeds])
+    if np.intersect1d(training, testing).size:
+        raise ValueError("Training and held-out episode ids overlap; "
+                         "use smaller seeds or fewer steps")
+
+
 def run(output="runs/graph-skeleton-horizons", seeds=(11, 23, 37),
         steps=100, batch_size=4, heldout=12, context=8, horizon=10,
         occlusion_frames=3, channels=16):
@@ -107,6 +125,7 @@ def run(output="runs/graph-skeleton-horizons", seeds=(11, 23, 37),
         raise ValueError("Invalid seed/training settings")
     if context < 2 or horizon < 1 or context+horizon-1 < 12:
         raise ValueError("Use context+horizon-1 >= 12 and positive context/horizon")
+    check_disjoint(seeds, steps, batch_size, heldout)
     graph = graph_nca.adjacency()
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
@@ -130,19 +149,21 @@ def run(output="runs/graph-skeleton-horizons", seeds=(11, 23, 37),
             return update
         updates = {"graph": make_update(True), "no_messages": make_update(False)}
         for i in range(1, steps+1):
-            episode_ids = 100_000+seed*100_000+i*batch_size+np.arange(batch_size)
+            episode_ids = train_ids(seed, i, batch_size)
             observed, mask, _ = examples(
                 episode_ids, steps=context+horizon-1, occlusion_frames=occlusion_frames)
+            errors = {}
             for name in params:
-                params[name], moments[name], variances[name], error = updates[name](
+                params[name], moments[name], variances[name], errors[name] = updates[name](
                     params[name], moments[name], variances[name],
                     jnp.asarray(observed), jnp.asarray(mask), i)
             if i == steps or i % max(1, steps//5) == 0:
-                print(f"seed={seed} step={i} loss={float(error):.6f}", flush=True)
+                print(f"seed={seed} step={i} "
+                      + " ".join(f"{k}_loss={float(v):.6f}" for k, v in errors.items()),
+                      flush=True)
 
-        test_ids = 50_000_000+seed*1000+np.arange(heldout)
         observed, mask, truth = examples(
-            test_ids, steps=context+horizon-1, occlusion_frames=occlusion_frames)
+            test_ids(seed, heldout), steps=context+horizon-1, occlusion_frames=occlusion_frames)
         future_truth = truth[:, context:context+horizon]
         future_masks = mask[:, context:context+horizon]
         prev_mask = mask[:, context-1]
@@ -165,6 +186,8 @@ def run(output="runs/graph-skeleton-horizons", seeds=(11, 23, 37),
               "horizon": horizon, "steps_per_arm": steps,
               "occlusion_frames": occlusion_frames, "leads": list(leads),
               "runs": cases,
+              "checkpoint_selection": "none: metrics use final-step weights, so "
+                                      "held-out scenes never influence selection",
               "limitations": "Provided 2D joints and known topology (not RGB pose extraction). "
                              "Future observations are never inputs. Hidden-joint truth is scoring-only; "
                              "future visible joints alone train the predictor. Fixed synthetic actors "
