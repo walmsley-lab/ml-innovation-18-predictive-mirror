@@ -18,7 +18,7 @@ def png_bytes(rgb):
     if image.ndim != 3 or image.shape[2] != 3:
         raise ValueError("Expected RGB image [H,W,3]")
     pixels = (np.clip(image, 0, 1) * 255).astype(np.uint8)
-    height, width = pixels.shape
+    height, width = pixels.shape[:2]
     def chunk(name, data):
         return (struct.pack(">I", len(data)) + name + data +
                 struct.pack(">I", zlib.crc32(name + data) & 0xffffffff))
