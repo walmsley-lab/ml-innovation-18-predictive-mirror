@@ -1,4 +1,12 @@
-# Predictive Mirror — research charter and PR plan
+# Predictive Mirror — original research charter
+
+> **Historical research charter (October 2026).** The hypotheses and
+> scientific constraints below remain useful, but the implementation status,
+> proposed sequence, and launch instructions are historical. For current
+> capabilities and commands, use [README](../README.md),
+> [experiment map](EXPERIMENTS.md), and [training/demos](GETTING_STARTED.md).
+> Preserve this record; do not treat earlier draft-status statements as live
+> repository status.
 
 Date: 2026-10-30 · Repository: `walmsley-lab/ml-innovation-18-predictive-mirror`
 

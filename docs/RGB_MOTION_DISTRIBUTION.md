@@ -1,10 +1,10 @@
 # Step 6 — RGB motion NCA: distribution training versus memorization
 
 This is a standalone benchmark in experiments/rgb_motion_distribution.py.
-The original Step 5 sweep implementation and local
-runs/rgb-motion-nca-sweep/metrics.json are not currently present on remote
-main, so do not compare raw MSE values across these two benchmarks. This PR
-does not edit any prior experiment, recording, or checkpoint.
+The earlier motion sweep is also present in this repository, but the
+experiments use different scene generators and should **not** have raw MSE
+values compared across protocols. This standalone experiment does not
+replace any earlier recordings, checkpoints, or baseline results.
 
 ## Hypothesis
 
@@ -41,7 +41,7 @@ truth is always scoring/training labels, never an inference input.
 
 ## CPU pilot
 
-After reviewing and merging the PR:
+Short local smoke (not a validated training result):
 
     python -m experiments.rgb_motion_distribution --steps 30 --batch-size 2 --horizon 10 --context 8 --out runs/rgb-motion-distribution-smoke
 
@@ -61,5 +61,6 @@ not established yet. Increasing training compute is not proof of learning.
    whole-frame MSE dominated by static backgrounds.
 4. Replicate on a new frozen test set before RGB webcam transfer.
 
-This step adds no new NCA architecture, learned reference selector, phase
-oscillator, or claims about biological equivalence.
+This experiment changes training exposure, not the RGB NCA's architecture.
+Other techniques (selectors, oscillators, graphs, particles) are catalogued
+in [the experiment map](EXPERIMENTS.md); this file describes only this protocol.
