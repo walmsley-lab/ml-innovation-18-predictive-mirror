@@ -4,7 +4,7 @@ This is a **separate architecture** from the grayscale recurrent sheet, fast/slo
 
 ## NCA components
 
-- **Select:** for now each cell selects its fixed 3x3 spatial neighborhood via a shared convolution. **Relative-coordinate selectors, explicit references/pointers and learned routing are not in this PR.** Test them as separately labeled implementations rather than conflating them with this local model.
+- **Select:** for now each cell selects its fixed 3x3 spatial neighborhood via a shared convolution. **This local model does not contain learned references or dynamic routing.** Those alternatives now exist as independent experiments; see [experiment map](EXPERIMENTS.md).
 - **Update:** each cell uses the same small gated rule and maintains its own latent state, advancing for `--ticks` iterations for each input or forecast.
 - **Sense / correct:** before new observation `x_t`, the model had dreamed its prediction `x_hat_t`. The correction stage receives `x_t - x_hat_t`, then clamps its RGB input to `x_t`. We explicitly dream between observed context frames so this is an actual prediction error rather than simple temporal difference.
 - **Dream / predict:** no new observations are supplied. Iterate the NCA, read out a three-channel RGB residual, then feed that predicted RGB state into the next forecast; score +1..+H against withheld future labels only.
@@ -48,4 +48,8 @@ The display shows actual future RGB (offline replay only), RGB persistence, RGB 
 - Per-horizon full-frame MSE, changed-region MSE and changing-pixel counts versus persistence and pixel extrapolation. No hidden simulator truth enters inference.
 - The 70/10/20 temporal train/embargo/validation split selects the best saved checkpoint; resulting scores are **validation only**, not unbiased test estimates. Capture another independent recording for honest evaluation.
 - Never directly compare RGB MSE with the earlier grayscale models on different video; they require a common color/luma benchmark on the same scenes.
-- No cell growth/topology evolution, learned selection, reference-based routing, object permanency or 3D reconstruction is claimed.
+- This baseline itself does not perform cell growth, topological evolution,
+learned reference selection, object discovery, or 3D reconstruction.
+Separate reference and phase variants are catalogued in
+[the experiment map](EXPERIMENTS.md); their existence does not establish
+learned object permanence or biological equivalence.
