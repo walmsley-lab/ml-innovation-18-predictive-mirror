@@ -1,9 +1,11 @@
 """Selector benchmark should use causally observed images and common baseline."""
+import tempfile
 import unittest
 import numpy as np
 import jax
 import jax.numpy as jnp
 from src import selectable_rgb_nca as nca, rgb_benchmark as benchmark
+from experiments.rgb_selector_benchmark import run
 
 
 class RGBSelectorBenchmarkTests(unittest.TestCase):
@@ -22,3 +24,12 @@ class RGBSelectorBenchmarkTests(unittest.TestCase):
         x=benchmark.frames(benchmark.scenes(71000,1,context=4,horizon=3,size=16))
         controls=benchmark.controls(x[:,:4],3)
         self.assertIn("constant_velocity",controls)
+
+    def test_step_zero_checkpoint_stays_eligible(self):
+        with tempfile.TemporaryDirectory() as folder:
+            report=run(folder,seeds=(3,),steps=1,context=3,horizon=2,
+                       size=16,ticks=1,channels=4)
+        for arm in report["runs"][0]["arms"].values():
+            self.assertIn(arm["selected_step"],(0,1))
+            self.assertLessEqual(arm["validation_mse"],
+                                 arm["step_zero_validation_mse"])
