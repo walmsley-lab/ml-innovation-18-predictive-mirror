@@ -88,6 +88,13 @@ def _render(objects, camera, size, world_size, occlusion):
     if occlusion:
         left, right = size // 2 - max(1, size // 18), size // 2 + max(1, size // 18)
         frame[:, left:right] = np.asarray((0.12, 0.12, 0.15), np.float32)
+        # After rendering the foreground stripe, distinguish objects actually
+        # visible in the returned image from merely being inside the camera.
+        for index, obj in enumerate(objects):
+            x, y = obj["position"] - camera - (world_size - size) / 2
+            disc = (xx - x) ** 2 + (yy - y) ** 2 <= obj["radius"] ** 2
+            visible[index] = bool(np.any(disc & ~(
+                (xx >= left) & (xx < right))))
     return frame, visible
 
 
