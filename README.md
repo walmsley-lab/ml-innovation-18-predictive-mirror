@@ -1,39 +1,102 @@
 # Predictive Mirror
 
-A minimal executable path toward a **causal predictive mirror**, with an experimentally testable hypothesis about developmental perception. Start with a deterministic low-resolution world, train a locally recurrent perceptual field, and measure forecasts before adding representational sheets, plasticity or learned gaze.
+**Can simple recurrent cells learn to anticipate what they will see next?**
 
-**Read [the charter and PR plan](docs/PLAN.md) before extending the experiment.**
+A small, CPU-friendly JAX research lab for predictive perception. Our models observe
+a few frames, update their internal state, then predict future frames without
+new observations. We test what locality, memory, communication, oscillations,
+and active sensing contribute to that ability.
 
-## Quick start (Python 3.11)
+Two complementary outcomes:
+
+- **Predictive Mirror:** a live RGB camera demonstration that compares a
+  previously issued forecast against the observation that actually arrived.
+- **Perceptual Systems Lab:** independently runnable experiments, checkpoints,
+  visualizations, and reproducible evidence. Models need not share a representation.
+
+**Evidence so far:** in one synthetic three-seed comparison, distribution-trained
+RGB NCA achieved +10-frame MSE **0.00800**, compared with last-frame persistence
+**0.01207** and image-derived constant velocity **0.00496**. It learned beyond
+persistence, but **did not beat constant velocity**. A +10-frame forecast is
+approximately one second only at a verified 10 fps; synthetic time is nominal.
+These results do **not** establish real-webcam prediction or object permanence.
+
+## Start here
+
+Python 3.11 and a CPU are enough for the synthetic experiments:
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate
 python -m pip install 'jax==0.9.0.1' 'numpy==2.3.5'
 python -m unittest discover -s tests -v
-python -m train --steps 120 --batch-size 8 --output runs/pilot
 ```
 
-`runs/pilot/` contains `metrics.json`, `parameters.npz`, and `example.npz`. Pilot metrics compare a recurrent predictor with last-frame persistence on untouched synthetic trajectories. It does **not** prove emergent perception.
-
-## Akash GPU
-
-`Dockerfile` installs JAX CUDA 12 support; `deploy/akash-gpu.yaml` provides an example one-GPU Akash SDL. On launch the container trains, then serves **synthetic-only** results on port 8080. The image in the SDL is **a placeholder until a real GHCR image is published**. Read the [Akash runbook](docs/PLAN.md#akash-training-runbook) before bidding, and **close the lease when done**. No paid job has been started.
-
-## Code conventions
-
-- Functions and explicit arrays, no class hierarchies or framework registries.
-- Self-contained experiments; shared code moves to `src/` only when actually reused.
-- Physics/simulation ground truth is held out of the model's training inputs.
-- Split by complete sequences and random seeds, not individual neighboring frames.
-- No claim of emergence without meaningful ablations, generalization and causal tests.
-
-
-## Stacked implementation PRs
-
-Review and merge PRs #1–#9 in order, retargeting each stacked PR to `main` once its parent is merged. PR #2 covers durability, #3 curriculum, #4 strong feedforward control, #5 a two-sheet model, #6 exploratory representation probes, #7 analytical gaze, #8 plasticity toy, and #9 GPU sweep harness. The original PR estimates in `docs/PLAN.md` were a scope sketch, not actual GitHub PR numbering.
+To see the RGB NCA, first train a small model:
 
 ```bash
-python -m unittest discover -s tests -v
-python -m sweep --steps 2 --batch-size 2 --seeds 3 --architectures recurrent feedforward multisheet --curricula baseline --episodes 2 --output runs/sweep-smoke
+python -m experiments.rgb_motion_distribution \
+  --seeds 11 --steps 30 --batch-size 2 \
+  --train-trajectories 24 --validation-trajectories 6 --test-trajectories 6 \
+  --context 8 --horizon 10 --out runs/rgb-intro
 ```
 
-**No GPU lease has run**. Before Akash, verify Docker build, NVIDIA JAX, immutable GHCR image pull, SDL validity, checkpoint off-provider export, and closed lease readback; see `docs/TRAINING.md`.
+Then render its predictions and actual future frames side by side.
+The gallery needs Pillow (not needed for CPU training/tests):
+
+```bash
+python -m pip install pillow
+python -m experiments.rgb_prediction_gallery \
+  --parameters runs/rgb-intro/seed-11-distribution.npz \
+  --context 8 --horizon 10 --seed 71000 --episodes 3 \
+  --out runs/rgb-intro-gallery
+```
+
+Open `runs/rgb-intro-gallery/episode-00.png`. Inspect the actual images
+alongside persistence, constant velocity, and the NCA; **a short smoke run
+is not expected to produce strong forecasts**. Never treat a small validation
+gain as an independent test result.
+
+See **[Training and demos](docs/GETTING_STARTED.md)** for a full multi-seed
+run, independent benchmark, optional RGB webcam recording, and *verified*
+live viewer. No cloud GPU is required for the entry-level demos.
+
+## Find an experiment
+
+**[Experiment map](docs/EXPERIMENTS.md)** — start with a question, then open
+one model, one runner, its evidence, and its tests. The models remain independent:
+
+- Image prediction: grayscale recurrent model and RGB pixel NCAs.
+- Cellular connectivity: local, fixed references, learned soft offsets,
+  graph-connected joints, and interacting particles.
+- Time and memory: fast/slow sheets, oscillations, phase entrainment,
+  hidden-state interventions, and local sensory error traces.
+- Learning and action: trajectory diversity, staged curricula, occlusion,
+  camera transfer, and active gaze.
+
+**[Research charter (historical)](docs/PLAN.md)** records the original
+hypotheses, constraints, and planned experiments. It is not a current
+task list; consult this README and the experiment map for the present state.
+
+## How the code is organized
+
+```text
+src/          Small, mostly pure models, synthetic worlds, shared baselines
+experiments/  Independent training, evaluation, and visual-demo scripts
+tests/        Deterministic regression and no-future-leakage checks
+docs/         Experiment-specific protocols and historical research notes
+runs/         Local checkpoints and metrics (gitignored)
+recordings/   Local webcam captures (gitignored)
+deploy/       Optional cloud/GPU exploration; not required to get started
+```
+
+**Code conventions:** functions and explicit arrays, not model registries
+or class hierarchies; keep experiments self-contained until shared code is
+actually reused; keep simulator truth out of inference; retain step-zero
+checkpoints as eligible; report failures, seeds, splits, and strong controls.
+Avoid combining scores from RGB pixels with those from provided skeleton
+joints or tracked particles.
+
+This is a set of **small experimental programs**, not a claim of biological
+equivalence or consciousness. Research evidence precedes architectural
+complexity.
