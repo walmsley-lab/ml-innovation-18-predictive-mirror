@@ -1,0 +1,70 @@
+{
+  "schema": "predictive-mirror-evidence-v1",
+  "instructions": "Run the Step 6 distribution experiment first; paths are relative to repository root. These entries share the exact test scenes and metric definition. Verify run configuration before interpreting.",
+  "entries": [
+    {
+      "representation": "32x32 RGB pixels",
+      "benchmark": "rgb-motion-distribution-v1",
+      "metric": "whole-image MSE",
+      "unit": "normalized RGB squared error",
+      "direction": "lower",
+      "horizon_frames": 10,
+      "split": "24 unseen synthetic test episodes",
+      "seed_protocol": "training seeds 11,23,37; test episodes 51000-51023",
+      "checkpoint_selection": "models select by validation; baselines fixed",
+      "source": "runs/rgb-motion-distribution/metrics.json",
+      "name": "Distribution-trained RGB NCA",
+      "technique": "RGB NCA: varied trajectories",
+      "metric_path": "summary.distribution.mean_horizon_mse",
+      "notes": "Mean over three selected model seeds."
+    },
+    {
+      "representation": "32x32 RGB pixels",
+      "benchmark": "rgb-motion-distribution-v1",
+      "metric": "whole-image MSE",
+      "unit": "normalized RGB squared error",
+      "direction": "lower",
+      "horizon_frames": 10,
+      "split": "24 unseen synthetic test episodes",
+      "seed_protocol": "training seeds 11,23,37; test episodes 51000-51023",
+      "checkpoint_selection": "models select by validation; baselines fixed",
+      "source": "runs/rgb-motion-distribution/metrics.json",
+      "name": "Single-trajectory RGB NCA",
+      "technique": "RGB NCA: one trajectory",
+      "metric_path": "summary.single.mean_horizon_mse",
+      "notes": "Mean over three selected model seeds."
+    },
+    {
+      "representation": "32x32 RGB pixels",
+      "benchmark": "rgb-motion-distribution-v1",
+      "metric": "whole-image MSE",
+      "unit": "normalized RGB squared error",
+      "direction": "lower",
+      "horizon_frames": 10,
+      "split": "24 unseen synthetic test episodes",
+      "seed_protocol": "training seeds 11,23,37; test episodes 51000-51023",
+      "checkpoint_selection": "models select by validation; baselines fixed",
+      "source": "runs/rgb-motion-distribution/metrics.json",
+      "name": "Persistence",
+      "technique": "Observation-only baseline",
+      "metric_path": "baselines.persistence.10.mse",
+      "notes": "No learned checkpoint."
+    },
+    {
+      "representation": "32x32 RGB pixels",
+      "benchmark": "rgb-motion-distribution-v1",
+      "metric": "whole-image MSE",
+      "unit": "normalized RGB squared error",
+      "direction": "lower",
+      "horizon_frames": 10,
+      "split": "24 unseen synthetic test episodes",
+      "seed_protocol": "training seeds 11,23,37; test episodes 51000-51023",
+      "checkpoint_selection": "models select by validation; baselines fixed",
+      "source": "runs/rgb-motion-distribution/metrics.json",
+      "name": "Constant velocity",
+      "technique": "Observation-only extrapolation",
+      "metric_path": "baselines.constant_velocity.10.mse",
+      "notes": "No learned checkpoint."
+    }
+  ]
+}
