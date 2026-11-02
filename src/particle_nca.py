@@ -31,8 +31,10 @@ def neighbor_messages(hidden, positions, radius=.40):
     count = positions.shape[1]
     weight = jnp.exp(-sq / (radius*radius))
     weight = weight * (1.0-jnp.eye(count, dtype=weight.dtype)[None])
-    return jnp.einsum("bij,bjc->bic", weight, hidden) / jnp.maximum(
-        jnp.sum(weight, axis=-1, keepdims=True), 1e-6)
+    # Include an inert baseline in the denominator: with only two
+    # particles, normalizing by sum(weight) alone would cancel distance.
+    return jnp.einsum("bij,bjc->bic", weight, hidden) / (
+        1.0 + jnp.sum(weight, axis=-1, keepdims=True))
 
 
 def step(params, state, observed, mask, use_messages=True):
