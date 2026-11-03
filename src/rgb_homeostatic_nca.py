@@ -64,6 +64,22 @@ def dream(params, state, ticks, mode, strength, decay):
     return (hidden, future, recovery), future
 
 
+def spatial_roughness(hidden):
+    """Neighbor squared-difference / spatial variance; 0 for uniform fields."""
+    centered = hidden - hidden.mean(axis=(1, 2), keepdims=True)
+    variance = jnp.mean(jnp.square(centered))
+    horizontal = jnp.mean(jnp.square(hidden[:, :, 1:] - hidden[:, :, :-1]))
+    vertical = jnp.mean(jnp.square(hidden[:, 1:] - hidden[:, :-1]))
+    return jnp.where(variance > 1e-10,
+                     (horizontal + vertical) / (2 * jnp.maximum(variance, 1e-10)),
+                     0.0)
+
+
+def spatial_variance(hidden):
+    centered = hidden - hidden.mean(axis=(1, 2), keepdims=True)
+    return jnp.mean(jnp.square(centered))
+
+
 def rollout_and_diagnostics(params, context, horizon=10, ticks=2,
                             mode="local_recovery", strength=.15, decay=.9):
     if (mode not in MODES or context.ndim != 5 or context.shape[1] < 2
@@ -86,14 +102,17 @@ def rollout_and_diagnostics(params, context, horizon=10, ticks=2,
         s, frame = dream(params, s, ticks, mode, strength, decay)
         hidden, _, recovery = s
         return s, (frame, jnp.mean(jnp.abs(hidden)),
-                   jnp.max(jnp.abs(hidden)), jnp.max(recovery))
+                   jnp.max(jnp.abs(hidden)), jnp.max(recovery),
+                   spatial_roughness(hidden), spatial_variance(hidden))
 
-    _, (predictions, mean_abs, max_abs, max_recovery) = jax.lax.scan(
+    _, (predictions, mean_abs, max_abs, max_recovery, roughness, variance) = jax.lax.scan(
         predict, state, None, length=horizon)
     return (jnp.swapaxes(predictions, 0, 1), {
         "mean_abs_hidden": jnp.mean(mean_abs),
         "max_abs_hidden": jnp.max(max_abs),
         "max_recovery": jnp.max(max_recovery),
+        "mean_spatial_roughness": jnp.mean(roughness),
+        "mean_spatial_variance": jnp.mean(variance),
     })
 
 
