@@ -106,11 +106,12 @@ def run(out="runs/rgb-homeostatic-recovery", seeds=(11, 23, 41),
         "trainable_parameters_per_arm": int(sum(
             np.size(np.asarray(p)) for p in jax.tree.leaves(base_params))),
         "additional_recovery_scalars_per_episode_per_arm": {
-            "plain": 0, "local_recovery": size * size * channels,
+            "plain": size * size * channels, "local_recovery": size * size * channels,
             "shuffled_recovery": size * size * channels},
         "controls": baselines, "results": results,
-        "limits": "Extra fixed-size recurrent recovery state and compute for "
-                  "recovery arms, but no new trainable parameters. This is a "
+        "limits": "Every arm carries the same recovery trace for matched "
+                  "state budget; plain computes it but never feeds it back. "
+                  "No new trainable parameters. This is a "
                   "toy activity-dependent negative feedback, not real chemical "
                   "homeostasis. Report test performance vs constant velocity; "
                   "higher internal stability alone is not predictive value. "
