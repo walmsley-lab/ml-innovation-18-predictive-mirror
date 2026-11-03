@@ -63,7 +63,12 @@ def run(parameters, output="runs/rgb-live-verified/metrics.json", camera=0,
                 before=time.perf_counter()
                 forecast=np.asarray(predict(jnp.asarray(np.stack(history)[None])))[0]
                 inference_ms.append((time.perf_counter()-before)*1000)
-                delayed.issue(pending,index,now,current,forecast)
+                # Timestamp after JAX materializes the forecast, not the
+                # camera read that happened before inference.
+                committed_ns = time.monotonic_ns()
+                if committed_ns < now:
+                    raise RuntimeError("Monotonic clock regressed")
+                delayed.issue(pending,index,committed_ns,current,forecast)
             if not no_display and cv2.waitKey(1)&0xff in (27,ord("q")):
                 break
             if max_frames and index+1>=max_frames:
