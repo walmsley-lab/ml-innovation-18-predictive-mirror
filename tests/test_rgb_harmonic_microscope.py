@@ -20,7 +20,6 @@ class HarmonicsTests(unittest.TestCase):
         assert eig.min() > 0
         for value, mode in zip(eig, modes):
             v = mode
-            degree = (np.pad(v, ((1, 1), (0, 0)))[1:-1] * 0)
             # Open boundary 4-neighbor combinatorial Laplacian.
             lap = np.zeros_like(v)
             lap[:-1] += v[:-1] - v[1:]
@@ -31,7 +30,7 @@ class HarmonicsTests(unittest.TestCase):
 
     def test_projection_energy_and_shuffle(self):
         eig, modes = hm.lattice_modes(4, 4, 5)
-        frames = np.broadcast_to(modes[0], (2, 3, 4, 4, 1)).copy()
+        frames = np.broadcast_to(modes[0][None, None, :, :, None], (2, 3, 4, 4, 1)).copy()
         s = hm.spectrum(frames, modes)
         self.assertAlmostEqual(s["selected_fraction"], 1, places=6)
         self.assertGreater(s["fractions"][0], .999)
