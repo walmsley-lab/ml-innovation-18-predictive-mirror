@@ -15,6 +15,7 @@ experiments and specialized inputs are intentionally retained.
 | Does emphasizing the distant future matter? | `experiments/rgb_horizon_objective.py` | Same RGB NCA; alternative loss targets |
 | Do cell neighborhoods or remote references matter? | `src/selectable_rgb_nca.py`, `experiments/rgb_selector_benchmark.py` | Local, relative, fixed-reference arms; [protocol](RGB_SELECTOR_BENCHMARK.md) |
 | Can cells learn which offset to read? | `src/rgb_soft_references.py`, `experiments/rgb_soft_references.py` | Soft learned spatial offset routing; [protocol](RGB_SOFT_REFERENCES.md) |
+| Does local recovery stabilize and improve a cellular predictor? | `src/rgb_homeostatic_nca.py`, `experiments/rgb_homeostatic_recovery.py` | Plain vs local vs shuffled nontrainable activity regulation; [protocol](RGB_HOMEOSTATIC_RECOVERY.md) |
 | Do fast and slow sheets help? | `src/rgb_multiscale_sheets.py`, `experiments/rgb_multiscale_sheets.py` | Dual-rate recurrent state; [protocol](RGB_MULTISCALE_SHEETS.md) |
 | Can phase coupling/entrainment contribute? | `src/rgb_phase_nca.py`, `src/rgb_phase_entrainment.py`; corresponding `experiments/` runners | Independent oscillatory controls; [protocol](RGB_PHASE_ENTRAINMENT.md) |
 | Does prediction depend on hidden memory? | `src/rgb_hidden_interventions.py`, `experiments/rgb_hidden_interventions.py` | Perturb a frozen checkpoint, then forecast; [protocol](RGB_HIDDEN_INTERVENTIONS.md) |
