@@ -30,12 +30,12 @@ python -m unittest tests.test_rgb_homeostatic_recovery -v
 
 Outputs include independently selected checkpoints, validation and held-out
 RGB MSE by lead, last-frame and constant-velocity controls, and diagnostic
-hidden/recovery magnitudes. During open-loop dreaming the model gets no new
+hidden/recovery magnitudes **and normalized adjacent-cell spatial\nroughness** (mean squared neighbor difference divided by spatial variance).\nA lower roughness value alone can reflect oversmoothing; interpret it jointly\nwith nonzero spatial variance and held-out forecast accuracy. During open-loop dreaming the model gets no new
 sensory evidence or future simulator state.
 
 **Claim gate:** held-out improvements beyond strong forecasting baselines
 *and* the spatially scrambled recovery control, repeated across seeds,
-with stable bounded dynamics. Smaller hidden magnitude alone is not a win.
+with stable bounded dynamics. Smaller hidden magnitude or lower spatial roughness alone is not a win.
 No fitted weights or experimental results are claimed by this protocol.
 
 **Related:** [Connectome harmonics](https://github.com/fractastical/connectome_harmonics)
