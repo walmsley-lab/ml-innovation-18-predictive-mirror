@@ -38,18 +38,6 @@ def run(out="runs/action-world3d-nca",seeds=(11,23,41),steps=100,
                      "best":initial,"step":0,
                      "val":evaluate(initial,validation,aware)}
               for aware in (True,False)}
-        @jax.jit
-        def update(params,m,v,video,actions,step,aware):
-            loss=lambda p:model.loss(p,video,actions,context,horizon,aware)
-            value,grad=jax.value_and_grad(loss)(params)
-            norm=jnp.sqrt(sum((g*g).sum() for g in jax.tree.leaves(grad)))
-            grad=jax.tree.map(lambda g:g/jnp.maximum(1.,norm),grad)
-            params,m,v=adamw(params,grad,m,v,step)
-            return params,m,v,value
-        # Separate JIT functions, since conditioning is a static architecture arm.
-        updates={aware:jax.jit(lambda p,m,v,video,actions,step:
-            update.__wrapped__(p,m,v,video,actions,step,aware))
-            for aware in ()} if False else {}
         def make_update(aware):
             @jax.jit
             def step_fn(p,m,v,video,actions,index):
