@@ -17,9 +17,10 @@ Compare three independently trained arms:
 
 All arms begin with the **same base weights** for each model seed, have the
 same trainable parameter count, consume the same training examples in the same
-order, and receive the same number of optimizer steps. Recovery adds one
-nontrainable state variable **per pixel and hidden channel**, plus compute;
-that resource mismatch is explicitly reported. Step-zero checkpoints remain
+order, and receive the same number of optimizer steps. All arms carry the same nontrainable recovery trace **per pixel and hidden
+channel**; the plain arm computes it but ignores it for its update. This
+matches state budget while leaving a small feedback-operation cost difference,
+which should be profiled before making a compute-matched claim. Step-zero checkpoints remain
 eligible during validation-based selection.
 
 ```bash
