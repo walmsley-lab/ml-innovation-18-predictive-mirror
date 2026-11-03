@@ -15,9 +15,7 @@ class TinyCNNVideoTests(unittest.TestCase):
         params=cnn.init(jax.random.PRNGKey(1),width=4)
         context=jnp.ones((1,3,16,16,3),jnp.float32)*.3
         a=np.asarray(cnn.rollout(params,context,2))
-        b=np.asarray(cnn.rollout(params,context.at[:,0].set(0),2))
         self.assertEqual(a.shape,(1,2,16,16,3))
-        self.assertGreater(np.abs(a-b).sum(),0) if False else None
         # Changing withheld future labels cannot affect a context-only rollout.
         extended=jnp.concatenate((context,jnp.ones_like(context[:,:2])),axis=1)
         np.testing.assert_array_equal(a,np.asarray(cnn.rollout(params,extended[:,:3],2)))
