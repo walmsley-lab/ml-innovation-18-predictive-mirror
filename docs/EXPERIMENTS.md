@@ -18,6 +18,7 @@ experiments and specialized inputs are intentionally retained.
 | Does local recovery stabilize and improve a cellular predictor? | `src/rgb_homeostatic_nca.py`, `experiments/rgb_homeostatic_recovery.py` | Plain vs local vs shuffled nontrainable activity regulation; [protocol](RGB_HOMEOSTATIC_RECOVERY.md) |
 | Do fast and slow sheets help? | `src/rgb_multiscale_sheets.py`, `experiments/rgb_multiscale_sheets.py` | Dual-rate recurrent state; [protocol](RGB_MULTISCALE_SHEETS.md) |
 | Can phase coupling/entrainment contribute? | `src/rgb_phase_nca.py`, `src/rgb_phase_entrainment.py`; corresponding `experiments/` runners | Independent oscillatory controls; [protocol](RGB_PHASE_ENTRAINMENT.md) |
+| Do recurrent states prefer particular lattice harmonics? | `src/rgb_harmonics.py`, `experiments/rgb_harmonic_microscope.py` | Frozen trained/untrained/shuffled hidden-state spectra; [protocol](RGB_HARMONIC_MICROSCOPE.md) |
 | Does prediction depend on hidden memory? | `src/rgb_hidden_interventions.py`, `experiments/rgb_hidden_interventions.py` | Perturb a frozen checkpoint, then forecast; [protocol](RGB_HIDDEN_INTERVENTIONS.md) |
 | Can a minimal circuit-style cell forecast RGB? | `src/rgb_circuit_cell.py`, `experiments/circuit_rgb_comparison.py` | Independent fixed two-state primitive, one-step ridge head, held-out open-loop RGB; [protocol](CIRCUIT_RGB_COMPARISON.md) |
 | Can transient local error traces adapt predictions? | `src/rgb_error_trace.py`, `experiments/rgb_error_trace.py` | Frozen weights; state-only adaptation; [protocol](RGB_ERROR_TRACE.md) |
