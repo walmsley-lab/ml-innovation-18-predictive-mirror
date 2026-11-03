@@ -59,6 +59,17 @@ class HomeostaticRecoveryTests(unittest.TestCase):
         self.assertGreater(float(next_r.max()), 0)
         self.assertLessEqual(float(next_r.max()), 1)
 
+    def test_spatial_roughness_is_nontrivial(self):
+        x = np.linspace(-1, 1, 8, dtype=np.float32)
+        smooth = jnp.asarray(np.broadcast_to(x[None, None, :, None],
+                                              (1, 8, 8, 1)))
+        cells = np.indices((8, 8)).sum(axis=0) % 2
+        checker = jnp.asarray(cells[None, :, :, None], jnp.float32)
+        self.assertGreater(float(recovery.spatial_roughness(checker)),
+                           float(recovery.spatial_roughness(smooth)))
+        self.assertEqual(float(recovery.spatial_roughness(
+            jnp.ones_like(checker))), 0.0)
+
     def test_minimal_train_and_evaluate_smoke(self):
         with tempfile.TemporaryDirectory() as directory:
             report = run(directory, seeds=(3,), steps=1, context=4,
@@ -67,6 +78,7 @@ class HomeostaticRecoveryTests(unittest.TestCase):
             self.assertEqual(set(report["results"][0]["arms"]),
                              set(recovery.MODES))
             for arm in report["results"][0]["arms"].values():
+                self.assertIn("mean_spatial_roughness", arm["activity"])
                 self.assertLessEqual(arm["validation_mse"],
                                      arm["step_zero_validation_mse"])
             self.assertTrue((Path(directory) / "metrics.json").exists())
