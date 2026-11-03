@@ -19,6 +19,7 @@ experiments and specialized inputs are intentionally retained.
 | Do fast and slow sheets help? | `src/rgb_multiscale_sheets.py`, `experiments/rgb_multiscale_sheets.py` | Dual-rate recurrent state; [protocol](RGB_MULTISCALE_SHEETS.md) |
 | Can phase coupling/entrainment contribute? | `src/rgb_phase_nca.py`, `src/rgb_phase_entrainment.py`; corresponding `experiments/` runners | Independent oscillatory controls; [protocol](RGB_PHASE_ENTRAINMENT.md) |
 | Does prediction depend on hidden memory? | `src/rgb_hidden_interventions.py`, `experiments/rgb_hidden_interventions.py` | Perturb a frozen checkpoint, then forecast; [protocol](RGB_HIDDEN_INTERVENTIONS.md) |
+| Can a minimal circuit-style cell forecast RGB? | `src/rgb_circuit_cell.py`, `experiments/circuit_rgb_comparison.py` | Independent fixed two-state primitive, one-step ridge head, held-out open-loop RGB; [protocol](CIRCUIT_RGB_COMPARISON.md) |
 | Can transient local error traces adapt predictions? | `src/rgb_error_trace.py`, `experiments/rgb_error_trace.py` | Frozen weights; state-only adaptation; [protocol](RGB_ERROR_TRACE.md) |
 
 ## Structured representations (not image recognition)
