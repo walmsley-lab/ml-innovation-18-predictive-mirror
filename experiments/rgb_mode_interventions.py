@@ -10,6 +10,8 @@ import numpy as np
 from src import rgb_benchmark as benchmark
 from src import rgb_harmonics as harmonics
 from src import rgb_mode_interventions as modes
+from src import rgb_hidden_interventions as hidden
+from src import forecast_diagnostics as diagnostics
 
 
 def run(checkpoint, out="runs/rgb-mode-interventions", seed=71000,
@@ -49,6 +51,14 @@ def run(checkpoint, out="runs/rgb-mode-interventions", seed=71000,
     controls = {name: benchmark.score(pred, values, context, leads)
                 for name, pred in benchmark.controls(
                     values[:, :context], horizon).items()}
+    # Positive control: wipe the entire recurrent memory at the same lead. This
+    # is the strongest possible hidden-state intervention, so if even it fails to
+    # move the forecast at a lead, the mode-suppression null there is a dead
+    # measurement (a collapsed, input-independent forecast), not a real null.
+    wiped = np.asarray(hidden.forecast(
+        params, context_frames, horizon, ticks, "reset", intervene_at))
+    measurement = diagnostics.collapse_report(
+        intact, leads, positive_control={"wipe_hidden_memory": wiped})
     folder = Path(out)
     folder.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(folder / "example.npz",
@@ -65,12 +75,17 @@ def run(checkpoint, out="runs/rgb-mode-interventions", seed=71000,
         "selected_mode_count_including_ties": len(eigenvalues),
         "selected_eigenvalues": eigenvalues.tolist(),
         "interventions": report_modes, "baselines": controls,
+        "measurement": measurement,
         "limits": "Paired intervention on one frozen model. Random-subspace "
                   "suppression matches the low-mode removal's per-sample, "
                   "per-channel L2 magnitude at intervention time. A forecast "
                   "difference alone is not evidence of improvement, semantic "
                   "representations, or brain mechanisms. Check that held-out "
-                  "test seeds were excluded from checkpoint selection.",
+                  "test seeds were excluded from checkpoint selection. The "
+                  "'measurement' block reports whether the forecast has "
+                  "collapsed to an input-independent clip-rail fixed point; at "
+                  "any lead flagged 'dead' a ~0 suppression delta is "
+                  "uninformative rather than a causal null.",
     }
     (folder / "metrics.json").write_text(json.dumps(report, indent=2) + "\n")
     return report
@@ -93,8 +108,11 @@ def main():
     report = run(a.checkpoint, a.out, a.seed, a.episodes, a.context,
                  a.horizon, a.size, a.ticks, a.mode_count,
                  a.intervene_at, a.strength)
-    print(json.dumps({name: arm["delta_mse_from_intact"] for name, arm
-                      in report["interventions"].items()}, indent=2))
+    print(json.dumps({
+        "delta_mse_from_intact": {name: arm["delta_mse_from_intact"] for name, arm
+                                  in report["interventions"].items()},
+        "measurement_verdict": report["measurement"].get("measurement_verdict"),
+    }, indent=2))
 
 
 if __name__ == "__main__":

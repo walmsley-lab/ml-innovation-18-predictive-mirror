@@ -39,6 +39,14 @@ class TransferTests(unittest.TestCase):
             self.assertEqual(len(result["results"]),1)
             self.assertEqual(set(result["results"][0]["arms"]),
                              {"scratch","transmission","spatially_shifted_transfer"})
+            measurement=result["results"][0]["measurement"]
+            self.assertIn("clip_rail_saturation",measurement)
+            self.assertIn("scratch_readout_x3",
+                          measurement["positive_control_response"])
+            # The init effect under test is reported alongside the positive
+            # control so a reader can compare the two magnitudes directly.
+            self.assertEqual(set(measurement["init_effect_on_forecast"]),
+                             {"transmission","spatially_shifted_transfer"})
 
 
 if __name__=="__main__":

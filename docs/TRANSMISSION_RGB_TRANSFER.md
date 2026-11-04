@@ -28,3 +28,10 @@ claim the communication curriculum helps merely because the weights can
 be loaded. A stronger future experiment should share *exact* communication
 weights architecturally and match total pretraining+fine-tuning compute.
 The current independent RGB NCA and communication experiments remain intact.
+
+The `measurement` block in `metrics.json` reports a positive control and a
+collapse check. On the current world all three arms fine-tune into the *same*
+input-independent clip-rail (all-black) forecast — bit-identical at leads 5/10 —
+so the initialization cannot matter: this is a **degenerate shared solution, not
+a transfer null**. Interpret only when the arms' forecasts are non-collapsed
+(see the [zero-effect diagnosis](ZERO_EFFECT_DIAGNOSIS.md)).

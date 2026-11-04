@@ -25,6 +25,13 @@ python -m unittest tests.test_rgb_mode_interventions -v
   removal to hurt more than the matched random intervention, not merely to
   change the output.
 
+The `measurement` block in `metrics.json` adds a positive control (wiping the
+whole hidden state) and a per-lead `live`/`dead` verdict: on the current frozen
+checkpoint the open-loop forecast collapses to an input-independent clip-rail
+frame by lead 5, so the ~0 suppression deltas at long leads are a **dead
+measurement, not a causal null**. See the [zero-effect
+diagnosis](ZERO_EFFECT_DIAGNOSIS.md) before interpreting any delta.
+
 Spatial modes are not necessarily stable physical waves; the lattice is a
 computational scaffold, not anatomical connectomics. Compare multiple
 checkpoints, seeds, low-mode cutoffs and independent scenes before broad claims.

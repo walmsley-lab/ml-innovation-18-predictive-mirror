@@ -16,3 +16,11 @@ whole-frame and foreground MSE. Comparing action-aware vs blind is a test
 of action-conditioned RGB prediction, **not** evidence of metric 3D
 understanding or a learned viewpoint-invariant state. Depth/geometry
 probes and independent scene composition are required before that claim.
+
+The `measurement` block is a positive control: feeding the trained aware model
+counterfactual action plans moves its forecast monotonically and
+sign-sensitively (the pathway is **live**, not a dead wire), while
+`world_action_dependence` gives the ceiling on any learnable action effect. The
+learned response is real but ~10× below that ceiling and below the aggregate
+MSE floor, so aware≈blind is a **genuine but underpowered** effect, not a null.
+See the [zero-effect diagnosis](ZERO_EFFECT_DIAGNOSIS.md).
