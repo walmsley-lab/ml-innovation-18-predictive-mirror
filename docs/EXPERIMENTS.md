@@ -38,6 +38,7 @@ experiments and specialized inputs are intentionally retained.
 |---|---|
 | Inspect model forecasts, future truth, and activity | `python -m experiments.rgb_prediction_gallery --help`; [gallery](RGB_PREDICTION_GALLERY.md) |
 | Score a frozen RGB NCA on new synthetic seeds | `python -m experiments.rgb_benchmark --help`; [benchmark contract](RGB_BENCHMARK_CONTRACT.md) |
+| Localize objects (hard/segmentation/soft) and see why a model misses them | `python -m experiments.rgb_event_benchmark --help`, `python -m experiments.rgb_event_gallery --help`; [event benchmark](RGB_EVENT_BENCHMARK.md) |
 | Capture RGB webcam frames; fit a video-specific NCA | `python -m experiments.rgb_nca --help`; [guide](GETTING_STARTED.md) |
 | Compare committed forecasts with later webcam frames | `python -m experiments.rgb_verified_live --help`; [verified live](RGB_VERIFIED_LIVE.md) |
 | Compare independently recorded webcam footage | `python -m experiments.rgb_transfer_eval --help`; [protocol](RGB_WEBCAM_TRANSFER.md) |
