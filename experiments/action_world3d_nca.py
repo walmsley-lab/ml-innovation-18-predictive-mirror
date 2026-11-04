@@ -6,6 +6,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from src import action_rgb_nca as model,world3d,world3d_benchmark as bench
+from src import forecast_diagnostics as diagnostics
 from train import adamw
 
 
@@ -74,6 +75,33 @@ def run(out="runs/action-world3d-nca",seeds=(11,23,41),steps=100,
                 "test":bench.score(test[2],forecast,context,leads)}
             np.savez_compressed(folder/f"seed-{seed}-{mode}.npz",
                                 **jax.tree.map(np.asarray,arm["best"]))
+        # Positive control: feed the trained action-aware model counterfactual
+        # action plans on the same contexts. If zeroing/negating the planned
+        # camera actions moves the forecast, the action pathway reaches the
+        # prediction, so action_aware ~= action_blind is a genuine (weak-signal)
+        # null, not a dead input wire. We also report how much the *world's* true
+        # future depends on those actions -- the ceiling on any learnable effect.
+        aware_best=arms[True]["best"]
+        ctx=jnp.asarray(test[0][:,:context])
+        planned_actions=jnp.asarray(test[1])
+        planned=np.asarray(model.rollout(aware_best,ctx,planned_actions,horizon,True))
+        counterfactual={
+            "zeroed_actions":np.asarray(model.rollout(
+                aware_best,ctx,jnp.zeros_like(planned_actions),horizon,True)),
+            "negated_actions":np.asarray(model.rollout(
+                aware_best,ctx,-planned_actions,horizon,True))}
+        measurement=diagnostics.collapse_report(
+            planned,leads,positive_control=counterfactual)
+        truth_planned=test[0][:,context:context+horizon]
+        truth_zeroed=np.stack([world3d.episode(
+            83000+i,length,size,"ood_camera",
+            actions=np.zeros_like(test[1][i]))["rgb"][context:context+horizon]
+            for i in range(len(test[0]))])
+        measurement["world_action_dependence"]={
+            str(lead):float(np.abs(
+                truth_planned[:,lead-1]-truth_zeroed[:,lead-1]).mean())
+            for lead in leads}
+        row["measurement"]=measurement
         reports.append(row)
     result={"protocol":"action-conditioned-rgb-world3d-v1",
             "test_domain":"ood_camera","test_seed_root":83000,
@@ -83,7 +111,11 @@ def run(out="runs/action-world3d-nca",seeds=(11,23,41),steps=100,
                 "guarantee of metric 3D state. Planned camera actions "
                 "are available in both train/test; true future pixels "
                 "and depth/pose are withheld. Blind arm is a weaker "
-                "information condition, not compute-identical architecture."}
+                "information condition, not compute-identical architecture. "
+                "Each run's 'measurement' block is a positive control: "
+                "counterfactual action plans that must move a live model's "
+                "forecast, plus the world's own action dependence as the "
+                "ceiling on any learnable action effect."}
     (folder/"metrics.json").write_text(json.dumps(result,indent=2)+"\n")
     return result
 

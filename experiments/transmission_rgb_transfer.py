@@ -7,6 +7,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from src import predictive_rgb_nca as rgb, rgb_benchmark as bench
+from src import forecast_diagnostics as diagnostics
 from src.transmission_to_rgb import transfer
 from train import adamw
 
@@ -59,14 +60,36 @@ def run(communication_checkpoint,out="runs/transmission-rgb-transfer",
                         arm["best"],arm["val"],arm["step"]=arm["p"],score,step
         record={"seed":int(seed),"arms":{}}
         leads=tuple(sorted({horizon,*(h for h in bench.LEADS if h<=horizon)}))
+        test_context=jnp.asarray(test[:,:context])
+        arm_forecasts={}
         for name,arm in arms.items():
-            forecast=np.asarray(rgb.rollout(
-                arm["best"],jnp.asarray(test[:,:context]),horizon,ticks))
+            forecast=np.asarray(rgb.rollout(arm["best"],test_context,horizon,ticks))
+            arm_forecasts[name]=forecast
             record["arms"][name]={
                 "best_step":arm["step"],"validation_mse":arm["val"],
                 "test":bench.score(forecast,test,context,leads)}
             np.savez_compressed(folder/f"seed-{seed}-{name}.npz",
                                 **jax.tree.map(np.asarray,arm["best"]))
+        # Positive control + collapse check. The scientific question is whether
+        # the *initialization* changes the fine-tuned forecast; the arms coming
+        # out equal is only a transfer null if the scoring pipeline can see a
+        # forecast difference at all. Perturbing the frozen scratch readout is a
+        # known forecast-changing manipulation, and cross-arm divergence shows
+        # whether the three initializations actually converged to one function.
+        scratch_best=arms["scratch"]["best"]
+        louder=dict(scratch_best,rgb_readout=scratch_best["rgb_readout"]*3.0)
+        positive={"scratch_readout_x3":np.asarray(
+                      rgb.rollout(louder,test_context,horizon,ticks))}
+        measurement=diagnostics.collapse_report(
+            arm_forecasts["scratch"],leads,positive_control=positive)
+        # How far the two transfer initializations' forecasts actually land from
+        # scratch -- the effect under test. Compare against the verdict above.
+        measurement["init_effect_on_forecast"]=diagnostics.response(
+            arm_forecasts["scratch"],
+            {"transmission":arm_forecasts["transmission"],
+             "spatially_shifted_transfer":arm_forecasts["spatially_shifted_transfer"]},
+            leads)
+        record["measurement"]=measurement
         results.append(record)
     report={
         "experiment":"cellular_transmission_to_rgb_transfer",
@@ -82,7 +105,12 @@ def run(communication_checkpoint,out="runs/transmission-rgb-transfer",
                  "architecture, not an exact shared core. The supplied "
                  "communication checkpoint must have been trained on "
                  "separate signal tasks with no RGB-test selection. "
-                 "Only measured RGB test gains could support a transfer claim."
+                 "Only measured RGB test gains could support a transfer claim. "
+                 "Each seed's 'measurement' block contrasts the init effect "
+                 "(transmission/shifted vs scratch) against a positive control "
+                 "and a collapse check: if the forecast is railed and "
+                 "input-independent, equal arms reflect a degenerate shared "
+                 "solution rather than an informative transfer null."
     }
     (folder/"metrics.json").write_text(json.dumps(report,indent=2)+"\n")
     return report

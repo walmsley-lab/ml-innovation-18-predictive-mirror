@@ -9,6 +9,7 @@ import numpy as np
 
 from src import predictive_rgb_nca as base, rgb_benchmark as benchmark
 from src import rgb_homeostatic_nca as model
+from src import forecast_diagnostics as diagnostics
 from train import adamw
 
 
@@ -93,6 +94,22 @@ def run(out="runs/rgb-homeostatic-recovery", seeds=(11, 23, 41),
             }
             np.savez_compressed(output / f"seed-{seed}-{mode}.npz",
                                 **jax.tree.map(np.asarray, arm["best"]))
+        # Positive control: on the FROZEN selected 'plain' weights, dial the
+        # recovery gain up and measure how far the forecast moves from the
+        # no-feedback (strength 0) prediction. A monotone, nonzero response
+        # proves the recovery->forecast pathway is live, so the matched-seed
+        # arms being equal is a genuine prediction null (the retrained readout
+        # absorbs the regulariser), not a disconnected feedback term.
+        frozen = arms["plain"]["best"]
+        test_context = jnp.asarray(test[:, :context])
+        no_feedback = np.asarray(model.rollout(
+            frozen, test_context, horizon, ticks, "plain", 0.0, decay))
+        sweep = {f"local_recovery@strength={probe}": np.asarray(model.rollout(
+                    frozen, test_context, horizon, ticks,
+                    "local_recovery", probe, decay))
+                 for probe in (strength, min(1.0, max(strength * 3, 0.5)), 1.0)}
+        seed_results["measurement"] = diagnostics.collapse_report(
+            no_feedback, leads, positive_control=sweep)
         results.append(seed_results)
     base_params = base.init(jax.random.PRNGKey(0), channels)
     report = {
@@ -115,7 +132,11 @@ def run(out="runs/rgb-homeostatic-recovery", seeds=(11, 23, 41),
                   "toy activity-dependent negative feedback, not real chemical "
                   "homeostasis. Report test performance vs constant velocity; "
                   "higher internal stability alone is not predictive value. "
-                  "No direct harmonic forcing or phase oscillator.",
+                  "No direct harmonic forcing or phase oscillator. Each seed's "
+                  "'measurement' block is a positive control: a frozen-weight "
+                  "recovery-gain sweep that must move the forecast, confirming "
+                  "the feedback reaches predictions even where the retrained "
+                  "arms end up equal.",
     }
     (output / "metrics.json").write_text(json.dumps(report, indent=2) + "\n")
     return report

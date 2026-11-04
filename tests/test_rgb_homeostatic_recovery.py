@@ -83,6 +83,26 @@ class HomeostaticRecoveryTests(unittest.TestCase):
                                      arm["step_zero_validation_mse"])
             self.assertTrue((Path(directory) / "metrics.json").exists())
             self.assertTrue((Path(directory) / "seed-3-local_recovery.npz").exists())
+            measurement = report["results"][0]["measurement"]
+            self.assertIn("clip_rail_saturation", measurement)
+            self.assertIn("measurement_verdict", measurement)
+            # The frozen-weight gain sweep is the positive control.
+            self.assertTrue(any(name.startswith("local_recovery@strength")
+                                for name in measurement["positive_control_response"]))
+
+    def test_frozen_strength_sweep_moves_forecast(self):
+        # On a model with a nonzero readout, dialing the recovery gain up must
+        # change the forecast -- the recovery->prediction pathway is live, so an
+        # equal-arms result is a real null rather than a disconnected feedback.
+        x = jnp.asarray(np.random.default_rng(7).random(
+            (2, 10, 8, 8, 3), dtype=np.float32))
+        params = nca.init(jax.random.PRNGKey(5), 4)
+        params = dict(params, rgb_readout=jnp.ones((4, 3)) * .2)
+        prefix = x[:, :6]
+        base = np.asarray(recovery.rollout(params, prefix, 4, 2, "plain", 0.0, .9))
+        strong = np.asarray(recovery.rollout(
+            params, prefix, 4, 2, "local_recovery", 1.0, .9))
+        self.assertGreater(float(np.abs(strong - base).mean()), 1e-5)
 
 
 if __name__ == "__main__":

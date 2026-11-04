@@ -70,6 +70,18 @@ class ModeInterventionTests(unittest.TestCase):
             self.assertEqual(set(report["interventions"]), set(probe.MODES))
             for result in report["interventions"].values():
                 self.assertEqual(result["forecast_mean_absolute_change"], 0.0)
+            # A zero-readout checkpoint maps hidden state to nothing, so the
+            # positive control (wiping hidden memory) must register no change
+            # and no lead may be flagged 'live': every ~0 mode-suppression delta
+            # is uninformative (a dead or merely insensitive measurement), never
+            # a causal null.
+            measurement = report["measurement"]
+            self.assertIn("clip_rail_saturation", measurement)
+            self.assertIn("input_independence", measurement)
+            wipe = measurement["positive_control_response"]["wipe_hidden_memory"]
+            for lead, change in wipe.items():
+                self.assertEqual(change, 0.0)
+            self.assertNotIn("live", set(measurement["measurement_verdict"].values()))
 
 
 if __name__ == "__main__":

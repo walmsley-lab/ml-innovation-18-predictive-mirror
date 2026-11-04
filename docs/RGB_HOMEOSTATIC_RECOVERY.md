@@ -34,6 +34,13 @@ RGB MSE by lead, last-frame and constant-velocity controls, and diagnostic
 hidden/recovery magnitudes **and normalized adjacent-cell spatial\nroughness** (mean squared neighbor difference divided by spatial variance).\nA lower roughness value alone can reflect oversmoothing; interpret it jointly\nwith nonzero spatial variance and held-out forecast accuracy. During open-loop dreaming the model gets no new
 sensory evidence or future simulator state.
 
+Each seed's `measurement` block is a positive control: on the frozen selected
+`plain` weights it dials the recovery gain up and shows the forecast moves
+monotonically at every lead (`live` verdict). That confirms the feedback reaches
+predictions, so equal retrained arms are a **genuine prediction null** — the
+retrained readout absorbs the regulariser — rather than a disconnected feedback
+term. See the [zero-effect diagnosis](ZERO_EFFECT_DIAGNOSIS.md).
+
 **Claim gate:** held-out improvements beyond strong forecasting baselines
 *and* the spatially scrambled recovery control, repeated across seeds,
 with stable bounded dynamics. Smaller hidden magnitude or lower spatial roughness alone is not a win.
