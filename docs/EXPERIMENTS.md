@@ -44,6 +44,7 @@ experiments and specialized inputs are intentionally retained.
 | Compare independently recorded webcam footage | `python -m experiments.rgb_transfer_eval --help`; [protocol](RGB_WEBCAM_TRANSFER.md) |
 | Report experiments without invalid cross-representation rankings | `python -m experiments.evidence_report --help`; [evidence guide](CROSS_TECHNIQUE_EVIDENCE.md) |
 | Tell a genuine null from a collapsed/dead forecast measurement | every runner's `metrics.json` `measurement` block; [zero-effect diagnosis](ZERO_EFFECT_DIAGNOSIS.md) |
+| Tell undertraining from collapse across step budgets, and which anti-collapse lever works | `python -m experiments.training_budget_sweep --help`; [budget sweep](TRAINING_BUDGET_SWEEP.md) |
 
 **Status and evidence:** Source code and a runnable CLI mean *implemented*, not
 *experimentally proven*. The synthetic RGB NCA has beaten persistence on one
