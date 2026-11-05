@@ -42,3 +42,17 @@ Decision labels: supported task advantage / no demonstrated advantage / inconclu
 Archive exact source revision, command, seed roots, dependency versions, candidate checkpoints, checkpoint-selection rule, test results, plotting inputs and source hashes. Record original-run / fresh-reproduction / operator-reported-only statuses separately. Label all changes after test inspection as exploratory and increment the contract version.
 
 Use `python -m src.research_contract --contract experiments/research_contract_v1.json` to schema-check and print the contract SHA256. Do not interpret schema validation as experimental preregistration, data verification, or user approval.
+
+
+## Literature-informed amendments (Perplexity review, 2026-11-05)
+
+- Preexisting spatiotemporal NCA work (Richardson et al., PLOS Computational Biology 2024, DOI 10.1371/journal.pcbi.1011589) and spatiotemporal forecasting with NCAs mean that **NCA for prediction is not the novelty claim**.
+- Benchmark history regimes separately: **history-identifiable** (different observed prefixes and different futures), **observation-equivalent but future-ambiguous** (same full RGB prefix; different stochastic futures), and **same-future controls**. They cannot be pooled for a claim about deterministic object permanence.
+- History-dependent prediction **does not imply NCA-specific memory**. Kalman filters, tracking with data association, ConvLSTM, and SimVP's multi-frame input can exploit past observations; H2 demands evidence beyond competent alternatives.
+- Distinguish motion memory, identity persistence, uncertainty calibration, and long-range spatial communication. Passing one is not evidence for all four.
+- Candidate comparator selection and model capacity require two explicitly labeled regimes: resource matched and adequately trained competence baselines. No post-hoc comparator choice on the frozen final test.
+- Only launch a study after schema-validation plus documented final-test freezing, pilot-based precision planning, and model capacity/optimization sufficiency checks. Do not treat the proposed 0.10 margin or 3x latency ceiling as published facts.
+- Use interventions on a **responsive trained checkpoint**; an insensitive positive control makes the mechanism claim unmeasurable. CD-NOD is observational causal discovery, not a substitute for accessible interventions.
+- Publish real numerical outputs with compatible units and protocols; external Moving-MNIST MSE and our normalized RGB MSE must **never** share a leaderboard.
+
+See the separate prior-art register proposed for this repository for current 2026 work, including local asynchronous reasoning NCAs and high-resolution coarse-state NCA decoders.
