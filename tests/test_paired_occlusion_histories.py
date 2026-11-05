@@ -40,6 +40,9 @@ class PairedHistoryTests(unittest.TestCase):
             result=run(directory+"/metrics.json",seeds=(11,))
             self.assertEqual(result["predictor"],"persistence")
             self.assertEqual(result["positive_control"]["barrier_events"],2)
+            control=result["history_linear_reset_shuffle"]
+            self.assertLess(control["intact"]["contrast_mse"],
+                            control["reset"]["contrast_mse"])
 
 
 if __name__=="__main__":
