@@ -130,6 +130,13 @@ def run(out="runs/object-permanence-campaign",models=FAMILIES,
     }
     controls={name:episode_success(p,test,context)
               for name,p in baseline.items()}
+    # Group two opposite directions from the same world seed into one
+    # bootstrap unit; the two trajectories are NOT independent episodes.
+    def pair_success(scored):
+        x=np.asarray(scored["success_per_event"],float)
+        if len(x)%2:
+            raise ValueError("Expected paired return events")
+        return x.reshape((-1,2)).mean(axis=1)
     runs=[]
     for name in models:
         for seed in seeds:
@@ -175,10 +182,18 @@ def run(out="runs/object-permanence-campaign",models=FAMILIES,
             elapsed=time.perf_counter()-start
             prediction=forecast(best,test_rgb)
             scored=episode_success(prediction,test,context)
-            comparisons={baseline_name:paired_bootstrap(
-                scored["success_per_event"],reference["success_per_event"],
+            baseline_comparisons={baseline_name:paired_bootstrap(
+                pair_success(scored),pair_success(reference),
                 seed=int(seed)+101)
                 for baseline_name,reference in controls.items()}
+            changed=world.controls(test_rgb[:,:context])
+            reset_forecast=np.asarray(predict(best,jnp.asarray(changed["reset"])))
+            shuffled_forecast=np.asarray(predict(best,jnp.asarray(changed["shuffled"])))
+            control_scores={"reset":episode_success(reset_forecast,test,context),
+                            "shuffled":episode_success(shuffled_forecast,test,context)}
+            history_comparisons={mode:paired_bootstrap(
+                pair_success(scored),pair_success(value),seed=int(seed)+102)
+                for mode,value in control_scores.items()}
             checkpoint=folder/f"{name}-seed{seed}-best.npz"
             np.savez_compressed(checkpoint,**jax.tree.map(np.asarray,best))
             sample=gallery(folder,f"{name}-seed{seed}",test,
@@ -193,7 +208,10 @@ def run(out="runs/object-permanence-campaign",models=FAMILIES,
                 "gallery":sample,
                 "gallery_sha256":hashlib.sha256((folder/sample).read_bytes()).hexdigest(),
                 "test_contrast_mse":contrast_error(prediction,test_truth),
-                "test":scored,"paired_success_vs_baselines":comparisons})
+                "test":scored,
+                "reset_and_shuffled":control_scores,
+                "paired_success_vs_baselines":baseline_comparisons,
+                "paired_success_vs_history_controls":history_comparisons})
     manifest={
         "protocol":"focused-history-dependent-permanence-v1",
         "seed_roots":ROOTS,"steps":steps,"seeds":list(map(int,seeds)),
