@@ -1,13 +1,21 @@
 # Experiment ledger
 
-What each experiment **establishes** and **why it matters** to the project's
-central question: *does cellular / persistent prediction actually beat simpler
-baselines at perception and short-horizon anticipation?*
+What each experiment **is designed to establish** and **why it matters** to the
+broader investigation of emergence, structure–dynamics–function mapping,
+perception, adaptation, robustness, communication and substrate efficiency.
 
-This is the evidence ledger. The older [`EXPERIMENTS.md`](EXPERIMENTS.md) is a
-*what/how* map (question → model → input); this file is the *what-was-shown*
-companion. Each runner lives in `experiments/` and most have a protocol doc in
-`docs/`.
+This is an **experiment-intent and evidence-scope catalog**, not a claim that
+every hypothesis was experimentally demonstrated. [`EXPERIMENTS.md`](EXPERIMENTS.md)
+is the smaller *what/how* entry map (question → model → input). This ledger
+catalogs all **147 Python runners** under `experiments/` at this revision;
+`field_perturbation_probe.py` appears under two roles but is counted once.
+Implementation, smoke-test success, held-out results and independent biological
+measurements are distinct levels of evidence. Consult each runner's actual
+metrics, checkpoint provenance and protocol before making scientific claims.
+
+**Filename notation:** arrows such as `roadmap_35_rgb_gates.py` →
+**`rgb_promotion_gate.py`** are **proposals only**; no files are renamed by
+this PR. Existing imports and documented commands remain authoritative.
 
 ## How to read "kind"
 
@@ -271,8 +279,12 @@ tables above. (`roadmap 46–55` share `docs/ROADMAP_46_55_ATTENTION.md`;
 
 ## Cleanup backlog (drives the code-simplicity pass)
 
-Collected across all 123 runners; high-value, low-risk, behavior-preserving
-unless noted:
+Collected across all 147 runners; these are **future opportunities**, not a
+checklist that must be completed before this incremental PR can merge.
+Seven RGB-family training runners already use the shared clipped-AdamW step;
+other migrations, renames and reorganization remain deferred. Any migration
+must preserve the original rate, gradient clipping and update semantics, with
+its own tests. Behavior-shifting candidates require separate review.
 
 1. **Shared `train_and_select` helper.** The jitted grad-norm-clip + `adamw`
    `update`/`make_update` closure plus the per-arm `{params, m, v, best, step,
