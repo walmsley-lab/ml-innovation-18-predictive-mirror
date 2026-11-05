@@ -36,6 +36,18 @@ class Tests(unittest.TestCase):
             self.assertEqual(json.loads((root/"gpu_status.json").read_text())["status"],"completed")
             self.assertFalse((root/"campaign/gpu_status.json").exists())
 
+    def test_bad_image_config_fails_fast_with_status(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            cfg=root/"cfg.json";cfg.write_text("{}")
+            with patch.object(worker,"gpu_available") as gpu, \
+                 patch.object(worker.time,"monotonic",side_effect=[0,61]), \
+                 patch.object(worker.time,"sleep"):
+                ok=worker.run_campaign(cfg,root/"campaign",1,"0"*64,60)
+            self.assertFalse(ok)
+            gpu.assert_not_called()
+            self.assertEqual(json.loads((root/"gpu_status.json").read_text())["status"],"failed")
+
     def test_sdl_and_manifest(self):
         template=Path("deploy/akash-gpu.yaml").read_text()
         output=campaign.render_sdl(template,IMAGE,"experiments/gpu-smoke.json","b"*64,1,60)
