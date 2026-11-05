@@ -25,3 +25,12 @@ Report the number of independent scene pairs, number of model seeds, model-seed 
 `pilot_precision` resamples a pilot score distribution at proposed counts of seeds/pairs to estimate plausible interval widths. **It is not a formal power analysis**, not evidence of external validity, and cannot select a margin after final-test inspection. Use pilot variability and the desired accuracy–cost decision to choose a final run budget *before* evaluating the held-out test.
 
 This module is an independent analysis tool until the frozen campaign is completed. Its outputs cannot certify provenance or verify an empirical finding by themselves.
+
+
+## Identifiability strata and planning
+
+Never pool recoverable latent history, genuinely ambiguous futures, and same-future null controls into one headline object-permanence success rate. Report per-regime effects first. A perfect deterministic point forecast is not achievable on observation-equivalent stochastic futures, so use appropriate distributions and proper scoring rules there.
+
+Treat model seed and independent scene seed as separate uncertainty sources and report empirical precision, not arbitrary claims that 3, 5 or 10 seeds confer significance. The `pilot_precision()` helper is a rough, resampling-based **planning aid only**; a prospective power or assurance analysis would require an explicit effect and variance model specified before looking at the final test. Include practical effect sizes and confidence/credible intervals rather than replacing them with p-value thresholds.
+
+SSIM, PSNR, LPIPS and MSE may supplement object- and event-sensitive metrics where appropriate, but are **not** substitute primary metrics for a paired-history reappearance experiment; report metric units and input normalization explicitly.
