@@ -14,6 +14,9 @@ class ReactionDiffusionTests(unittest.TestCase):
         self.assertTrue(np.isfinite(a).all())
         self.assertGreater(float(np.mean(np.abs(a[0]-a[-1]))),0)
 
+    def test_constant_field_has_zero_laplacian(self):
+        self.assertAlmostEqual(float(np.max(np.abs(rd.laplace(np.ones((16,16)))))),0.)
+
     def test_shared_local_forecast_shape(self):
         p=rd.init(jax.random.PRNGKey(11),width=4)
         x=jnp.asarray(rd.start(size=16)[None])
