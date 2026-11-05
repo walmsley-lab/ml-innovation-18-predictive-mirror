@@ -78,7 +78,7 @@ def run(out="runs/persistent-gaussian-observer",checkpoint=None,
             drift=_center_error(record,trace,context)
             display_indices=[0,min(2,horizon-1),horizon-1]
             panel=np.concatenate(
-                [record["rgb"][context-1],
+                [observed[context-1],
                  *[record["rgb"][context+i] for i in display_indices],
                  *[modes["short_context"][i] for i in display_indices],
                  *[modes["persistent"][i] for i in display_indices]],axis=1)
