@@ -55,3 +55,12 @@ Complete evidence audit and existing pair-history tests, then export the same da
 - Pajouheshgar, Xu & Süsstrunk, [Discovering Partial Differential Equations With Neural Cellular Automata](https://doi.org/10.1162/artl.a.454), *Artificial Life* (2026): another direct mechanistic/prior-art challenge for using NCAs to infer physical dynamics. Scope and code comparison require close inspection before claiming mechanistic novelty.
 
 These extend the literature search beyond the initial Perplexity report. NCA applied to distributed computation, physical rule discovery, or biological self-organization is a mature research space; our discriminating contribution must be **specific empirical causal evidence** under controlled partial observability, not a generic synthesis of these topics.
+
+
+## Established object permanence / intuitive physics benchmarks
+
+- [IntPhys](https://intphys.cognitive-ml.fr/benchmark/description.html) tests macroscopic object permanence and continuity using closely matched possible/impossible video cases, manipulating occlusion duration and objects.
+- [Physion](https://physion-benchmark.github.io/) assesses visual intuitive physical prediction with rendered 3D scenarios and object-contact evaluation; compare with its reported task protocol, not our 32px MSE scale.
+- [IntPhys 2](https://arxiv.org/abs/2506.09849) extends intuitive-physics tests to permanence, immutability, spatiotemporal continuity, and solidity.
+
+Thus "we use visual occlusion as a test of object permanence" is firmly established. A defensible contribution would instead isolate *specific recurrent mechanisms* through matched same-last-image histories and interventions on a performant model, with a careful prior-art check before claiming even that distinction as novel.
