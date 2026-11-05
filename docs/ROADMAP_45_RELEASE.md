@@ -1,0 +1,5 @@
+# Roadmap 45 — reproducible research release
+
+Supply a JSON `{"git_sha":"<exact commit>","sources":[{"role":"train|validation|test|checkpoint|metrics","path":"...","capture_session":"..."}],"hardware":{},"software":{},"run_config":{}}` file, then `python -m experiments.roadmap_45_release --spec release.json`. The packer verifies local files, SHA256, exact git commit shape, nonidentical split files/session labels and read-back zip integrity. It is reproducible across identical input files, platforms aside from ZIP implementation differences.
+
+Raw recordings/train/validation/test data are **NOT embedded by default**; their hashes and metadata remain in manifest. The operator must explicitly opt in to embedding video (which can contain people), and independently review checkpoint privacy/license and artifact sizes before publication. Training cannot be recreated solely from redacted footage or optional hardware annotations. This is an evidence release and integrity gate, not evidence of model performance or clinical/biological validity.
