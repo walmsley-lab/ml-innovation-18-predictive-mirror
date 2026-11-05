@@ -83,8 +83,16 @@ def _rows(report):
                         scores.get(metric),"observed_rgb_center_plus_planned_dt",
                         "irregular-temporal")
     else:  # 42
+        # Each circuit arm repeats the same pixel baselines. A baseline
+        # computed on one test set must count only once per resolution.
+        seen_controls=set()
         for row in report["rows"]:
             for name,metrics in [(row["mode"],row["scores"]),*row["baselines"].items()]:
+                if name!=row["mode"]:
+                    marker=(row["size"],name)
+                    if marker in seen_controls:
+                        continue
+                    seen_controls.add(marker)
                 for lead,values in metrics.items():
                     add(None,name,"resolution-"+str(row["size"]),lead,
                         "mse","rgb_mse",values.get("mse"),
