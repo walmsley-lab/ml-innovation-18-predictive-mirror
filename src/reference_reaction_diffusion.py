@@ -9,7 +9,7 @@ from src.model import conv
 
 
 def laplace(field):
-    return (-field + .2 * (np.roll(field,1,0)+np.roll(field,-1,0)
+    return (-field + .25 * (np.roll(field,1,0)+np.roll(field,-1,0)
                                +np.roll(field,1,1)+np.roll(field,-1,1)))
 
 
