@@ -5,7 +5,7 @@
 and cellular dynamics give a measurable advantage over simpler predictors, or do
 simpler approaches remain sufficient?
 
-**Verdict (at achievable CPU budgets): simpler approaches remain sufficient.**
+**Verdict (at these tested CPU budgets): no demonstrated benefit from additional complexity.**
 Plain persistence beats the RGB-inferred Gaussian predictor on viewpoint change;
 cheap CNN / transport match or beat the expensive cellular NCA variants on the
 perceptual ladder; cellular dynamics add nothing over static/velocity Gaussian
@@ -60,7 +60,7 @@ failure is expected and is not a differentiator.
 
 No model localizes at this budget. Every real model misses most objects
 (missed 2.5–7.3 of ~7.3 visible; hard-detection location error 22–45 px on a
-32-px frame).
+32-px frame). **The hard localization average includes a full-image diagonal penalty (45.25 px at 32×32) for each missed visible object; it is not the mean displacement of successfully detected centers.**
 
 | model | visible-location MAE px | missed / visible objects |
 |---|---|---|
@@ -74,7 +74,7 @@ No model localizes at this budget. Every real model misses most objects
 The structured models (`routing`, `hierarchical`) localize marginally more
 objects than `cnn` or plain `nca` — but it is a modest, metric-dependent edge
 (soft-centroid scoring actually favours `transport`) at 2–10× the compute, not a
-win. Plain `nca` is strictly dominated: expensive and mediocre.
+win. Plain `nca` is less competitive on this narrow measured protocol, not ruled out more generally.
 
 **Reappearance is not directly measurable in this run.** The dedicated
 return-after-invisibility probe detected **zero** qualifying events in every test
@@ -109,4 +109,4 @@ budgets,"** not "cellular dynamics can never help." Equal SGD steps and image
 loss do not imply equal FLOPs or capacity; initializations are model-specific;
 curriculum (linear vs mixed) showed small, inconsistent differences with no clear
 winner. Checkpoints and per-domain reports are saved so a larger run can
-re-score the same protocol. No result here is promoted to the README.
+re-score the same protocol. No result here is promoted to the README. These numbers are operator-reported: the original local metrics, checkpoints, exact launch command, source revision, and timing conditions have not been independently verified. See the [metric and provenance audit](CAMPAIGN_FINDINGS_20261104.md).
