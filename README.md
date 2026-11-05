@@ -21,6 +21,8 @@ persistence, but **did not beat constant velocity**. A +10-frame forecast is
 approximately one second only at a verified 10 fps; synthetic time is nominal.
 These results do **not** establish real-webcam prediction or object permanence.
 
+**Illustrated research note:** [Read *From Pixels to Persistent Worlds?* (PDF)](paper/From_Pixels_to_Persistent_Worlds.pdf) · [editable Markdown](paper/From_Pixels_to_Persistent_Worlds.md). The figures distinguish conceptual schematics from reported measurements.
+
 ## Start here
 
 Python 3.11 and a CPU are enough for the synthetic experiments:
