@@ -34,7 +34,7 @@ def initialize(seed=31000, episodes=3):
         raise ValueError("Need independent source episodes")
     x, y = [], []
     for i in range(episodes):
-        features, targets, _ = samples(seed+i, (60,0,0)) if False else source(seed+i)
+        features, targets, _ = source(seed+i)
         x.append(features)
         y.append(targets)
     xx, yy = np.concatenate(x), np.concatenate(y)
