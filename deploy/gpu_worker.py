@@ -83,17 +83,18 @@ def run_campaign(config, output, max_runs, expected_sha, hold_seconds):
     """Run the repo's existing campaign.py and remain available to akt exec."""
     config = Path(config).resolve()
     out = Path(output).resolve()
-    if not config.is_file() or hash_file(config) != expected_sha:
-        raise ValueError("Container campaign config digest differs from approved local manifest")
-    if max_runs < 1 or not 60 <= hold_seconds <= 86400:
-        raise ValueError("Invalid bounds")
     out.mkdir(parents=True, exist_ok=True)
     status = out.parent / "gpu_status.json"
-    state = {"status": "running", "config_sha256": expected_sha,
+    state = {"status": "starting", "config_sha256": expected_sha,
              "source_revision": os.environ.get("SOURCE_REVISION", "unknown")}
     try:
+        if not config.is_file() or hash_file(config) != expected_sha:
+            raise ValueError("Container config differs from approved local manifest")
+        if max_runs < 1 or not 60 <= hold_seconds <= 86400:
+            raise ValueError("Invalid bounds")
         if not gpu_available():
             raise RuntimeError("JAX GPU device unavailable; refusing CPU fallback")
+        state["status"] = "running"
         atomic_json(status, state)
         command = [sys.executable, "-m", "campaign", "--config", str(config),
                    "--output", str(out), "--execute", "--max-runs", str(max_runs),
