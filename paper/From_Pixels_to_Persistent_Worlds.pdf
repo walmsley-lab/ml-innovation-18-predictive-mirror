@@ -1,0 +1,439 @@
+%PDF-1.4
+%ASCII-ONLY RESEARCH NOTE
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R] /Count 8 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >>
+endobj
+6 0 obj
+<< /Length 3817 >>
+stream
+q 1 1 1 rg 0 0 612 792 re f Q
+q 0.098 0.204 0.286 rg 0.098 0.204 0.286 RG 0 783 612 9 re B Q
+BT /F2 28 Tf 0.098 0.204 0.286 rg 1 0 0 1 53 684 Tm (FROM PIXELS TO) Tj ET
+BT /F2 28 Tf 0.098 0.204 0.286 rg 1 0 0 1 53 642 Tm (PERSISTENT WORLDS?) Tj ET
+BT /F1 13 Tf 0.165 0.404 0.529 rg 1 0 0 1 55 610 Tm (Reproducing, Improving, and Understanding) Tj ET
+BT /F1 13 Tf 0.165 0.404 0.529 rg 1 0 0 1 55 591 Tm (Distributed Visual Prediction) Tj ET
+q 0.851 0.945 0.937 rg 0.851 0.945 0.937 RG 55 477 502 80 re B Q
+BT /F2 10 Tf 0.165 0.404 0.529 rg 1 0 0 1 70 537 Tm (REPRODUCE) Tj ET
+BT /F1 8.6 Tf 0.376 0.455 0.529 rg 1 0 0 1 70 516 Tm (Proven reference capabilities) Tj ET
+BT /F2 10 Tf 0.165 0.404 0.529 rg 1 0 0 1 230 537 Tm (IMPROVE) Tj ET
+BT /F1 8.6 Tf 0.376 0.455 0.529 rg 1 0 0 1 230 516 Tm (Prediction and robustness) Tj ET
+BT /F2 10 Tf 0.165 0.404 0.529 rg 1 0 0 1 390 537 Tm (UNDERSTAND) Tj ET
+BT /F1 8.6 Tf 0.376 0.455 0.529 rg 1 0 0 1 390 516 Tm (Structure and function) Tj ET
+BT /F2 12 Tf 0.165 0.404 0.529 rg 1 0 0 1 55 439 Tm (ABSTRACT) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 417 Tm (Can a network of small, locally interacting computational cells learn to anticipate visual events? Predictive) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 401.8 Tm (Mirror explores this question with neural cellular automata \(NCAs\), conventional visual predictors, controllable) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 386.6 Tm (synthetic environments, and interventions on recurrent state. We use established NCA and video-prediction) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 371.40000000000003 Tm (research as reference capabilities to reproduce and improve, not as ideas we must avoid because they are no) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 356.20000000000005 Tm (longer novel.) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 334.00000000000006 Tm (In one previously reported three-seed synthetic benchmark, an RGB cellular predictor reduced ten-frame image) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 318.80000000000007 Tm (MSE relative to last-frame persistence \(approximately 0.0080 versus 0.0121\), but did not match image-derived) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 303.6000000000001 Tm (constant-velocity extrapolation \(approximately 0.0050\). Separate campaigns exposed degenerate image outputs,) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 288.4000000000001 Tm (uninformative interventions, and cases in which object information survived a hard detection threshold before) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 273.2000000000001 Tm (disappearing at later horizons. A non-saturating readout removed one clipping pathology, but has not yet) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 258.0000000000001 Tm (established accurate object tracking. These results motivate our next phase: reproduce strong reference) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 242.80000000000013 Tm (results, make small models train reliably, compare them against capable alternatives, and test which internal) Tj ET
+BT /F1 10.2 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 227.60000000000014 Tm (mechanisms produce useful behavior under partial observability and communication constraints.) Tj ET
+q 0.933 0.953 0.965 rg 0.933 0.953 0.965 RG 55 88 502 50 re B Q
+BT /F1 8.7 Tf 0.376 0.455 0.529 rg 1 0 0 1 67 120 Tm (Evidence labels: the benchmark is a historical report, not an independent reproduction. Vector figures explain concepts) Tj ET
+BT /F1 8.7 Tf 0.376 0.455 0.529 rg 1 0 0 1 67 108.8 Tm (rather than impersonate checkpoint outputs.) Tj ET
+BT /F1 8.5 Tf 0.376 0.455 0.529 rg 1 0 0 1 55 40 Tm (Research note  /  November 2026) Tj ET
+BT /F2 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 534 40 Tm (01) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 3830 >>
+stream
+q 1 1 1 rg 0 0 612 792 re f Q
+q 0.098 0.204 0.286 rg 0.098 0.204 0.286 RG 0 784 612 8 re B Q
+BT /F2 8.3 Tf 0.165 0.404 0.529 rg 1 0 0 1 55 756 Tm (PREDICTIVE MIRROR  /  RESEARCH NOTE) Tj ET
+q 0.820 0.878 0.906 RG 1.2 w 55 745 m 557 745 l S Q
+BT /F2 15.7 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 709 Tm (1. The predictive mirror) Tj ET
+q 0.027 0.541 0.522 RG 1.2 w 55 698 m 557 698 l S Q
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 55 36 Tm (From Pixels to Persistent Worlds?  |  2026) Tj ET
+BT /F2 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 531 36 Tm (02) Tj ET
+q 0.933 0.953 0.965 rg 0.933 0.953 0.965 RG 55 615 502 75 re B Q
+q 1.000 1.000 1.000 rg 0.820 0.878 0.906 RG 68 639 109 30 re B Q
+BT /F2 9 Tf 0.165 0.404 0.529 rg 1 0 0 1 83 651 Tm (OBSERVE) Tj ET
+q 0.027 0.541 0.522 RG 1.2 w 179 654 m 192 654 l S Q
+q 0.851 0.945 0.937 rg 0.820 0.878 0.906 RG 193 639 109 30 re B Q
+BT /F2 9 Tf 0.165 0.404 0.529 rg 1 0 0 1 208 651 Tm (PREDICT) Tj ET
+q 0.027 0.541 0.522 RG 1.2 w 304 654 m 317 654 l S Q
+q 1.000 1.000 1.000 rg 0.820 0.878 0.906 RG 318 639 109 30 re B Q
+BT /F2 9 Tf 0.165 0.404 0.529 rg 1 0 0 1 333 651 Tm (WAIT) Tj ET
+q 0.027 0.541 0.522 RG 1.2 w 429 654 m 442 654 l S Q
+q 1.000 1.000 1.000 rg 0.820 0.878 0.906 RG 443 639 109 30 re B Q
+BT /F2 9 Tf 0.165 0.404 0.529 rg 1 0 0 1 458 651 Tm (COMPARE) Tj ET
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 72 622 Tm (ILLUSTRATION: the future is not an inference input.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 594 Tm (Imagine a mirror that shows what it expects to happen next. A moving ball is easy to extrapolate while visible, but once it) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 581.45 Tm (passes behind an obstacle the current image no longer reveals its motion. An observer may still anticipate its return by) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 568.9000000000001 Tm (using earlier observations and a model of the environment.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 549.3500000000001 Tm (Our computational challenge is deliberately smaller. A predictor receives a short sequence of RGB images, updates its) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 536.8000000000002 Tm (internal state, and commits future frames before those frames are observed. The future observation is available only) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 524.2500000000002 Tm (for training targets or later evaluation, never as a forecasting input.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 504.7000000000002 Tm (A useful predictive mirror must do more than render plausible colors. It should anticipate what moves, where and when it) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 492.1500000000002 Tm (moves, when something is hidden, and what earlier observations imply about future events. Some outcomes are) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 479.6000000000002 Tm (intrinsically ambiguous: if two worlds produce exactly the same complete observation history but different futures, no) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 467.0500000000002 Tm (deterministic RGB-only model can know which hidden outcome occurred.) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 447.50000000000017 Tm (FIGURE NOTE: Figure 1 Prediction is a testable commitment. Illustrate observed frames committed forecast subsequent truth error. For) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 436.6000000000002 Tm (published figures use real checkpoint outputs and identical visual scales. A ball behind an occluder is an explanatory example, not evidence that) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 425.7000000000002 Tm (the present NCA achieves object permanence.) Tj ET
+BT /F3 7.6 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 62 Tm (VECTOR DIAGRAM: CONCEPTUAL UNLESS LABELED AS REPORTED) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 5948 >>
+stream
+q 1 1 1 rg 0 0 612 792 re f Q
+q 0.098 0.204 0.286 rg 0.098 0.204 0.286 RG 0 784 612 8 re B Q
+BT /F2 8.3 Tf 0.165 0.404 0.529 rg 1 0 0 1 55 756 Tm (PREDICTIVE MIRROR  /  RESEARCH NOTE) Tj ET
+q 0.820 0.878 0.906 RG 1.2 w 55 745 m 557 745 l S Q
+BT /F2 15.7 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 709 Tm (2. A simple local computational substrate) Tj ET
+q 0.027 0.541 0.522 RG 1.2 w 55 698 m 557 698 l S Q
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 55 36 Tm (From Pixels to Persistent Worlds?  |  2026) Tj ET
+BT /F2 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 531 36 Tm (03) Tj ET
+q 0.933 0.953 0.965 rg 0.933 0.953 0.965 RG 55 615 502 75 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 76 639 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 76 651 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 76 663 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 76 675 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 90 639 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 90 651 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 90 663 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 90 675 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 104 639 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 104 651 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 104 663 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 104 675 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 118 639 11 9 re B Q
+q 0.447 0.725 0.714 rg 0.447 0.725 0.714 RG 118 651 11 9 re B Q
+q 0.447 0.725 0.714 rg 0.447 0.725 0.714 RG 118 663 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 118 675 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 132 639 11 9 re B Q
+q 0.447 0.725 0.714 rg 0.447 0.725 0.714 RG 132 651 11 9 re B Q
+q 0.447 0.725 0.714 rg 0.447 0.725 0.714 RG 132 663 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 132 675 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 146 639 11 9 re B Q
+q 0.447 0.725 0.714 rg 0.447 0.725 0.714 RG 146 651 11 9 re B Q
+q 0.447 0.725 0.714 rg 0.447 0.725 0.714 RG 146 663 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 146 675 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 160 639 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 160 651 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 160 663 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 160 675 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 174 639 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 174 651 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 174 663 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 174 675 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 188 639 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 188 651 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 188 663 11 9 re B Q
+q 0.835 0.882 0.910 rg 0.835 0.882 0.910 RG 188 675 11 9 re B Q
+BT /F2 10 Tf 0.165 0.404 0.529 rg 1 0 0 1 248 663 Tm (LOCAL 3 x 3) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 248 646 Tm (Hidden state + shared update) Tj ET
+BT /F1 9 Tf 0.376 0.455 0.529 rg 1 0 0 1 248 628 Tm (Repeated ticks -> RGB forecast) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 594 Tm (Our primary RGB NCA is a grid of cells with persistent hidden vectors. Each cell repeatedly receives information from a 3 3) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 581.45 Tm (neighborhood, applies a shared learned update, and changes its state. During observation, a sensory discrepancy) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 568.9000000000001 Tm (influences the recurrent computation; during an open-loop forecast, no new sensory information arrives. A learned) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 556.3500000000001 Tm (readout converts hidden activity into changes in the predicted image.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 536.8000000000002 Tm (This is intentionally a small, interpretable experimental substrate, not a model of individual biological neurons. Distributed) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 524.2500000000002 Tm (and recurrent processing in visual systems motivates asking about local receptive fields, feedback, temporal) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 511.7000000000002 Tm (information, and long-range communication. A biological analogy does not establish that these mechanisms arise in our) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 499.1500000000002 Tm (model or confer any advantage.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 479.6000000000002 Tm (The laboratory maintains independent comparisons rather than one monolithic architecture: direct RGB models, image) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 467.0500000000002 Tm (transport, hierarchical processing, soft spatial references, oscillator and harmonic probes, graph and particle) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 454.50000000000017 Tm (systems with explicitly different inputs, active sensing, and controlled physical worlds. A source file or runnable) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 441.95000000000016 Tm (experiment establishes implementation, not empirical success.) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 422.40000000000015 Tm (FIGURE NOTE: Figure 2 Local cell, global forecast. Show a neighborhood, hidden vector, shared update rule, and repeated ticks; pair it with a) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 411.50000000000017 Tm (clearly labeled diagnostic hidden-state activity map if a verified checkpoint is available. A small cortex feedback schematic can convey) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 400.6000000000002 Tm (motivation without inventing brain-activation measurements.) Tj ET
+BT /F3 7.6 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 62 Tm (VECTOR DIAGRAM: CONCEPTUAL UNLESS LABELED AS REPORTED) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 5224 >>
+stream
+q 1 1 1 rg 0 0 612 792 re f Q
+q 0.098 0.204 0.286 rg 0.098 0.204 0.286 RG 0 784 612 8 re B Q
+BT /F2 8.3 Tf 0.165 0.404 0.529 rg 1 0 0 1 55 756 Tm (PREDICTIVE MIRROR  /  RESEARCH NOTE) Tj ET
+q 0.820 0.878 0.906 RG 1.2 w 55 745 m 557 745 l S Q
+BT /F2 15.7 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 709 Tm (3. Early experimental evidence) Tj ET
+q 0.027 0.541 0.522 RG 1.2 w 55 698 m 557 698 l S Q
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 55 36 Tm (From Pixels to Persistent Worlds?  |  2026) Tj ET
+BT /F2 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 531 36 Tm (04) Tj ET
+q 0.933 0.953 0.965 rg 0.933 0.953 0.965 RG 55 615 502 75 re B Q
+BT /F2 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 74 665 Tm (Persistence) Tj ET
+q 0.376 0.455 0.529 rg 0.376 0.455 0.529 RG 74 641 117 13 re B Q
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 74 627 Tm (0.0121) Tj ET
+BT /F2 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 234 665 Tm (Cellular NCA) Tj ET
+q 0.027 0.541 0.522 rg 0.027 0.541 0.522 RG 234 641 77.35537190082646 13 re B Q
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 234 627 Tm (0.0080) Tj ET
+BT /F2 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 394 665 Tm (Velocity) Tj ET
+q 0.165 0.404 0.529 rg 0.165 0.404 0.529 RG 394 641 48.34710743801653 13 re B Q
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 394 627 Tm (0.0050) Tj ET
+BT /F1 7.7 Tf 0.376 0.455 0.529 rg 1 0 0 1 72 616 Tm (HISTORICALLY REPORTED; NOT REPRODUCED HERE) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 594 Tm (Small synthetic scenes let us control motion, color, collisions, occlusion, and viewpoint changes, while keeping ground) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 581.45 Tm (truth for scoring. We compare an NCA with persistence and a constant-velocity baseline estimated from earlier RGB) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 568.9000000000001 Tm (frames; simulator object positions and velocities are not supplied to those predictors.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 549.3500000000001 Tm (A reported three-seed benchmark with eight context frames and a ten-frame horizon produced the following mean RGB) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 536.8000000000002 Tm (errors:) Tj ET
+BT /F1 9.1 Tf 0.376 0.455 0.529 rg 1 0 0 1 64 517.2500000000002 Tm (Method Ten-frame RGB MSE \(lower is better\)) Tj ET
+BT /F1 9.1 Tf 0.376 0.455 0.529 rg 1 0 0 1 64 498.2500000000002 Tm (Last-frame persistence 0.0121) Tj ET
+BT /F1 9.1 Tf 0.376 0.455 0.529 rg 1 0 0 1 64 479.2500000000002 Tm (Recurrent RGB NCA 0.0080) Tj ET
+BT /F1 9.1 Tf 0.376 0.455 0.529 rg 1 0 0 1 64 460.2500000000002 Tm (Image-derived constant velocity 0.0050) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 441.2500000000002 Tm (These rounded numbers are historical operator-reported results from one synthetic generator. They are not) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 428.7000000000002 Tm (independently re-executed estimates with confidence intervals, and they do not demonstrate object tracking, webcam) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 416.1500000000002 Tm (generalization, or an advantage over modern learned predictors.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 396.6000000000002 Tm (Later exploratory CPU studies encountered more severe problems. A residual-plus-clip forecast head could drive almost) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 384.0500000000002 Tm (every pixel to black and become independent of the input; additional optimization steps did not rescue that saturated) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 371.50000000000017 Tm (solution. Replacing the readout with a non-saturating blend prevented the specific clip-rail collapse in the reported) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 358.95000000000016 Tm (training sweep, but did not yield reliable foreground detection or localization at the tested budgets. This is an) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 346.40000000000015 Tm (engineering improvement in trainability, not yet a performance breakthrough.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 326.85000000000014 Tm (The key development lesson is to confirm that a model can learn a simple known task such as overfitting a handful of) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 314.3000000000001 Tm (moving-object clips before investing in larger architectures or interpretation experiments. Then increase environmental) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 301.7500000000001 Tm (and horizon difficulty in measured stages.) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 282.2000000000001 Tm (FIGURE NOTE: Figure 3 Forecasts, not a leaderboard alone. The principal result image should compare last observation, NCA, persistence,) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 271.3000000000001 Tm (RGB-derived velocity, and truth at the same horizon, with an error heatmap. Accompany it with per-horizon performance and model-seed) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 260.40000000000015 Tm (variation from one frozen run. Do not mix incompatible synthetic campaigns.) Tj ET
+BT /F3 7.6 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 62 Tm (VECTOR DIAGRAM: CONCEPTUAL UNLESS LABELED AS REPORTED) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 4454 >>
+stream
+q 1 1 1 rg 0 0 612 792 re f Q
+q 0.098 0.204 0.286 rg 0.098 0.204 0.286 RG 0 784 612 8 re B Q
+BT /F2 8.3 Tf 0.165 0.404 0.529 rg 1 0 0 1 55 756 Tm (PREDICTIVE MIRROR  /  RESEARCH NOTE) Tj ET
+q 0.820 0.878 0.906 RG 1.2 w 55 745 m 557 745 l S Q
+BT /F2 15.7 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 709 Tm (4. Understanding failures as a route to better models) Tj ET
+q 0.027 0.541 0.522 RG 1.2 w 55 698 m 557 698 l S Q
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 55 36 Tm (From Pixels to Persistent Worlds?  |  2026) Tj ET
+BT /F2 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 531 36 Tm (05) Tj ET
+q 0.933 0.953 0.965 rg 0.933 0.953 0.965 RG 55 615 502 75 re B Q
+q 1.000 1.000 1.000 rg 0.820 0.878 0.906 RG 69 638 147 34 re B Q
+BT /F2 8.4 Tf 0.165 0.404 0.529 rg 1 0 0 1 79 656 Tm (METRIC EXPLOIT) Tj ET
+q 0.851 0.945 0.937 rg 0.820 0.878 0.906 RG 231 638 147 34 re B Q
+BT /F2 8.4 Tf 0.165 0.404 0.529 rg 1 0 0 1 241 656 Tm (DETECTOR ISSUE) Tj ET
+q 1.000 1.000 1.000 rg 0.820 0.878 0.906 RG 393 638 147 34 re B Q
+BT /F2 8.4 Tf 0.165 0.404 0.529 rg 1 0 0 1 403 656 Tm (REAL INFO LOSS) Tj ET
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 72 621 Tm (Separate runs. These are diagnostic classes, not snapshots.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 594 Tm (An image metric can reward the wrong behavior. In one exploratory campaign, a nearly uniform bright prediction achieved) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 581.45 Tm (reported foreground recall 1.0 while foreground precision was only about 0.011 and the model failed to localize objects.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 568.9000000000001 Tm (In a different frozen-checkpoint diagnostic, an object contributed detectable color mass at short horizons even) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 556.3500000000001 Tm (though a hard threshold declared it absent; the long-horizon rollout then lost that information and collapsed toward) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 543.8000000000002 Tm (black.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 524.2500000000002 Tm (These are distinct cases: metric exploitation, detection sensitivity, and genuine loss of predicted information. The) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 511.7000000000002 Tm (distinction matters for training. A stronger threshold does not repair missing dynamics; a better dynamics model does) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 499.1500000000002 Tm (not cure an invalid metric.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 479.6000000000002 Tm (A similar issue appears in mechanistic interpretation. If a forecast is already independent of hidden state, removing or) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 467.0500000000002 Tm (perturbing that state may have no visible effect. Such a measurement is uninformative about the mechanism's usefulness.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 454.50000000000017 Tm (A controlled positive intervention must first show that the assay responds when it should. Then targeted interventions) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 441.95000000000016 Tm (can distinguish a descriptive activity pattern from a mechanism that contributes to prediction.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 422.40000000000015 Tm (The repository now contains diagnostic measures for foreground location and mass, clip-rail saturation, input) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 409.85000000000014 Tm (dependence, event timing, and intervention sensitivity. They should guide development without becoming a burden on) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 397.3000000000001 Tm (every small PR.) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 377.7500000000001 Tm (FIGURE NOTE: Figure 4 Three different failures. Use verified, independently sourced examples of bright-frame collapse, a soft object) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 366.85000000000014 Tm (rejected by a hard detector, and genuine late-horizon black-frame collapse. Always mark the separate run provenance. A small inset can show) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 355.95000000000016 Tm (intact / targeted lesion / known-live positive control as a method, not an accomplished causal discovery.) Tj ET
+BT /F3 7.6 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 62 Tm (VECTOR DIAGRAM: CONCEPTUAL UNLESS LABELED AS REPORTED) Tj ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 5842 >>
+stream
+q 1 1 1 rg 0 0 612 792 re f Q
+q 0.098 0.204 0.286 rg 0.098 0.204 0.286 RG 0 784 612 8 re B Q
+BT /F2 8.3 Tf 0.165 0.404 0.529 rg 1 0 0 1 55 756 Tm (PREDICTIVE MIRROR  /  RESEARCH NOTE) Tj ET
+q 0.820 0.878 0.906 RG 1.2 w 55 745 m 557 745 l S Q
+BT /F2 15.7 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 709 Tm (5. Reproduce what works, then exceed it) Tj ET
+q 0.027 0.541 0.522 RG 1.2 w 55 698 m 557 698 l S Q
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 55 36 Tm (From Pixels to Persistent Worlds?  |  2026) Tj ET
+BT /F2 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 531 36 Tm (06) Tj ET
+q 0.933 0.953 0.965 rg 0.933 0.953 0.965 RG 55 615 502 75 re B Q
+q 0.851 0.945 0.937 rg 0.820 0.878 0.906 RG 67 640 90 31 re B Q
+BT /F2 8.5 Tf 0.165 0.404 0.529 rg 1 0 0 1 76 653 Tm (Growth) Tj ET
+q 0.851 0.945 0.937 rg 0.820 0.878 0.906 RG 166 640 90 31 re B Q
+BT /F2 8.5 Tf 0.165 0.404 0.529 rg 1 0 0 1 175 653 Tm (PDE fields) Tj ET
+q 1.000 1.000 1.000 rg 0.820 0.878 0.906 RG 265 640 90 31 re B Q
+BT /F1 8.5 Tf 0.165 0.404 0.529 rg 1 0 0 1 274 653 Tm (RGB motion) Tj ET
+q 1.000 1.000 1.000 rg 0.820 0.878 0.906 RG 364 640 90 31 re B Q
+BT /F1 8.5 Tf 0.165 0.404 0.529 rg 1 0 0 1 373 653 Tm (Occlusion) Tj ET
+q 1.000 1.000 1.000 rg 0.820 0.878 0.906 RG 463 640 90 31 re B Q
+BT /F1 8.5 Tf 0.165 0.404 0.529 rg 1 0 0 1 472 653 Tm (Adaptive) Tj ET
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 71 620 Tm (Published reference capability -> intended development) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 594 Tm (We do not need to invent a principle to benefit from understanding it. Mordvintsev and colleagues showed that NCAs can) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 581.45 Tm (grow and regenerate target patterns. Richardson and colleagues showed that NCAs can reproduce evolving reaction) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 568.9000000000001 Tm (diffusion and other spatiotemporal patterns. These are excellent capability references: a faithful reproduction gives) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 556.3500000000001 Tm (us something real to optimize and extend.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 536.8000000000002 Tm (The video-prediction literature supplies equally important competitors. ConvLSTM introduced spatially organized) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 524.2500000000002 Tm (recurrent memory; PhyDNet incorporates physically structured dynamics; and SimVP shows how capable a relatively simple) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 511.7000000000002 Tm (convolutional predictor can be without recurrence. The OpenSTL ecosystem offers implementations and evaluation) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 499.1500000000002 Tm (conventions, but published benchmark numbers from different datasets cannot be compared directly with our tiny RGB) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 486.6000000000002 Tm (world.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 467.0500000000002 Tm (Our planned performance progression is deliberately practical:) Tj ET
+BT /F1 9.15 Tf 0.098 0.204 0.286 rg 1 0 0 1 64 447.50000000000017 Tm (1. Reproduce: Pattern growth/regeneration, spatiotemporal PDE dynamics, and strong conventional video-prediction) Tj ET
+BT /F1 9.15 Tf 0.098 0.204 0.286 rg 1 0 0 1 64 435.1000000000002 Tm (references under their own published settings.) Tj ET
+BT /F1 9.15 Tf 0.098 0.204 0.286 rg 1 0 0 1 64 415.7000000000002 Tm (2. Learn reliably: Repair the present NCA forecast dynamics, demonstrate short-sequence overfitting, then increase) Tj ET
+BT /F1 9.15 Tf 0.098 0.204 0.286 rg 1 0 0 1 64 403.30000000000024 Tm (horizon and scene complexity.) Tj ET
+BT /F1 9.15 Tf 0.098 0.204 0.286 rg 1 0 0 1 64 383.90000000000026 Tm (3. Compete: Compare direct RGB, image transport, and hybrid dynamics-plus-rendering models on common RGB-only history) Tj ET
+BT /F1 9.15 Tf 0.098 0.204 0.286 rg 1 0 0 1 64 371.5000000000003 Tm (tasks, with meaningful training budgets.) Tj ET
+BT /F1 9.15 Tf 0.098 0.204 0.286 rg 1 0 0 1 64 352.1000000000003 Tm (4. Adapt: Test occlusion, identity, partial observability, uncertain futures, active observation, and transfer to) Tj ET
+BT /F1 9.15 Tf 0.098 0.204 0.286 rg 1 0 0 1 64 339.70000000000033 Tm (recorded or live video.) Tj ET
+BT /F1 9.15 Tf 0.098 0.204 0.286 rg 1 0 0 1 64 320.30000000000035 Tm (5. Explain and optimize: Study causal state/communication roles, actual information reach, latency, memory traffic, and) Tj ET
+BT /F1 9.15 Tf 0.098 0.204 0.286 rg 1 0 0 1 64 307.9000000000004 Tm (measured physical cost when available.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 288.5000000000004 Tm (Reproducing a published capability is progress even if it is not novel. Beating a reference is a valuable performance) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 275.9500000000004 Tm (milestone even without a new explanatory theory. Explaining why a mechanism works is a separate scientific achievement.) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 256.4000000000004 Tm (FIGURE NOTE: Figure 5 Capability ladder. Draw a clear progression from pattern growth and recovery evolving spatial fields observed video) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 245.50000000000037 Tm (motion history-dependent reappearance adaptable prediction. Use only actual replication artifacts for achieved stages; mark others as) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 234.60000000000036 Tm (planned. Place RGB prediction, motion transport, and persistent structured-state models as competing or complementary alternatives rather) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 223.70000000000036 Tm (than claiming one finished hybrid.) Tj ET
+BT /F3 7.6 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 62 Tm (VECTOR DIAGRAM: CONCEPTUAL UNLESS LABELED AS REPORTED) Tj ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 6265 >>
+stream
+q 1 1 1 rg 0 0 612 792 re f Q
+q 0.098 0.204 0.286 rg 0.098 0.204 0.286 RG 0 784 612 8 re B Q
+BT /F2 8.3 Tf 0.165 0.404 0.529 rg 1 0 0 1 55 756 Tm (PREDICTIVE MIRROR  /  RESEARCH NOTE) Tj ET
+q 0.820 0.878 0.906 RG 1.2 w 55 745 m 557 745 l S Q
+BT /F2 15.7 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 709 Tm (6. Toward adaptable predictive computation) Tj ET
+q 0.027 0.541 0.522 RG 1.2 w 55 698 m 557 698 l S Q
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 55 36 Tm (From Pixels to Persistent Worlds?  |  2026) Tj ET
+BT /F2 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 531 36 Tm (07) Tj ET
+q 0.933 0.953 0.965 rg 0.933 0.953 0.965 RG 55 615 502 75 re B Q
+q 1.000 1.000 1.000 rg 0.820 0.878 0.906 RG 77 644 142 31 re B Q
+q 0.851 0.945 0.937 rg 0.820 0.878 0.906 RG 242 644 142 31 re B Q
+q 1.000 1.000 1.000 rg 0.820 0.878 0.906 RG 407 644 142 31 re B Q
+BT /F2 9 Tf 0.165 0.404 0.529 rg 1 0 0 1 97 657 Tm (DYNAMICS) Tj ET
+BT /F2 9 Tf 0.165 0.404 0.529 rg 1 0 0 1 269 657 Tm (MEMORY) Tj ET
+BT /F2 9 Tf 0.165 0.404 0.529 rg 1 0 0 1 409 657 Tm (OBSERVATION) Tj ET
+BT /F1 9 Tf 0.376 0.455 0.529 rg 1 0 0 1 216 625 Tm (Forecast + verify + learn) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 594 Tm (A useful perceptual foundation must jointly address dynamics \(what changes\), memory \(what remains relevant when) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 581.45 Tm (information is missing\), and observation \(what is visible and what evidence might be acquired\). These functions need not) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 568.9000000000001 Tm (belong to one monolithic network or share one internal representation.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 549.3500000000001 Tm (Our next discriminating test uses paired histories whose last visible image is identical but whose earlier trajectories) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 536.8000000000002 Tm (differ. A successful predictor should produce the appropriate different futures when the earlier evidence is) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 524.2500000000002 Tm (informative. It must compete with history-aware classical filters and learned convolutional predictors; merely beating) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 511.7000000000002 Tm (last-frame persistence would not establish a special NCA capability. Reappearance, identity preservation, and irreducible) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 499.1500000000002 Tm (future ambiguity require distinct evaluations.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 479.6000000000002 Tm (Once functioning models perform useful tasks, we can study the consequences of local communication, longer-range) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 467.0500000000002 Tm (references, recurrent state, oscillations, and spatial harmonics. Traveling-wave-like visualizations can be compelling,) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 454.50000000000017 Tm (but a spatial spectrum alone does not prove a propagating functional wave. Perturbation experiments must first) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 441.95000000000016 Tm (demonstrate measurement sensitivity and then a task-specific consequence.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 422.40000000000015 Tm (Our longer-term interest includes physical computing. Locality and shared rules could someday be useful on distributed or) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 409.85000000000014 Tm (in-memory substrates, but present CPU experiments have not demonstrated an efficiency advantage. We therefore) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 397.3000000000001 Tm (measure computation and memory/communication costs alongside predictive quality rather than treating biological) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 384.7500000000001 Tm (inspiration as a hardware-efficiency result.) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 365.2000000000001 Tm (FIGURE NOTE: Figure 6 Research architecture, not product claim. Show three interacting functions dynamics, memory, observation feeding a) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 354.3000000000001 Tm (future renderer, with evaluation feeding back into training. A small conceptual grid of multiple plausible futures may illustrate uncertainty,) Tj ET
+BT /F3 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 343.40000000000015 Tm (but should not be presented as samples from a trained probabilistic model.) Tj ET
+BT /F2 11.2 Tf 0.165 0.404 0.529 rg 1 0 0 1 60 325.50000000000017 Tm (Conclusion) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 303.50000000000017 Tm (Predictive Mirror began as an effort to anticipate future camera frames using small networks of recurrent, locally) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 290.95000000000016 Tm (interacting cells. Our initial studies exposed both a modest aggregate-image improvement over persistence and clear) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 278.40000000000015 Tm (failures of training, forecasting, and measurement. They do not yet establish object permanence, cellular superiority,) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 265.85000000000014 Tm (biological equivalence, or practical efficiency.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 246.30000000000013 Tm (The next stage emphasizes reproducible capability: match established demonstrations, improve stable learning, compare) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 233.7500000000001 Tm (competent predictors, and investigate why specific mechanisms help in particular environments. The broader aim is not to) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 221.2000000000001 Tm (prove that NCAs are uniquely intelligent. It is to build and understand adaptable computational systems that predict,) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 208.6500000000001 Tm (remember, and respond effectively.) Tj ET
+BT /F1 9.35 Tf 0.098 0.204 0.286 rg 1 0 0 1 59 189.10000000000008 Tm (Reproduce what works. Improve what does not. Understand why.) Tj ET
+BT /F3 7.6 Tf 0.376 0.455 0.529 rg 1 0 0 1 59 62 Tm (VECTOR DIAGRAM: CONCEPTUAL UNLESS LABELED AS REPORTED) Tj ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 18 0 R >>
+endobj
+20 0 obj
+<< /Length 3587 >>
+stream
+q 1 1 1 rg 0 0 612 792 re f Q
+q 0.098 0.204 0.286 rg 0.098 0.204 0.286 RG 0 784 612 8 re B Q
+BT /F2 8.3 Tf 0.165 0.404 0.529 rg 1 0 0 1 55 756 Tm (PREDICTIVE MIRROR  /  RESEARCH NOTE) Tj ET
+q 0.820 0.878 0.906 RG 1.2 w 55 745 m 557 745 l S Q
+BT /F2 15.7 Tf 0.098 0.204 0.286 rg 1 0 0 1 55 709 Tm (Sources and provenance) Tj ET
+q 0.027 0.541 0.522 RG 1.2 w 55 698 m 557 698 l S Q
+BT /F1 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 55 36 Tm (From Pixels to Persistent Worlds?  |  2026) Tj ET
+BT /F2 8 Tf 0.376 0.455 0.529 rg 1 0 0 1 531 36 Tm (08) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 669 Tm (Mordvintsev, A., Randazzo, E., Niklasson, E., and Levin, M. \(2020\). Growing Neural Cellular Automata. Distill.) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 656.2 Tm (https://distill.pub/2020/growing-ca/) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 630.4000000000001 Tm (Richardson, A. et al. \(2024\). Learning spatio-temporal patterns with Neural Cellular Automata. PLOS Computational Biology.) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 617.6000000000001 Tm (https://doi.org/10.1371/journal.pcbi.1011589) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 591.8000000000002 Tm (Shi, X. et al. \(2015\). Convolutional LSTM Network. https://arxiv.org/abs/1506.04214) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 566.0000000000002 Tm (Le Guen, V., and Thome, N. \(2020\). Disentangling Physical Dynamics from Unknown Factors for Unsupervised Video Prediction.) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 553.2000000000003 Tm (CVPR.) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 540.4000000000003 Tm (https://openaccess.thecvf.com/content_CVPR_2020/html/Le_Guen_Disentangling_Physical_Dynamics_From_Unknown_Factors_for_Unsupervised_Video_Prediction_CVPR_2020_paper.html) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 514.6000000000004 Tm (Gao, Z. et al. \(2022\). SimVP: Simpler Yet Better Video Prediction. CVPR.) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 501.80000000000035 Tm (https://openaccess.thecvf.com/content/CVPR2022/html/Gao_SimVP_Simpler_Yet_Better_Video_Prediction_CVPR_2022_paper.html) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 476.00000000000034 Tm (Tan, C. et al. \(2023\). A Comprehensive Benchmark of Spatio-Temporal Predictive Learning / OpenSTL.) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 463.20000000000033 Tm (https://arxiv.org/abs/2306.11249) Tj ET
+BT /F1 9 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 437.4000000000003 Tm (Rao, R. P. N., and Ballard, D. H. \(1999\). Predictive coding in the visual cortex. https://doi.org/10.1038/4580) Tj ET
+BT /F2 11 Tf 0.165 0.404 0.529 rg 1 0 0 1 60 398.6000000000003 Tm (EVIDENCE REQUIREMENTS) Tj ET
+BT /F1 9.3 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 375.6000000000003 Tm (Source repository: https://github.com/walmsley-lab/ml-innovation-18-predictive-mirror Experimental images should) Tj ET
+BT /F1 9.3 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 362.6000000000003 Tm (identify the model checkpoint, source revision, generator and scene seeds, training/evaluation protocol, and forecast) Tj ET
+BT /F1 9.3 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 349.6000000000003 Tm (horizon. Operator-reported historical numbers remain marked as such until reproduced. This report intentionally uses) Tj ET
+BT /F1 9.3 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 336.6000000000003 Tm (conceptual vector diagrams for ideas whose experimental image artifacts are not bundled; no conceptual drawing should) Tj ET
+BT /F1 9.3 Tf 0.098 0.204 0.286 rg 1 0 0 1 60 323.6000000000003 Tm (be mistaken for a measured result.) Tj ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 20 0 R >>
+endobj
+xref
+0 22
+0000000000 65535 f 
+0000000035 00000 n 
+0000000084 00000 n 
+0000000189 00000 n 
+0000000259 00000 n 
+0000000334 00000 n 
+0000000412 00000 n 
+0000004280 00000 n 
+0000004426 00000 n 
+0000008307 00000 n 
+0000008453 00000 n 
+0000014453 00000 n 
+0000014601 00000 n 
+0000019877 00000 n 
+0000020025 00000 n 
+0000024531 00000 n 
+0000024679 00000 n 
+0000030573 00000 n 
+0000030721 00000 n 
+0000037038 00000 n 
+0000037186 00000 n 
+0000040825 00000 n 
+trailer
+<< /Size 22 /Root 1 0 R >>
+startxref
+40973
+%%EOF
