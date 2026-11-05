@@ -58,7 +58,11 @@ def run(out="runs/structured-pretraining",architectures=("cnn","nca"),
                         batch=train_target[all_indices[step-1]]
                     else:
                         batch=pretraining[source][all_indices[step-1]]
-                    params,m,v=update(params,m,v,jnp.asarray(batch),step)
+                    # Restart Adam's bias-correction clock after resetting
+                    # optimizer moments at the curriculum boundary.
+                    optimizer_step=(step-pretrain_steps if (
+                        source!="scratch" and step>pretrain_steps) else step)
+                    params,m,v=update(params,m,v,jnp.asarray(batch),optimizer_step)
                     if step==pretrain_steps and source!="scratch":
                         # Compare fine-tuning from a frozen pretraining state.
                         m=jax.tree.map(jnp.zeros_like,m)
