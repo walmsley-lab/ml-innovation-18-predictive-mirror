@@ -10,16 +10,18 @@ Start with the test suite:
 ```bash
 python -m unittest tests.test_roadmap_31_calibration \
     tests.test_roadmap_32_adaptation tests.test_roadmap_33_replay \
-    tests.test_roadmap_34_crossmodal tests.test_roadmap_35_gates -v
+    tests.test_roadmap_34_crossmodal tests.test_roadmap_35_gates \
+    tests.test_roadmap_31_rgb_calibration tests.test_roadmap_32_rgb_adaptation \
+    tests.test_roadmap_33_rgb_replay tests.test_roadmap_35_rgb_gates -v
 ```
 
 | Roadmap | Runner | Question and relevant controls | Current evidence level |
 |---|---|---|---|
-| [31](https://github.com/walmsley-lab/ml-innovation-18-predictive-mirror/pull/133) | `python -m experiments.roadmap_31_calibration` | Do observed volatility bins improve interval sharpness without breaking coverage? Global conformal/fixed width | Scalar observed-position calibration, not RGB spatial uncertainty |
-| [32](https://github.com/walmsley-lab/ml-innovation-18-predictive-mirror/pull/134) | `python -m experiments.roadmap_32_adaptation` | Can post-observation updates recover from A→B→A shifts? Frozen and stale-feedback controls | Prequential observed-feature regression, not trained recurrent video |
-| [33](https://github.com/walmsley-lab/ml-innovation-18-predictive-mirror/pull/135) | `python -m experiments.roadmap_33_replay` | Does bounded earlier-example rehearsal change forgetting and new-task fit at equal updates? Recent-only control | Tiny scalar regression and replay memory; no neuron/device cost advantage |
+| [31](https://github.com/walmsley-lab/ml-innovation-18-predictive-mirror/pull/133) | `python -m experiments.roadmap_31_calibration` and `python -m experiments.roadmap_31_rgb_calibration` | Do observed volatility bins improve interval sharpness without breaking coverage? Global conformal/fixed width | Scalar calibration reference plus actual frozen RGB forecast *pixel-bound* wrapper; neither learns uncertainty |
+| [32](https://github.com/walmsley-lab/ml-innovation-18-predictive-mirror/pull/134) | `python -m experiments.roadmap_32_adaptation` and `python -m experiments.roadmap_32_rgb_adaptation` | Can post-observation updates recover from A→B→A shifts? Frozen and stale-feedback controls | Feature-regression control plus causal post-score SGD on the real RGB NCA; independent held-out video remains untested |
+| [33](https://github.com/walmsley-lab/ml-innovation-18-predictive-mirror/pull/135) | `python -m experiments.roadmap_33_replay` and `python -m experiments.roadmap_33_rgb_replay` | Does bounded earlier-example rehearsal change forgetting and new-task fit at equal updates? Recent-only control | Scalar control plus full recurrent RGB NCA rehearsal under matched updates; no demonstrated device-cost advantage |
 | [34](https://github.com/walmsley-lab/ml-innovation-18-predictive-mirror/pull/136) | `python -m experiments.roadmap_34_crossmodal` | Does RGB plus timestamp-aligned inertial signal improve motion prediction and survive missing channels? Vision, inertial, shuffle, dropout, video coasting | Synthetic single-axis rendered RGB + noisy motion-sensor proxy, not actual IMU |
-| [35](https://github.com/walmsley-lab/ml-innovation-18-predictive-mirror/pull/137) | `python -m experiments.roadmap_35_gates` | Can validation-only capability gates schedule training without test leakage? Fixed and mixed exposure at equal updates | Simulated capability *proxies*, not the charter's validated perceptual competencies |
+| [35](https://github.com/walmsley-lab/ml-innovation-18-predictive-mirror/pull/137) | `python -m experiments.roadmap_35_gates` and `python -m experiments.roadmap_35_rgb_gates` | Can validation-only capability gates schedule training without test leakage? Fixed and mixed exposure at equal updates | Toy reference plus RGB NCA held-out domain gates; **not** full charter capability certification |
 
 ## What these implementations do *not* establish
 
