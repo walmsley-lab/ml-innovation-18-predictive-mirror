@@ -8,7 +8,7 @@ from experiments import roadmap_61_selection as m
 def candidate(name,mse,latency):
     return {"name":name,"checkpoint_sha256":name+"123","validation_mse":mse,
             "latency_ms":latency,"device":"CPU-A","protocol":"rgb-1s",
-            "validation_session_sha256":"val-session-1","evidence":"checkpoint_loaded"}
+            "validation_session_sha256":"val-session-1","evidence":"trained_checkpoint"}
 
 
 class ModelSelectionTests(unittest.TestCase):
@@ -17,6 +17,10 @@ class ModelSelectionTests(unittest.TestCase):
            candidate("transport",.16,35)]
         self.assertEqual(m.select(c,100)["name"],"transport")
         self.assertIsNone(m.select(c,4))
+        with self.assertRaises(ValueError):
+            m.select([{**c[0],"evidence":"untrained_smoke"}],200)
+        with self.assertRaises(ValueError):
+            m.select([{**c[0],"latency_ms":0}],200)
         with self.assertRaises(ValueError):
             m.select([c[0],{**c[1],"device":"GPU"}],200)
 
