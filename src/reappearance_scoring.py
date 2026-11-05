@@ -6,7 +6,7 @@ committed before the target future frame is inspected.
 import numpy as np
 from src.rgb_event_metrics import soft_localization
 
-PRESENCE_MASS_THRESHOLD=.10
+PRESENCE_MASS_THRESHOLD=.03
 
 
 def score(forecasts, records, context):
