@@ -43,6 +43,7 @@ def track(frames,beam=3):
         raise ValueError("Require two distinct observed sources initially")
     position=first[np.argsort(first[:,0])]
     hypotheses=[(0.,position,np.zeros_like(position),[position.copy()])]
+    committed=[position.copy()]  # never revise earlier outputs with later detections
     for frame in frames[1:]:
         found=reference.detections(frame)
         next_hypotheses=[]
@@ -50,7 +51,8 @@ def track(frames,beam=3):
             for p,v,extra in proposals(positions,velocity,found):
                 next_hypotheses.append((old_cost+extra,p,v,path+[p.copy()]))
         hypotheses=sorted(next_hypotheses,key=lambda a:a[0])[:beam]
-    return np.stack(hypotheses[0][3])
+        committed.append(hypotheses[0][1].copy())
+    return np.stack(committed)
 
 
 def score(predicted,truth,visible):
