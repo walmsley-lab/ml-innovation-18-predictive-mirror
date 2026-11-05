@@ -5,7 +5,8 @@ continual learning, rehearsal, multimodal input and validation-gated curricula.
 These are *additive*, independent experiments. None replaces or disqualifies the
 CNN, transport, RGB NCA, hierarchical, Gaussian, graph or particle families.
 
-Start with the test suite:
+After merging the relevant independent PRs, run the combined test suite.
+Before then, run only the tests included on the individual PR branch:
 
 ```bash
 python -m unittest tests.test_roadmap_31_calibration \
