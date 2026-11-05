@@ -1,29 +1,40 @@
 #!/bin/sh
 set -eu
-# Public endpoint serves SYNTHETIC artifacts only; never place private images here.
+
 mode="${RUN_MODE:-train}"
 case "$mode" in
-  train|sweep) ;;
   campaign)
-    if [ "${CAMPAIGN_APPROVED:-0}" != "1" ]; then
-      echo "Full campaign requires CAMPAIGN_APPROVED=1 and explicit CAMPAIGN_MAX_RUNS" >&2
+    if [ "${CAMPAIGN_APPROVED:-0}" != "1" ] || [ -z "${CAMPAIGN_SHA256:-}" ]; then
+      echo "Campaign requires approved manifest SHA and CAMPAIGN_APPROVED=1" >&2
       exit 2
     fi
+    exec python -m deploy.gpu_worker train \
+      --config "${CAMPAIGN_CONFIG:-/app/experiments/campaign.json}" \
+      --output "${CAMPAIGN_OUTPUT:-/app/runs/campaign}" \
+      --max-runs "${CAMPAIGN_MAX_RUNS:-1}" \
+      --sha256 "$CAMPAIGN_SHA256" \
+      --hold-seconds "${CAMPAIGN_HOLD_SECONDS:-3600}"
     ;;
-  *)
-    echo "Unknown RUN_MODE: $mode" >&2
-    exit 2
-    ;;
+  train|sweep) ;;
+  *) echo "Unknown RUN_MODE: $mode" >&2; exit 2 ;;
 esac
-mkdir -p /app/runs
-python -m http.server 8080 --bind 0.0.0.0 --directory /app/runs &
-server_pid=$!
-trap 'kill "$server_pid" 2>/dev/null || true' EXIT HUP INT TERM
+
+# Legacy manual workflows can explicitly opt into public HTTP for synthetic
+# artifacts. The managed GPU campaign above never starts an HTTP server.
+server_pid=""
+if [ "${ARTIFACT_HTTP:-0}" = "1" ]; then
+  mkdir -p /app/runs
+  python -m http.server 8080 --bind 0.0.0.0 --directory /app/runs &
+  server_pid=$!
+  trap 'kill "$server_pid" 2>/dev/null || true' EXIT HUP INT TERM
+fi
+
 case "$mode" in
-  sweep) python -m sweep --require-gpu --output "${SWEEP_OUTPUT:-/app/runs/sweep}" ;;
-  campaign) python -m campaign --config /app/experiments/campaign.json \
-              --output /app/runs/campaign --execute --require-gpu \
-              --max-runs "${CAMPAIGN_MAX_RUNS:-1}" ;;
   train) python -m train --require-gpu --output "${OUTPUT:-/app/runs/pilot}" ;;
+  sweep) python -m sweep --require-gpu --output "${SWEEP_OUTPUT:-/app/runs/sweep}" ;;
 esac
-wait "$server_pid"
+
+# Preserve the existing opt-in manual artifact server, not a paid-run default.
+if [ -n "$server_pid" ]; then
+  wait "$server_pid"
+fi
