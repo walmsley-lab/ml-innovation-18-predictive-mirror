@@ -1,0 +1,5 @@
+# Attention and scene behavior, roadmap 46–55
+
+Ten sequential PRs build independent causal experiments: dynamic selection (46), sparse budgeted updates (47), limited working memory (48), birth/absence/reappearance (49), multi-hypothesis association (50), capture-time memory (51), prediction-first correction (52), routing lesions (53), active 2D gaze (54), and provenance-linked campaign (55).
+
+After merging the stack, run `python -m experiments.roadmap_55_scene_campaign`. The manifest preserves each experiment's data/input unit and seed. Do **not** collapse position-cells, pixel MSE, object association and hardware proxy counts into one leaderboard. Optional **real trained** NCA/CNN/transport checkpoints activate the frozen RGB evaluation; missing checkpoints are explicitly skipped. The sample code deliberately tests cognitive-computation ideas in simplified worlds; it does not certify trained biological attention or superiority on webcam footage. Only substantive independent training and recorded evaluation can do so.
