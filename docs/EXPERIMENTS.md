@@ -45,6 +45,7 @@ experiments and specialized inputs are intentionally retained.
 | Report experiments without invalid cross-representation rankings | `python -m experiments.evidence_report --help`; [evidence guide](CROSS_TECHNIQUE_EVIDENCE.md) |
 | Tell a genuine null from a collapsed/dead forecast measurement | every runner's `metrics.json` `measurement` block; [zero-effect diagnosis](ZERO_EFFECT_DIAGNOSIS.md) |
 | Tell undertraining from collapse across step budgets, and which anti-collapse lever works | `python -m experiments.training_budget_sweep --help`; [budget sweep](TRAINING_BUDGET_SWEEP.md) |
+| Do persistent/cellular representations beat simpler predictors on reappearance, unseen motion, viewpoint and compute? | `python -m experiments.rgb_world_ladder_training --help`, `python -m experiments.rgb_gaussian_nca --help`; [findings](PERSISTENCE_VS_SIMPLE_FINDINGS.md) ([ladder](RGB_WORLD_LADDER_TRAINING.md), [gaussian](RGB_GAUSSIAN_NCA.md)) |
 
 **Status and evidence:** Source code and a runnable CLI mean *implemented*, not
 *experimentally proven*. The synthetic RGB NCA has beaten persistence on one
