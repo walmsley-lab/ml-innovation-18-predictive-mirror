@@ -18,7 +18,7 @@ def validate(adjacency,node_ids):
     a=np.asarray(adjacency,dtype=np.float64)
     ids=np.asarray(node_ids)
     if a.ndim!=2 or a.shape[0]!=a.shape[1] or len(a)<3 or (
-            ids.shape!=(len(a),)) or len(np.unique(ids))!=len(ids) or
+            ids.shape!=(len(a),) or len(np.unique(ids))!=len(ids) or
             not np.isfinite(a).all() or np.any(a<0) or
             not np.allclose(np.diag(a),0)):
         raise ValueError("Need finite nonnegative zero-diagonal adjacency with unique IDs")
