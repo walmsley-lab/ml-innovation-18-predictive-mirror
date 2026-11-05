@@ -39,9 +39,9 @@ def load(path,metadata):
 
 
 def validate(x,y,sessions):
-    if x.ndim!=3 or y.ndim!=3 or x.shape[:2]!=y.shape[:2] or (
-            len(sessions)!=len(x)) or len(np.unique(sessions))<5 or
-            x.shape[1]<6 or not np.isfinite(x).all() or not np.isfinite(y).all():
+    if (x.ndim!=3 or y.ndim!=3 or x.shape[:2]!=y.shape[:2] or
+            len(sessions)!=len(x) or len(np.unique(sessions))<5 or
+            x.shape[1]<6 or not np.isfinite(x).all() or not np.isfinite(y).all()):
         raise ValueError("Need aligned finite [trials,time,channels] and >=5 sessions")
 
 
