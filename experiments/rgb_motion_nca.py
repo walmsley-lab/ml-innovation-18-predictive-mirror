@@ -15,7 +15,7 @@ import jax.numpy as jnp
 import numpy as np
 
 from src import baselines, predictive_rgb_nca as nca, rgb_motion_world
-from train import adamw
+from src import experiment_harness as harness
 
 
 def _examples(seeds, steps, size, context, horizon, balls=1):
@@ -72,23 +72,15 @@ def fit(seed=41, steps=50, training_steps=100, size=24, context=4,
     train = _examples(training_seeds, steps, size, context, horizon)
     heldout = _examples(generalization_seeds, steps, size, context, horizon)
     params = nca.init(jax.random.PRNGKey(seed), channels=channels)
-    moments = jax.tree.map(jnp.zeros_like, params)
-    variances = jax.tree.map(jnp.zeros_like, params)
-
-    @jax.jit
-    def update(p, m, v, batch, step):
-        error, gradients = jax.value_and_grad(
-            lambda weights: nca.loss(weights, batch, context, horizon, ticks))(p)
-        norm = jnp.sqrt(sum(jnp.sum(jnp.square(g)) for g in jax.tree.leaves(gradients)))
-        gradients = jax.tree.map(lambda g: g / jnp.maximum(1.0, norm), gradients)
-        p, m, v = adamw(p, gradients, m, v, step)
-        return p, m, v, error
+    moments, variances = harness.init_moments(params)
+    update = harness.clipped_adamw_update(
+        lambda weights, batch: nca.loss(weights, batch, context, horizon, ticks))
 
     history = []
     batch = jnp.asarray(train)
     for step in range(1, training_steps + 1):
         params, moments, variances, error = update(
-            params, moments, variances, batch, step)
+            params, moments, variances, (batch,), step)
         if step == 1 or step == training_steps or step % max(1, training_steps // 5) == 0:
             history.append({"step": step, "training_loss": float(error)})
 

@@ -10,7 +10,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from src import predictive_rgb_nca as nca, rgb_benchmark as benchmark
-from train import adamw
+from src import experiment_harness as harness
 
 SCENARIOS = (
     {"balls": 1},
@@ -43,14 +43,8 @@ def run(output="runs/rgb-curriculum", seeds=(11, 23, 41), steps=100,
                            for i in range(len(SCENARIOS))])
     controls = benchmark.controls(test[:, :context], horizon)
 
-    @jax.jit
-    def update(p, m, v, x, step):
-        error, grads = jax.value_and_grad(
-            lambda weights: nca.loss(weights, x, context, horizon, ticks))(p)
-        norm = jnp.sqrt(sum(jnp.square(g).sum() for g in jax.tree.leaves(grads)))
-        grads = jax.tree.map(lambda g: g / jnp.maximum(norm, 1), grads)
-        p, m, v = adamw(p, grads, m, v, step)
-        return p, m, v, error
+    update = harness.clipped_adamw_update(
+        lambda weights, x: nca.loss(weights, x, context, horizon, ticks))
 
     out = Path(output)
     out.mkdir(parents=True, exist_ok=True)
@@ -76,7 +70,7 @@ def run(output="runs/rgb-curriculum", seeds=(11, 23, 41), steps=100,
             x["single"] = np.repeat(x["single"], batch_size, axis=0)
             for name, arm in arms.items():
                 arm["p"], arm["m"], arm["v"], error = update(
-                    arm["p"], arm["m"], arm["v"], jnp.asarray(x[name]), step)
+                    arm["p"], arm["m"], arm["v"], (jnp.asarray(x[name]),), step)
             if step == steps or step % max(1, steps//5) == 0:
                 row = {"step": step, "stage": stage}
                 for name, arm in arms.items():

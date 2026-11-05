@@ -9,7 +9,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from src import selectable_rgb_nca as nca, rgb_benchmark as benchmark
-from train import adamw
+from src import experiment_harness as harness
 
 
 def run(output="runs/rgb-selector-benchmark", seeds=(11,23,41), steps=60,
@@ -44,15 +44,8 @@ def run(output="runs/rgb-selector-benchmark", seeds=(11,23,41), steps=60,
 
         def make_update(mode):
             ref=refs if mode=="reference" else None
-            @jax.jit
-            def update(p,m,v,examples,step):
-                error,grad=jax.value_and_grad(
-                    lambda q:nca.loss(q,examples,context,horizon,ticks,mode,ref))(p)
-                norm=jnp.sqrt(sum(jnp.square(g).sum() for g in jax.tree.leaves(grad)))
-                grad=jax.tree.map(lambda g:g/jnp.maximum(norm,1),grad)
-                p,m,v=adamw(p,grad,m,v,step)
-                return p,m,v,error
-            return update
+            return harness.clipped_adamw_update(
+                lambda q,examples:nca.loss(q,examples,context,horizon,ticks,mode,ref))
         updates={mode:make_update(mode) for mode in nca.MODES}
         rng=np.random.default_rng(int(seed)+1000)
         history=[]
@@ -61,7 +54,7 @@ def run(output="runs/rgb-selector-benchmark", seeds=(11,23,41), steps=60,
             for mode in nca.MODES:
                 arm=arms[mode]
                 arm["params"],arm["m"],arm["v"],_=updates[mode](
-                    arm["params"],arm["m"],arm["v"],x,step)
+                    arm["params"],arm["m"],arm["v"],(x,),step)
             if step==steps or step%max(1,steps//5)==0:
                 row={"step":step}
                 for mode in nca.MODES:

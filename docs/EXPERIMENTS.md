@@ -4,6 +4,11 @@
 output.** Each line below is a separate technique or control. Historical
 experiments and specialized inputs are intentionally retained.
 
+> This is the *what/how* map. For **what each experiment establishes and why it
+> matters** — the evidence ledger covering every runner, tagged by kind
+> (world / training-study / probe / baseline / evaluation / calibration / audit /
+> demo) — see [`EXPERIMENT_LEDGER.md`](EXPERIMENT_LEDGER.md).
+
 ## Pixel-based predictive models
 
 | Question | Model / runner | Input and output |
