@@ -19,8 +19,6 @@ def run(out="runs/guaranteed-reappearance/metrics.json",
         evaluated="oracle_truth_positive_control"
     else:
         from experiments.rgb_world_ladder_training import specification
-        params,_=specification(model,jax.random.PRNGKey(0),width,horizon,ticks)
-        del params
         _,predictor=specification(model,jax.random.PRNGKey(0),width,horizon,ticks)
         with np.load(checkpoint,allow_pickle=False) as f:
             params={k:jnp.asarray(f[k]) for k in f.files}
