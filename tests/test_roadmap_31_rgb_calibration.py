@@ -28,7 +28,7 @@ class RGBIntervalTests(unittest.TestCase):
     def test_score_shape_guard(self):
         batch=m.frames(61000,10,3,2,16)
         with self.assertRaises(ValueError):
-            m.abs_max_errors(np.zeros((10,1,16,16,3)),batch,3)
+            m.abs_max_errors(np.zeros((10,1,16,16,1)),batch,3)
 
 
 if __name__=="__main__":
