@@ -56,7 +56,11 @@ def run(out="runs/physical-field-prediction",kind="diffusion",seeds=(11,23,41),
             predicted=np.asarray(field.rollout(
                 best,jnp.asarray(test[:,-1]),horizon,arm,kind))
             file=folder/f"{arm}-seed{seed}.npz"
-            np.savez_compressed(file,**jax.tree.map(np.asarray,best))
+            flat = ({"core_"+k: np.asarray(v) for k, v in best["core"].items()}
+                    | {"head": np.asarray(best["head"]),
+                       "bias": np.asarray(best["bias"])}) if arm=="cellular" else {
+                       k: np.asarray(v) for k, v in best.items()}
+            np.savez_compressed(file,**flat)
             learned.append({"arm":arm,"seed":int(seed),
                             "validation_mse":best_val,"selected_step":best_step,
                             "checkpoint_sha256":hashlib.sha256(file.read_bytes()).hexdigest(),
