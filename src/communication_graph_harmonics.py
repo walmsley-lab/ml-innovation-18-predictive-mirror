@@ -67,6 +67,7 @@ def rewired(a,seed=0,swaps=30):
     graph=validate(a).copy()
     if not np.array_equal(graph,(graph>0).astype(float)):
         raise ValueError("Rewiring requires binary adjacency")
+    reference_degree=graph.sum(axis=0)
     rng=np.random.default_rng(int(seed))
     edges=[tuple(map(int,edge)) for edge in np.argwhere(
         np.triu(graph,1)>0)]
@@ -92,7 +93,7 @@ def rewired(a,seed=0,swaps=30):
         swaps-=1
         if swaps==0:
             break
-    if not np.array_equal(graph.sum(axis=0),validate(a).sum(axis=0)):
+    if not np.array_equal(graph.sum(axis=0),reference_degree):
         raise AssertionError("Degree-preserving rewiring failed")
     return graph
 
