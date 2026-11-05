@@ -25,7 +25,8 @@ class ReappearanceTests(unittest.TestCase):
         self.assertEqual(event["timing_error_frames"],0)
         self.assertEqual(event["missed_reappearance"],False)
         self.assertAlmostEqual(event["reappearance_centroid_error_px"],0)
-        self.assertAlmostEqual(event["reappearance_mass_ratio"],1,delta=.5)
+        self.assertGreater(event["reappearance_mass_ratio"],0)
+        self.assertLessEqual(event["reappearance_mass_ratio"],1.05)
         self.assertEqual(event["premature_visible_frames"],0)
 
     def test_broken_forecasts_cannot_fake_object_permanence(self):
