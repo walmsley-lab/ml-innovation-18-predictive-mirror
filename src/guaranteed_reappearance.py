@@ -81,4 +81,4 @@ def records(seeds=(11,23,41),context=4,horizon=10,size=32,mode="barrier"):
 
 def model_inputs(record):
     """No positions, visibility, events, future frames, or true actions."""
-    return {"frames":record["frames"]}
+    return {"frames":record["frames"][:record["context"]]}
