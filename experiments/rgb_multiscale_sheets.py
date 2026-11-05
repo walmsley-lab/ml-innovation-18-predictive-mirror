@@ -6,7 +6,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from src import rgb_multiscale_sheets as model, rgb_benchmark as bench
-from train import adamw
+from src import experiment_harness as harness
 
 
 def run(out="runs/rgb-multiscale", seeds=(11,23,37), steps=50,
@@ -28,15 +28,8 @@ def run(out="runs/rgb-multiscale", seeds=(11,23,37), steps=50,
                 params,jnp.asarray(val[:,:context]),horizon,ticks,mode))
             return float(np.square(prediction-val[:,context:]).mean())
         def update_fn(mode):
-            @jax.jit
-            def update(p,m,v,x,i):
-                error,grads=jax.value_and_grad(
-                    lambda weights:model.loss(weights,x,context,horizon,ticks,mode))(p)
-                norm=jnp.sqrt(sum(jnp.square(g).sum() for g in jax.tree.leaves(grads)))
-                grads=jax.tree.map(lambda g:g/jnp.maximum(norm,1.),grads)
-                p,m,v=adamw(p,grads,m,v,i)
-                return p,m,v,error
-            return update
+            return harness.clipped_adamw_update(
+                lambda weights,x:model.loss(weights,x,context,horizon,ticks,mode))
         updates={m:update_fn(m) for m in model.MODES}
         arms={}
         for mode in model.MODES:
@@ -51,7 +44,7 @@ def run(out="runs/rgb-multiscale", seeds=(11,23,37), steps=50,
             batch=jnp.asarray(train[rng.integers(0,len(train),size=2)])
             for mode,arm in arms.items():
                 arm["params"],arm["m"],arm["v"],_=updates[mode](
-                    arm["params"],arm["m"],arm["v"],batch,step)
+                    arm["params"],arm["m"],arm["v"],(batch,),step)
             if step==steps or step%max(1,steps//5)==0:
                 for mode,arm in arms.items():
                     metric=validation(arm["params"],mode)

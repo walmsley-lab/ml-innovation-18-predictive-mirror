@@ -6,7 +6,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from src import predictive_rgb_nca as nca, rgb_benchmark as benchmark
-from train import adamw
+from src import experiment_harness as harness
 
 MODES = ("uniform", "late")
 
@@ -43,15 +43,8 @@ def run(output="runs/rgb-horizon-objective", seeds=(11,23,41), steps=100,
 
     def updater(mode):
         weights=horizon_weights(horizon,mode)
-        @jax.jit
-        def update(p,m,v,x,step):
-            loss,grads=jax.value_and_grad(
-                lambda q:objective(q,x,context,horizon,ticks,weights))(p)
-            norm=jnp.sqrt(sum(jnp.square(g).sum() for g in jax.tree.leaves(grads)))
-            grads=jax.tree.map(lambda g:g/jnp.maximum(norm,1),grads)
-            p,m,v=adamw(p,grads,m,v,step)
-            return p,m,v,loss
-        return update
+        return harness.clipped_adamw_update(
+            lambda q,x:objective(q,x,context,horizon,ticks,weights))
     updates={mode:updater(mode) for mode in MODES}
     folder=Path(output);folder.mkdir(parents=True,exist_ok=True)
     cases=[]
@@ -74,7 +67,7 @@ def run(output="runs/rgb-horizon-objective", seeds=(11,23,41), steps=100,
             for mode in MODES:
                 a=arms[mode]
                 a["p"],a["m"],a["v"],error=updates[mode](
-                    a["p"],a["m"],a["v"],chosen,step)
+                    a["p"],a["m"],a["v"],(chosen,),step)
             if step==steps or step%max(1,steps//5)==0:
                 row={"step":step}
                 for mode in MODES:
