@@ -111,10 +111,17 @@ def live(selection_path,checkpoint,out="runs/roadmap-44/live.json",
             frames_seen+=1
             next_capture=max(next_capture+1/fps,time.monotonic())
             if not no_display and scored["selected"]:
-                # Same target semantics as existing verified webcam gallery.
-                from experiments.rgb_verified_live import panel
-                cv2.imshow("Selected mirror: observed / issued / actual",
-                           panel(scored["selected"][-1],cv2))
+                # Draw the requested lead, not a hardcoded "+10" label.
+                pair=scored["selected"][-1]
+                title=f"Forecast +{lead} captured frames"
+                from experiments.rgb_verified_live import panel as verified_panel
+                canvas=verified_panel(pair,cv2)
+                # Replace only the forecast title band; the verifier owns
+                # the actual/issued/error panels and their timestamp pairing.
+                cv2.rectangle(canvas,(224,0),(448,42),(25,25,25),-1)
+                cv2.putText(canvas,title,(228,25),
+                            cv2.FONT_HERSHEY_SIMPLEX,.45,(200,230,240),1)
+                cv2.imshow("Selected mirror: observed / issued / actual",canvas)
                 if cv2.waitKey(1)&0xff in (27,ord("q")):
                     break
     finally:
