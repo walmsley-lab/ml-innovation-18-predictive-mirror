@@ -30,6 +30,8 @@ class OscillatoryVideoTests(unittest.TestCase):
                     size=16,width=2,ticks=1,batch=1)
             self.assertEqual(len(r["results"]),3)
             self.assertEqual(set(x["mode"] for x in r["results"]),set(m.MODES))
+            self.assertIn("constant_velocity",r["classical_baselines"]["chirp"])
+            self.assertIn("persistence",r["classical_baselines"]["periodic"])
             self.assertTrue(all(x["best_step"]<=1 for x in r["results"]))
 
 
