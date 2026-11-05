@@ -14,3 +14,12 @@ The two new methods do not access `COLORS`, event annotations, positions, veloci
 Evaluation groups two opposite histories sharing the final frame into one statistical scene pair, reports event success (return timing +/-1 frame, <=3 px location, no premature visibility), image MSE and future-contrast error. No confidence interval is inferred from a three-pair smoke. Future comparative campaigns should integrate these `rgb_only` methods and include uncertainty reporting, select any tuned hyperparameters using validation only, and never select a comparator on final test.
 
 The baseline runner is standalone to avoid changing the preexisting object-permanence campaign during parallel research PRs. The frozen campaign PR will integrate its observation contract explicitly.
+
+
+## Interpretation from prior-art review
+
+A Kalman filter has an explicit uncertainty covariance; multi-object filters with track association can preserve identities. The current single-object `kalman_history()` is deliberately narrower and does **not** implement multi-object tracking, identity assignment or calibrated video uncertainty. Do not claim that Kalman methods inherently lack these capabilities.
+
+An autoregressive per-pixel AR(1)/AR(2) baseline is a possible later diagnostic, but on translating colored objects it can be a weak and potentially misleading comparator. Before adding it, establish whether existing RGB history regression and Kalman filters pass the frozen history-contrast tests. This PR keeps a small fair baseline suite and preserves modern learned reference models for the following comparison stage.
+
+The learned-model benchmark must test both matched training resources and an adequately trained reference model. Moving-MNIST published MSE values are not numerically comparable with this normalized RGB synthetic task.
