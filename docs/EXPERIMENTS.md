@@ -45,6 +45,7 @@ experiments and specialized inputs are intentionally retained.
 | Report experiments without invalid cross-representation rankings | `python -m experiments.evidence_report --help`; [evidence guide](CROSS_TECHNIQUE_EVIDENCE.md) |
 | Tell a genuine null from a collapsed/dead forecast measurement | every runner's `metrics.json` `measurement` block; [zero-effect diagnosis](ZERO_EFFECT_DIAGNOSIS.md) |
 | Tell undertraining from collapse across step budgets, and which anti-collapse lever works | `python -m experiments.training_budget_sweep --help`; [budget sweep](TRAINING_BUDGET_SWEEP.md) |
+| Review the first diverse-world and RGB-inferred Gaussian campaign results | [findings and evidence gaps](CAMPAIGN_FINDINGS_20261104.md) |
 
 **Status and evidence:** Source code and a runnable CLI mean *implemented*, not
 *experimentally proven*. The synthetic RGB NCA has beaten persistence on one
@@ -53,9 +54,11 @@ variants need their own trained runs and evaluation before claiming benefits.
 For graph and particle tasks, compare within their own units and inputs.
 Independent webcam transfer and robust one-second anticipation remain open.
 
-## Research timeline (planned, not implemented)
+## Current research evidence and future milestones
 
-A future [Gaussian-state NCA experiment](RESEARCH_TIMELINE.md#gaussian-state-nca-future-track) will test whether cellular dynamics applied to **3D Gaussian scene elements** improve occlusion, novel-view and camera-action prediction over pixel-based models. Gaussian splatting is a representation/rendering technique, not a predictor by itself. This is a *proposal*, not a runnable experiment or demonstrated result.
+The Gaussian-state NCA [roadmap](RESEARCH_TIMELINE.md) now has **implemented** renderer, oracle-state dynamics, RGB-inferred dynamics, and active-view comparison runners. Their presence does not establish learned 3D scene understanding or superiority to simpler predictors. Gaussian splatting is a representation/rendering technique, not a predictor by itself.
+
+The [November 2026 campaign findings](CAMPAIGN_FINDINGS_20261104.md) record reported matched perceptual and RGB-inferred Gaussian results, including a diffuse-output NCA failure and the absence of scored reappearance events. Those metrics have not yet been archived as inspectable raw artifacts in this repository; no model is promoted on the summary alone.
 
 ## Where to read next
 
