@@ -33,6 +33,8 @@ class CampaignTests(unittest.TestCase):
                        train_pairs=2,val_pairs=2,test_pairs=2,batch_pairs=1)
             self.assertEqual(len(result["runs"]),1)
             self.assertIn("paired_success_vs_baselines",result["runs"][0])
+            self.assertIn("paired_success_vs_history_controls",result["runs"][0])
+            self.assertEqual(result["runs"][0]["paired_success_vs_baselines"]["persistence"]["pairs"],2)
             self.assertEqual(result["baselines"]["history_linear"]["event"]["coverage"],4)
 
 
