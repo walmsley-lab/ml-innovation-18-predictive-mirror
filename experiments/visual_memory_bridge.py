@@ -30,8 +30,10 @@ def episodes(seed, context=4, length=10, size=20):
 def update(bias, forecast, observed, rate=.15):
     """Small bounded online gradient on per-RGB-channel additive correction."""
     pred=np.clip(forecast+bias,0,1)
-    active=((forecast+bias>0)&(forecast+bias<1)).astype(float)
-    grad=np.mean(2*(pred-observed)*active,axis=(0,1))
+    # Straight-through boundary gradient: a dark (0) or saturated (1)
+    # forecast must still be able to adapt toward the observed target.
+    # Otherwise the clipped readout creates an absorbing fixed point.
+    grad=np.mean(2*(pred-observed),axis=(0,1))
     return np.clip(bias-rate*grad,-.25,.25)
 
 
