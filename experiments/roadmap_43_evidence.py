@@ -31,22 +31,24 @@ def _rows(report):
                         "input_representation":representation,
                         "protocol_scope":scope})
 
-    if roadmap in (36,37,41):
-        items=([{"seed":None,"mode":name,"heldout":data}
-                for name,data in report["cases"].items()] if roadmap==36
-               else report["results"])
-        for item in items:
-            name=item.get("mode",item.get("arm","latent"))
-            for domain,metrics in item["heldout"].items():
-                # Roadmap 36 uses a model->score dictionary at every domain,
-                # while 37/41 use model->domain->score.
-                for model,scores in (metrics.items() if roadmap==36 else [(name,metrics)]):
-                    for lead,values in scores.items():
-                        for metric in ("mse","motion_mse"):
-                            add(item.get("seed"),model,domain,lead,metric,"rgb_mse",
-                                values.get(metric),"observed_rgb",
-                                "rgb-frozen" if roadmap==36 else
-                                "phase-video" if roadmap==37 else "signal-transfer")
+    if roadmap==36:
+        # The top level is domain -> model -> forecast lead -> metrics.
+        # Roadmap 36 reports an aggregate only; it has no per-seed rows.
+        for domain,models in report["cases"].items():
+            for name,scores in models.items():
+                for lead,values in scores.items():
+                    for metric in ("mse","motion_mse"):
+                        add(None,name,domain,lead,metric,"rgb_mse",
+                            values.get(metric),"observed_rgb","rgb-latent")
+    elif roadmap in (37,41):
+        for item in report["results"]:
+            name=item.get("mode",item.get("arm"))
+            for domain,scores in item["heldout"].items():
+                for lead,values in scores.items():
+                    for metric in ("mse","motion_mse"):
+                        add(item.get("seed"),name,domain,lead,metric,"rgb_mse",
+                            values.get(metric),"observed_rgb",
+                            "phase-video" if roadmap==37 else "signal-transfer")
     elif roadmap in (38,39):
         measure=("visible_joint_mae_px" if roadmap==38 else "position_mae_px")
         for row in report["rows"]:
