@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "status": "proposed",
+  "research_question": "Does cellular recurrence improve paired-history barrier reappearance over competent RGB-only history predictors at acceptable cost?",
+  "task": {
+    "benchmark": "paired-occlusion-histories-v1",
+    "context_frames": 8,
+    "horizon_frames": 10,
+    "input": "past RGB only",
+    "statistical_unit": "scene_seed_pair",
+    "primary_metric": "on_time_localized_reappearance_success",
+    "localization_tolerance_px": 3,
+    "timing_tolerance_frames": 1,
+    "no_premature_visibility": true
+  },
+  "hypotheses": [
+    {
+      "id": "H1",
+      "test": "intact_history_vs_reset_and_shuffle",
+      "criterion": "paired_history_contrast_and_event_success",
+      "unmeasurable_if": "forecast_input_independent"
+    },
+    {
+      "id": "H2",
+      "test": "nca_vs_strongest_nonprivileged_history_baseline",
+      "criterion": "primary_effect_and_cost",
+      "unmeasurable_if": "baselines_or_assays_invalid"
+    },
+    {
+      "id": "H3",
+      "test": "targeted_vs_energy_matched_random_with_positive_control",
+      "criterion": "forecast_and_task_effect",
+      "unmeasurable_if": "positive_control_unresponsive"
+    },
+    {
+      "id": "H4",
+      "test": "accuracy_cost_pareto",
+      "criterion": "same_device_cost_at_matched_task",
+      "unmeasurable_if": "cost_not_measured"
+    }
+  ],
+  "split_seed_roots": {
+    "train": 11000,
+    "validation": 41000,
+    "test": 71000
+  },
+  "baseline_tiers": [
+    "rgb_only",
+    "declared_prior",
+    "oracle"
+  ],
+  "proposed_decision_thresholds": {
+    "absolute_success_improvement": 0.1,
+    "max_inference_latency_ratio_for_efficiency_claim": 3,
+    "min_model_seeds_target": 5,
+    "min_test_scene_pairs_target": 30,
+    "requires_interval_and_pilot_review": true
+  },
+  "primary_comparator_rule": "best_valid_nonprivileged_comparator_selected_on_validation_only",
+  "freeze_rule": "freeze commit and SHA256 before exposing final test; amendments versioned and labeled exploratory"
+}
