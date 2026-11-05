@@ -23,7 +23,13 @@ def run(out="runs/field-perturbation/metrics.json",kind="diffusion",
         if checkpoint is not None:
             from src import field_predictors as predictors
             with np.load(checkpoint,allow_pickle=False) as archive:
-                params={k:jnp.asarray(archive[k]) for k in archive.files}
+                values={k:jnp.asarray(archive[k]) for k in archive.files}
+            if arm=="cellular":
+                params={"core":{k.removeprefix("core_"):v for k,v in values.items()
+                                if k.startswith("core_")},
+                        "head":values["head"],"bias":values["bias"]}
+            else:
+                params=values
             # Isolated comparison, no training or future data in inference.
             def predict(start):
                 frames=start[None]
