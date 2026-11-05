@@ -10,7 +10,7 @@ from src import forecast_diagnostics as diag
 
 
 def run(checkpoint,out="runs/functional-state",seed_base=71000,
-        episodes=6,context=8,horizon=10,ticks=2):
+        episodes=6,context=8,horizon=10,ticks=2,output="residual"):
     if episodes<2 or context<2 or horizon<1:
         raise ValueError("Need distinct scenes and context")
     with np.load(checkpoint,allow_pickle=False) as data:
@@ -18,7 +18,7 @@ def run(checkpoint,out="runs/functional-state",seed_base=71000,
     frames,_=world.scenes(seed_base,episodes,context+horizon,32)
     obs=jnp.asarray(frames[:,:context])
     forecasts={mode:np.asarray(intervene.forecast(
-        params,obs,horizon,ticks,mode)) for mode in intervene.MODES}
+        params,obs,horizon,ticks,mode,output)) for mode in intervene.MODES}
     intact=forecasts["intact"]
     truth=frames[:,context:context+horizon]
     leads=tuple(sorted({1,horizon,*[x for x in (3,5) if x<=horizon]}))
@@ -35,7 +35,7 @@ def run(checkpoint,out="runs/functional-state",seed_base=71000,
     folder=Path(out);folder.mkdir(parents=True,exist_ok=True)
     np.savez_compressed(folder/"forecast-comparison.npz",**forecasts)
     metadata={"checkpoint":str(checkpoint),"episode_seed_base":seed_base,
-              "episodes":episodes,"context":context,"horizon":horizon,
+              "episodes":episodes,"context":context,"horizon":horizon,"output_head":output,
               "positive_control_interpretation":
                 "If no known control moves a lead, a targeted null is uninterpretable.",
               "measurement":report,"arms":results,
@@ -49,8 +49,9 @@ def main():
     p.add_argument("--checkpoint",required=True)
     p.add_argument("--out",default="runs/functional-state")
     p.add_argument("--episodes",type=int,default=6)
+    p.add_argument("--output",choices=("residual","blend"),default="residual")
     a=p.parse_args()
-    result=run(a.checkpoint,a.out,episodes=a.episodes)
+    result=run(a.checkpoint,a.out,episodes=a.episodes,output=a.output)
     print(json.dumps(result["measurement"],indent=2))
 
 
