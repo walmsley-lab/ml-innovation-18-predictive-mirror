@@ -28,7 +28,12 @@ def run(out="runs/convlstm-paired",seeds=(11,),steps=100,
         m,v=zero(),zero()
         update=harness.clipped_adamw_update(
             lambda p,x:convlstm.loss(p,x,context,horizon))
-        history=[]
+        initial=np.asarray(convlstm.rollout(
+            params,jnp.asarray(val[:,:context]),horizon))
+        best_score=float(np.mean((initial-val[:,context:])**2))
+        best_params=params
+        best_step=0
+        history=[{"step":0,"validation_mse":best_score}]
         for t in range(1,steps+1):
             example=samples(11000+t*train_pairs,train_pairs,context,horizon)
             params,m,v,objective=update(params,m,v,(jnp.asarray(example),),t)
@@ -37,11 +42,17 @@ def run(out="runs/convlstm-paired",seeds=(11,),steps=100,
             if t==1 or t==steps or t%max(1,steps//4)==0:
                 pred=np.asarray(convlstm.rollout(
                     params,jnp.asarray(val[:,:context]),horizon))
-                history.append({"step":t,"validation_mse":
-                                float(np.mean((pred-val[:,context:])**2))})
+                score=float(np.mean((pred-val[:,context:])**2))
+                history.append({"step":t,"validation_mse":score})
+                if score<best_score:
+                    best_score=score
+                    best_params=params
+                    best_step=t
         checkpoint=out/f"seed-{seed}.npz"
-        np.savez_compressed(checkpoint,**jax.tree.map(np.asarray,params))
+        np.savez_compressed(checkpoint,**jax.tree.map(np.asarray,best_params))
         result.append({"seed":int(seed),"history":history,
+                       "selected_step":best_step,
+                       "selected_validation_mse":best_score,
                        "checkpoint":checkpoint.name})
     report={"model":"minimal_single_layer_jax_convlstm",
             "reference":"Shi et al. 2015; architecture family only, not full benchmark reproduction",
