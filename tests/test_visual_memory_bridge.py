@@ -15,6 +15,9 @@ class VisualMemoryBridgeTests(unittest.TestCase):
         self.assertGreater(adaptive["stages"][0]["start_mse"],0)
         # The first score is independent of its target's training effect.
         self.assertEqual(adaptive["stages"][0]["stage"],"A")
+        # An initialized black forecast is allowed to learn a brighter
+        # observed target rather than remaining at the clipping boundary.
+        self.assertGreater(m.update(np.zeros(3),prior,target,rate=.1)[0],0)
         self.assertLess(adaptive["stages"][-1]["end_mse"],frozen["stages"][-1]["end_mse"])
 
     def test_causal_replay_and_equal_updates(self):
