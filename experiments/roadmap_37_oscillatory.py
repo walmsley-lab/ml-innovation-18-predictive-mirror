@@ -57,6 +57,11 @@ def run(out="runs/roadmap-37",seeds=(11,23,41),steps=30,
     validation=pool(61000,8,context,horizon,size,"periodic")
     heldout={d:pool(91000,12,context,horizon,size,d)
              for d in ("periodic","chirp","nonperiodic")}
+    baselines={domain:{
+        name:rgb_benchmark.score(prediction,clips,context,(1,horizon))
+        for name,prediction in rgb_benchmark.controls(
+            clips[:,:context],horizon).items()}
+        for domain,clips in heldout.items()}
     output=Path(out) if out else None
     if output: output.mkdir(parents=True,exist_ok=True)
     rows=[]
@@ -107,7 +112,8 @@ def run(out="runs/roadmap-37",seeds=(11,23,41),steps=30,
                          "checkpoint_sha256":checkpoint_hash})
     result={"roadmap_id":37,"steps":steps,"context":context,
             "horizon":horizon,"modes":list(MODES),"seeds":list(map(int,seeds)),
-            "results":rows,"limits":"Matched trainable params/schedules and clips, "
+            "results":rows,"classical_baselines":baselines,
+            "limits":"Matched trainable params/schedules and clips, "
             "but additional oscillator computation and state memory differ. "
             "Short synthetic training does not establish superiority or "
             "neural phase entrainment. Report step-zero selections."}
