@@ -64,6 +64,26 @@ class EvidenceComparisonTests(unittest.TestCase):
             self.assertIn("latent",latent_groups[0]["arms"])
             self.assertNotEqual(latent_groups[0]["scope"],"circuit-hardware")
 
+    def test_frozen_visual_bridge_inputs_and_control_deduplication(self):
+        sample={"protocol":"frozen-visual-bridge-v1",
+                "cases":{"linear/none":{
+                    arm:{"metrics":{
+                        arm:{"1":{"mse":val,"motion_mse":val+.1}},
+                        "persistence":{"1":{"mse":.3}},
+                        "constant_velocity":{"1":{"mse":.2}}}}
+                    for arm,val in (("nca",.25),("cnn",.22),("transport",.24))}}}
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/"frozen.json"
+            path.write_text(json.dumps(sample))
+            rows=m._rows(sample)
+            self.assertEqual(sum(r["model"]=="persistence" for r in rows),1)
+            self.assertEqual(sum(r["model"]=="cnn" for r in rows),2)
+            result=m.summarize([path])
+            self.assertEqual(result["sources"][0]["roadmap_id"],
+                             "frozen-visual-bridge-v1")
+            self.assertTrue(all(g["status"]=="descriptive_only"
+                                for g in result["groups"]))
+
     def test_duplicate_cannot_impersonate_replicates(self):
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/"r.json"
