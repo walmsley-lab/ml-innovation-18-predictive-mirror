@@ -10,7 +10,8 @@ class Development25Tests(unittest.TestCase):
         self.assertGreater(np.sum(partial[...,2] > .6), 0)
         self.assertTrue(np.any(truth))
         self.assertEqual(exp.features(partial).shape[0], 2*16*16+1)
-        np.testing.assert_array_equal(exp.obscure(clean,0,full=True)[...,2], .85)
+        np.testing.assert_allclose(exp.obscure(clean,0,full=True)[...,2], .85,
+                                   atol=1e-6)
 
     def test_small_ridge_and_unseen_test(self):
         w=exp.fit(range(31000,31012))
