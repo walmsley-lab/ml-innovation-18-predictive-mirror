@@ -69,7 +69,11 @@ def objective(p,batch,predictor,context,horizon):
 def report(p,predictor,records,frames,context,horizon):
     leads=tuple(sorted({horizon,*(l for l in (1,3,5,10) if l<=horizon)}))
     forecast=np.asarray(predictor(p,jnp.asarray(frames[:,:context])))
-    return event.score(forecast,records,context,leads)
+    from src import forecast_diagnostics as diagnostic
+    events=event.score(forecast,records,context,leads)
+    events["measurement"]=diagnostic.perceptual_failure_report(
+        forecast,records,context,leads)
+    return events
 
 
 def run(out="runs/rgb-world-ladder-training",models=MODELS,
