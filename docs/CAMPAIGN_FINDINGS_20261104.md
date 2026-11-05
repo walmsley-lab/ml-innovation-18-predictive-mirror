@@ -77,7 +77,17 @@ or dynamics. Test these components separately before scaling training.
   visible objects (depending on family) and location error was about
   22–45 px in a 32-px world. The routing and hierarchical arms had modest
   metric-dependent localization differences, but no robust performance
-  or cost advantage has been established.
+  or cost advantage has been established. **The reported 22–45 px**
+  numbers are *mean hard-detection location penalties*, not distances
+  restricted to successfully localized objects. The hard metric assigns
+  every missing visible object the **full image diagonal**:
+  `sqrt(32² + 32²) = 45.25 px` at 32×32. A mean near 45 px thus
+  primarily indicates failures to detect, and must not be described as
+  a 45-pixel displacement of a correctly detected center. Distinguish
+  `visible_location_mae_px` (includes missed-object penalties) from
+  `soft_centroid_mae_px` (defined only for sufficiently present
+  hue-matched predictions), and always report their denominators,
+  missing-event counts, and nullable cases.
 - **Original NCA:** prior experiments established a lower clip-rail,
   input-independent **black** open-loop forecast fixed point.
 - **Blend-head NCA:** apparent `foreground_recall=1.000` and low
@@ -89,6 +99,17 @@ or dynamics. Test these components separately before scaling training.
   successful anti-collapse perceptual model. Brightness-based recall and
   hue-specific mass answer different questions and must be interpreted
   together.
+
+**Interpretation of apparently conflicting foreground metrics:**
+`foreground_recall` is brightness-threshold mask recall; a forecast
+with nearly every pixel bright trivially includes every true foreground
+pixel. `predicted_mass_fraction` instead measures color-specific,
+hue-direction-weighted saliency divided by true object mass, so a
+bright but incorrectly hued sheet may score near zero. This is
+not evidence that all object pixels have physically vanished; it
+is failure of color-specific object reconstruction. Report
+`foreground_precision`, predicted foreground-pixel count, hue mass
+and spatial/cross-scene variance alongside both scores.
 
 The earlier blend treatment prevented *black rail saturation* in the
 budget sweep; this new result shows that avoiding one bad fixed point
