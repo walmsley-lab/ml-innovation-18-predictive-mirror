@@ -68,6 +68,8 @@ def predict_one(params,field):
 def rollout(params,start_field,horizon):
     if horizon<1:
         raise ValueError("Positive horizon required")
-    _,preds=jax.lax.scan(lambda x,_:(
-        predict_one(params,x),predict_one(params,x)),start_field,None,length=horizon)
+    def evolve(state, _):
+        next_state=predict_one(params,state)
+        return next_state,next_state
+    _,preds=jax.lax.scan(evolve,start_field,None,length=horizon)
     return jnp.swapaxes(preds,0,1)
