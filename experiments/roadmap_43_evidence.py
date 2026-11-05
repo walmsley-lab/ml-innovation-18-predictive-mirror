@@ -17,8 +17,8 @@ SCHEMAS=(36,37,38,39,40,41,42)
 
 def _rows(report):
     """Yield canonical scalar records; keep privileged inputs visibly separate."""
-    roadmap=report.get("roadmap_id")
-    if roadmap not in SCHEMAS:
+    roadmap=report.get("roadmap_id",report.get("protocol"))
+    if roadmap not in SCHEMAS and roadmap!="frozen-visual-bridge-v1":
         raise ValueError("Unsupported roadmap report: "+str(roadmap))
     emitted=[]
     def add(seed,model,domain,lead,metric,unit,value,representation,scope):
@@ -31,7 +31,21 @@ def _rows(report):
                         "input_representation":representation,
                         "protocol_scope":scope})
 
-    if roadmap==36:
+    if roadmap=="frozen-visual-bridge-v1":
+        # Each model block repeats identical persistence/velocity controls;
+        # include those controls once per frozen scene, not as extra evidence.
+        for domain,models in report["cases"].items():
+            first=sorted(models)[0]
+            for checkpointed,comparison in models.items():
+                for name,scores in comparison["metrics"].items():
+                    if name!=checkpointed and checkpointed!=first:
+                        continue
+                    for lead,values in scores.items():
+                        for metric in ("mse","motion_mse"):
+                            add(None,name,domain,lead,metric,"rgb_mse",
+                                values.get(metric),"observed_rgb",
+                                "frozen-visual-bridge-v1")
+    elif roadmap==36:
         # The top level is domain -> model -> forecast lead -> metrics.
         # Roadmap 36 reports an aggregate only; it has no per-seed rows.
         for domain,models in report["cases"].items():
@@ -90,7 +104,7 @@ def summarize(files):
         rows.extend(added)
         sources.append({"path":str(path),
                         "sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
-                        "roadmap_id":report["roadmap_id"],
+                        "roadmap_id":report.get("roadmap_id",report.get("protocol")),
                         "normalized_rows":len(added)})
     grouped=defaultdict(list)
     for r in rows:
