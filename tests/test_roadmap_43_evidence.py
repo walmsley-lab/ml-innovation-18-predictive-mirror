@@ -41,6 +41,29 @@ class EvidenceComparisonTests(unittest.TestCase):
             self.assertFalse(any(g["paired"] for g in groups
                                  if g["representation"]!="observed_rgb"))
 
+    def test_latent_and_hardware_reports_remain_descriptive(self):
+        latent={"roadmap_id":36,"cases":{
+            "linear":{"latent":{"1":{"mse":.12,"motion_mse":.2}},
+                      "persistence":{"1":{"mse":.15,"motion_mse":.25}}}}}
+        hardware={"roadmap_id":42,"rows":[{
+            "size":16,"mode":"quantized_4bit",
+            "scores":{"1":{"mse":.20}},
+            "baselines":{"persistence":{"1":{"mse":.18}}}}]}
+        with tempfile.TemporaryDirectory() as directory:
+            paths=[]
+            for i,report in enumerate((latent,hardware)):
+                path=Path(directory)/f"report{i}.json"
+                path.write_text(json.dumps(report))
+                paths.append(path)
+            result=m.summarize(paths)
+            self.assertEqual(len(result["sources"]),2)
+            latent_groups=[x for x in result["groups"] if x["roadmap_id"]==36]
+            self.assertTrue(latent_groups)
+            self.assertTrue(all(x["status"]=="descriptive_only"
+                                for x in result["groups"]))
+            self.assertIn("latent",latent_groups[0]["arms"])
+            self.assertNotEqual(latent_groups[0]["scope"],"circuit-hardware")
+
     def test_duplicate_cannot_impersonate_replicates(self):
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/"r.json"
