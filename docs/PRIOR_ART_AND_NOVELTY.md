@@ -46,3 +46,12 @@ Research position as of 2026-11-05. This is a **living, cited critical map**, no
 Complete evidence audit and existing pair-history tests, then export the same dataset to standard learned-model baselines under one manifest. Archive all result/checkpoint hashes. On the first frozen report distinguish **measured evidence**, **historically reported outcomes**, **source-code implementation**, **proposed research**, and **external literature**.
 
 **Open literature question:** find prior work that explicitly constructs *same full observed history, different possible futures* (irreducible uncertainty) versus *same last observed image, different informative histories* (memory), and directly tests causal dependence on local communication. The attached research report did not establish priority over all such work.
+
+
+## Additional 2026 review and mechanistic context
+
+- Spitznagel & Keuper, [A New Kind of Network? Review and Reference Implementation of Neural Cellular Automata](https://openreview.net/forum?id=NRwjj0ZLq0), *Transactions on Machine Learning Research* (2026): standardized notation and the NCAtorch reference implementation. Read before claiming a new NCA architecture or writing a redundant framework. A comparison should adapt ideas, not silently inherit external evaluation results.
+- Hartl, Levin & Pio-Lopez, [Neural cellular automata: Applications to biology and beyond classical AI](https://doi.org/10.1016/j.plrev.2025.11.010), *Physics of Life Reviews* 56 (2026): a biologically motivated review of multiscale organization. Relevant for long-range framing, **not** evidence that our model realizes biological perception.
+- Pajouheshgar, Xu & Süsstrunk, [Discovering Partial Differential Equations With Neural Cellular Automata](https://doi.org/10.1162/artl.a.454), *Artificial Life* (2026): another direct mechanistic/prior-art challenge for using NCAs to infer physical dynamics. Scope and code comparison require close inspection before claiming mechanistic novelty.
+
+These extend the literature search beyond the initial Perplexity report. NCA applied to distributed computation, physical rule discovery, or biological self-organization is a mature research space; our discriminating contribution must be **specific empirical causal evidence** under controlled partial observability, not a generic synthesis of these topics.
