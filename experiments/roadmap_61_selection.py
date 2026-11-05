@@ -23,11 +23,13 @@ def validate(candidates):
     for r in candidates:
         if any(not r.get(k) for k in fields if k not in ("validation_mse","latency_ms")):
             raise ValueError("Candidate missing required provenance")
-        if r.get("evidence")=="untrained_smoke":
-            raise ValueError("Cannot select random initialization as trained evidence")
+        if r.get("evidence") not in (
+                "trained_checkpoint","checkpoint_loaded_training_not_independently_verified"):
+            raise ValueError("Require explicit trained-checkpoint evidence status")
         for k in ("validation_mse","latency_ms"):
             value=r.get(k)
-            if value is None or not np.isfinite(float(value)) or float(value)<0:
+            if value is None or not np.isfinite(float(value)) or (
+                    float(value)<0 or (k=="latency_ms" and float(value)<=0)):
                 raise ValueError("Candidate lacks finite measured "+k)
     if len({r["name"] for r in candidates})!=len(candidates):
         raise ValueError("Duplicate model entries")
