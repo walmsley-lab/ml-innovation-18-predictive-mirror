@@ -174,7 +174,7 @@ def remote(dseq, command, context):
 
 def safe_rel(name):
     path = Path(name)
-    if not name or path.is_absolute() or any(p in ("..", ".") for p in path.parts):
+    if not name or not path.parts or path.is_absolute() or any(p in ("..", ".") for p in path.parts):
         raise ValueError("Unsafe artifact name")
     return path
 
@@ -229,6 +229,8 @@ def is_closed(value):
 
 
 def close(state, context):
+    if state.get("state") == "closed":
+        return True
     if not state.get("dseq"):
         return False
     dseq = state["dseq"]
