@@ -202,6 +202,73 @@ them, so each entry is tagged:
 
 ---
 
+## Added since first catalog (roadmap 44–70, bridge, late additions)
+
+These 28 runners landed after the initial pass; they complete coverage of all
+147 experiments. Grouped by kind here; a later edit can fold them into the
+tables above. (`roadmap 46–55` share `docs/ROADMAP_46_55_ATTENTION.md`;
+`roadmap 62–70` share `docs/ROADMAP_62_70_BIOLOGY.md`.)
+
+**training-studies**
+
+| experiment | establishes | why it matters |
+|---|---|---|
+| `layered_output_comparison.py` | Layered output-head variants, validation-selected; held-out RGB/motion MSE + sharpness + a 2×2 oracle-flow/visibility substitution and persistence/velocity controls. | Do learned output heads beat classical persistence/velocity at pixel+motion anticipation. |
+| `rgb_tiny_cnn_baseline.py` | Tiny CNN residual forecaster across seeds, validation-selected; lead-wise test MSE with episode-bootstrap CIs vs constant-velocity, optional frozen-NCA compare. | A learned non-cellular reference to confirm the NCA's edge is real, not only vs trivial controls. |
+| `roadmap_64_graph_dynamics.py` | Held-out MSE for 3-coefficient graph-message dynamics fit on a synthetic graph teacher vs row-shuffled and no-message null graphs. | Identifiability test of whether supplied graph structure aids prediction in-distribution. |
+| `roadmap_68_substrates.py` | Held-out MSE + edge-communication-cost proxies across connectome / grid / particle-proximity / uncoupled substrates, matched states and 3 coefficients each. | Does connectome topology beat generic substrates — cross-substrate efficiency framing. |
+
+**probes**
+
+| experiment | establishes | why it matters |
+|---|---|---|
+| `roadmap_53_interventions.py` | Accuracy-damage + causal output-delta from cutting the top-priority vs a matched-random attention window vs intact/none. | Causal importance of surprise-selected attention windows for forecast accuracy. |
+| `roadmap_65_lesions.py` | Accuracy-damage + output-effect-L2 from node lesions vs degree-matched/random/sham on a predictor frozen on the intact graph. | Counterfactual model-dependency test (explicitly not biological) of which nodes matter. |
+| `roadmap_67_harmonics.py` | Accuracy-damage + forecast-delta from removing low graph-harmonic modes vs energy-matched random vs sham on a frozen predictor. | Do low-frequency graph modes causally drive the predictor. |
+| `visual_memory_bridge.py` | Prequential A/B/A forecast MSE for frozen / recent-only / replay output-bias adaptation on frozen NCA/CNN/transport + known-action control + validation stage gate. | Does cheap online bias adaptation + bounded rehearsal on frozen forecasters improve anticipation under shift. |
+
+**baselines**
+
+| experiment | establishes | why it matters |
+|---|---|---|
+| `roadmap_48_working_memory.py` | Hidden-object MAE / recall / capacity under recency/novelty/random bounded-memory policies with a fixed-color sensor. | Non-learned persistent-memory reference for object permanence under occlusion. |
+| `roadmap_52_surprise.py` | Pre/event/recovery/glitch-window MSE for fixed / full-correction / bounded-innovation / delayed-feedback scalar estimators. | Classical surprise-recovery reference for how prediction should handle sudden change vs noise. |
+
+**evaluations**
+
+| experiment | establishes | why it matters |
+|---|---|---|
+| `active_gaze_comparison.py` _(collides with `src.active_gaze_comparison`)_ | Paired fixed/random/active 1D-gaze belief-tracking across seeds. | Non-neural active-sensing reference: does belief-driven gaze anticipate motion better than fixed/random. |
+| `roadmap_20_recording_eval.py` | Strict-causal offline replay of a timestamped webcam recording, frozen model vs persistence/constant-velocity at real inter-frame horizons. | Does the frozen cellular forecaster beat simple controls on real camera footage. |
+| `roadmap_44_live_mirror.py` | Live validation-selected frozen forecaster vs persistence/velocity, predictions timestamped before future frames, + deterministic replay harness. | Test-only live verification the selected model beats controls without on-stream tuning. |
+| `roadmap_46_attention.py` | Event-recall + observed-pixel-fraction for surprise/salience/center/random window selection (prior-RGB only) vs evaluator-only future motion. | Does prediction-error (surprise) attention cover upcoming motion better than null — precursor to cellular attention. |
+| `roadmap_47_budgeted_attention.py` | Masked constant-velocity-vs-persistence MSE + unique-updated-pixel counts across attention modes incl. full references. | Does a spatial attention budget buy accuracy per updated pixel. |
+| `roadmap_49_lifecycle.py` | False-retirement / missed-visible / reappearance-transition counts for threshold-based object-lifecycle inference from blobs. | Operational object-permanence (birth/death/occlusion) from visible pixels alone. |
+| `roadmap_50_correspondence.py` | Visible/hidden/post-crossing MAE for beam-search identity correspondence vs nearest/coast on same-color detections. | Does multi-hypothesis tracking preserve identity through crossings better than greedy. |
+| `roadmap_51_irregular_memory.py` | False-death / unsupported-presence / missed-object counts under regular/jitter/burst timing with time- vs frame-based expiry. | Robustness of persistent memory to irregular sampling (live-relevant). |
+| `roadmap_54_active_gaze.py` | Position MAE / sighting rate / gaze-travel for active-Bayesian vs trained-fixed vs random gaze (one 3×3 window/step). | Does belief-driven active sensing beat fixed/random — non-neural active-perception reference. |
+| `roadmap_63_retinotopy.py` | Temporal-change-energy + layout-effect MSE of graph-signal rasterization under true vs permutation-shuffled registration. | Node order alone isn't retinotopy; layout must be externally supplied — guards mapping claims. |
+| `roadmap_66_neural_agreement.py` | Held-out neural-response MSE + per-neuron Pearson for a lag-selected linear decoder vs shuffled/constant-mean nulls, with a noise-ceiling slot. | Scores stimulus→neural agreement with controls (synthetic by default — protocol, not biological support). |
+| `roadmap_69_topology_transfer.py` | Held-out MSE for frozen source-pretrained coefficients on a new target graph vs stale-source / shuffled-target / target-refit arms. | Do topology-conditioned cellular coefficients transfer across graphs (not biological transfer). |
+
+**audits**
+
+| experiment | establishes | why it matters |
+|---|---|---|
+| `roadmap_45_release.py` | Deterministic release zip with per-source SHA256, train/val/test byte+session disjointness, privacy omission of raw footage. | Provenance/reproducibility so results can't silently reuse data across splits. |
+| `roadmap_55_scene_campaign.py` | Provenance-linked manifest bundling 46–54 with per-module SHA256 + a checkpoint-gated trained-RGB comparison (never faked when absent). | Aggregates attention evidence while barring random-init from masquerading as trained. |
+| `roadmap_61_selection.py` | Validation+latency-gated frozen-model selection with fail-closed provenance (ckpt/session/device sha, finite metrics) + optional test attach. | Chooses the winning model without test leakage, meeting a real-time latency budget. |
+| `roadmap_62_connectome_contract.py` | Validated SHA256-provenance-gated connectome-adjacency loader (directed/undirected preserved) + labeled synthetic toy fallback. | Prevents graph studies from passing synthetic graphs off as measured biological connectomes. |
+| `roadmap_70_biology.py` | Provenance manifest aggregating 62–69 with per-module SHA256 + explicit `not_demonstrated` status for four biological-evidence claims. | Prevents synthetic graph studies from being read as measured biological/neural evidence. |
+
+**demos**
+
+| experiment | establishes | why it matters |
+|---|---|---|
+| `rgb_verified_live.py` | Live webcam 4-panel observed/forecast-+10/actual/abs-error view with delayed-scoring metrics for pre-committed forecasts. | Live demonstration that a frozen cellular forecaster's early predictions match reality (no baselines). |
+
+---
+
 ## Cleanup backlog (drives the code-simplicity pass)
 
 Collected across all 123 runners; high-value, low-risk, behavior-preserving
