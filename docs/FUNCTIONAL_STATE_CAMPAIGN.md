@@ -5,6 +5,7 @@ The repository already contains hidden-state intervention and harmonic probes. T
 ```bash
 python -m experiments.functional_state_campaign \
   --checkpoint runs/rgb-nca-1s/parameters.npz --episodes 6
+# For a trained non-saturating head, explicitly select --output blend
 ```
 
 For the *same observed RGB contexts* and parameters, compare intact, reset-hidden, spatially shifted hidden and image-shock arms. Future frames enter scoring only. The companion `forecast_diagnostics.collapse_report` labels each horizon as `live`, `dead`, or `insensitive` based on known controls.
