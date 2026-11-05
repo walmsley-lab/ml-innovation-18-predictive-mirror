@@ -32,6 +32,10 @@ def run(out="runs/roadmap-41",seeds=(11,23,41),pre_steps=30,
         "occlusion":rgb_pool(91000,10,context,horizon,size,{"balls":1,"occlusion":True}),
         "camera_motion":rgb_pool(92000,10,context,horizon,size,{"balls":1,"camera_motion":True}),
         "interactions":rgb_pool(93000,10,context,horizon,size,{"balls":2,"occlusion":True})}
+    baselines={domain:{
+        name:bench.score(values,clips,context,(1,horizon))
+        for name,values in bench.controls(clips[:,:context],horizon).items()}
+        for domain,clips in testing.items()}
     folder=Path(out) if out else None
     if folder:folder.mkdir(parents=True,exist_ok=True)
     rows=[]
@@ -80,7 +84,8 @@ def run(out="runs/roadmap-41",seeds=(11,23,41),pre_steps=30,
                          "parameters":int(sum(x.size for x in jax.tree.leaves(params)))})
     report={"roadmap_id":41,"seeds":list(map(int,seeds)),
             "pretrain_updates":pre_steps,"finetune_updates":target_steps,
-            "results":rows,"limits":"Exact hidden cellular core transferred from a "
+            "results":rows,"classical_baselines":baselines,
+            "limits":"Exact hidden cellular core transferred from a "
             "synthetic pulse task, not human neural recordings. Scratch equal-total "
             "sees extra RGB examples, so update parity != exposure parity; "
             "scratch-finetune-only has fewer total updates. Shuffled pulse "
