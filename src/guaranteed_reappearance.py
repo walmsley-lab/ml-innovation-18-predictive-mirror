@@ -56,12 +56,12 @@ def episode(seed=1, context=4, horizon=10, size=32, mode="barrier"):
         if reason[t] in ("visible","partial") and reason[t-1] in (
                 "barrier","out_of_view"):
             kind="barrier_return" if reason[t-1]=="barrier" else "camera_return"
+            first_hidden=t-1
+            while (first_hidden>0 and
+                   reason[first_hidden-1] in ("barrier","out_of_view")):
+                first_hidden-=1
             events.append({"frame":t,"kind":kind,
-                           "hidden_start":next(
-                               (j for j in range(t-1,-1,-1)
-                                if reason[j-1] not in ("barrier","out_of_view"))
-                               if j==0 or reason[j-1] not in ("barrier","out_of_view")),
-                               0)})
+                           "hidden_start":first_hidden})
     relevant=[e for e in events if e["frame"]>=context and
               e["frame"]<n]
     if not relevant or (mode=="barrier" and not any(
