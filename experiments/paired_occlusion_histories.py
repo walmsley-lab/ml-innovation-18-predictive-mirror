@@ -49,10 +49,22 @@ def run(out="runs/paired-occlusion/metrics.json",seeds=(11,23,41),
     compared=evaluate(predictor,records,context,horizon)
     observed=np.stack([r["frames"][:context] for r in records])
     fitted=np.stack([world.linear_history_forecast(x,horizon) for x in observed])
+    history_fit_controls={}
+    for condition,context_images in world.controls(observed).items():
+        forecasts=np.stack([world.linear_history_forecast(x,horizon)
+                            for x in context_images])
+        truth=np.stack([r["frames"][context:context+horizon]
+                        for r in records])
+        history_fit_controls[condition]={
+            "contrast_mse":float(np.mean(np.square(
+                (forecasts[::2]-forecasts[1::2])-
+                (truth[::2]-truth[1::2])))),
+            "event":events.score(forecasts,records,context)}
     result={"protocol":"history-identifiability-occlusion-v1",
             "seeds":list(map(int,seeds)),"context":context,"horizon":horizon,
             "size":size,"predictor":title,"comparisons":compared,
             "history_linear_baseline":events.score(fitted,records,context),
+            "history_linear_reset_shuffle":history_fit_controls,
             "positive_control":events.score(np.stack([
                 r["frames"][context:] for r in records]),records,context),
             "limits":"Paired last observed RGB frames are bit-identical. "
