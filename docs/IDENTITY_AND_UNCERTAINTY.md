@@ -21,3 +21,10 @@ Next: introduce a viewpoint/action that reveals the previously hidden identity, 
 - [IntPhys 2](https://arxiv.org/abs/2506.09849) expands violation-of-expectation physics principles, including permanence and continuity.
 
 The relevant narrower question is how *observable history*, trained recurrent state and explicit identity alternatives interact under a controlled input budget. Avoid claiming a general object-permanence benchmark is novel.
+
+
+## Active-observation continuation (reuse, don't duplicate)
+
+The repository already implements an action-aware 1D moving-target belief filter and active camera policy in [`src/active_gaze_dynamics.py`](../src/active_gaze_dynamics.py), with its own [experiment protocol](ACTIVE_GAZE_DYNAMICS.md). It uses explicit known dynamics and does not claim a learned neural gaze policy.
+
+**Next experiment after this audit:** connect the `identity` and `unobserved-turn` observability regimes to an explicit, budgeted reveal action, reusing that policy's expected-risk baseline. A reveal action should produce a measurable reduction in predicted identity/future uncertainty relative to fixed and random observation, without leaking hidden state into the policy. Preserve the old 1D control as its own reproducible baseline rather than recreating its machinery inside this PR.
