@@ -81,13 +81,16 @@ def run(out="runs/rgb-world-ladder-training",models=MODELS,
             or min(train_per_domain,val_per_domain,test_per_domain)<1):
         raise ValueError("Invalid paired training configuration")
     train_datasets={}
+    # Both curricula select checkpoints on identical varied validation
+    # scenes; different selection distributions would confound comparison.
+    common_validation=pool("validation",TRAIN_DOMAINS,val_per_domain,
+                           context,horizon,size,2)
     val_datasets={}
     for curriculum in curricula:
         domains=("linear",) if curriculum=="linear" else TRAIN_DOMAINS
         train_datasets[curriculum]=pool("train",domains,train_per_domain,
-                                         context,horizon,size,2)
-        val_datasets[curriculum]=pool("validation",domains,val_per_domain,
                                        context,horizon,size,2)
+        val_datasets[curriculum]=common_validation
     test={domain:pool("test",(domain,),test_per_domain,
                       context,horizon,size,2) for domain in TEST_DOMAINS}
     folder=Path(out);folder.mkdir(parents=True,exist_ok=True)
