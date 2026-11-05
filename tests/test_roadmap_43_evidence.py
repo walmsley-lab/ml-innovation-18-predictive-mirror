@@ -45,10 +45,10 @@ class EvidenceComparisonTests(unittest.TestCase):
         latent={"roadmap_id":36,"cases":{
             "linear":{"latent":{"1":{"mse":.12,"motion_mse":.2}},
                       "persistence":{"1":{"mse":.15,"motion_mse":.25}}}}}
-        hardware={"roadmap_id":42,"rows":[{
-            "size":16,"mode":"quantized_4bit",
-            "scores":{"1":{"mse":.20}},
-            "baselines":{"persistence":{"1":{"mse":.18}}}}]}
+        hardware={"roadmap_id":42,"rows":[
+            {"size":16,"mode":mode,"scores":{"1":{"mse":score}},
+             "baselines":{"persistence":{"1":{"mse":.18}}}}
+            for mode,score in (("full",.21),("quantized_4bit",.20))]}
         with tempfile.TemporaryDirectory() as directory:
             paths=[]
             for i,report in enumerate((latent,hardware)):
@@ -63,6 +63,10 @@ class EvidenceComparisonTests(unittest.TestCase):
                                 for x in result["groups"]))
             self.assertIn("latent",latent_groups[0]["arms"])
             self.assertNotEqual(latent_groups[0]["scope"],"circuit-hardware")
+            hardware_groups=[x for x in result["groups"] if x["roadmap_id"]==42]
+            self.assertEqual(len(hardware_groups),1)
+            self.assertEqual(set(hardware_groups[0]["arms"]),
+                             {"full","quantized_4bit","persistence"})
 
     def test_frozen_visual_bridge_inputs_and_control_deduplication(self):
         sample={"protocol":"frozen-visual-bridge-v1",
