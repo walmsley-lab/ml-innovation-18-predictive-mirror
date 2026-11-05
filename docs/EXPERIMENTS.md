@@ -54,9 +54,9 @@ variants need their own trained runs and evaluation before claiming benefits.
 For graph and particle tasks, compare within their own units and inputs.
 Independent webcam transfer and robust one-second anticipation remain open.
 
-## Research timeline (planned, not implemented)
+## Current research evidence and milestones
 
-A future [Gaussian-state NCA experiment](RESEARCH_TIMELINE.md#gaussian-state-nca-future-track) will test whether cellular dynamics applied to **3D Gaussian scene elements** improve occlusion, novel-view and camera-action prediction over pixel-based models. Gaussian splatting is a representation/rendering technique, not a predictor by itself. This is a *proposal*, not a runnable experiment or demonstrated result.
+The [Gaussian-state roadmap](RESEARCH_TIMELINE.md) has **implemented** rendering, oracle-state dynamics, RGB-inferred dynamics and active-view comparison runners. These are not yet demonstrated perception improvements. See the [operator-reported campaign findings](PERSISTENCE_VS_SIMPLE_FINDINGS.md) and [metric/provenance audit](CAMPAIGN_FINDINGS_20261104.md) before interpreting performance claims. Gaussian splatting is a representation and rendering method, not a predictor by itself.
 
 ## Where to read next
 

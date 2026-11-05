@@ -163,3 +163,83 @@ def collapse_report(forecasts, leads, positive_control=None,
         report["measurement_verdict"] = measurement_verdict(
             responses, leads, floor, independence, saturation)
     return report
+
+
+def perceptual_failure_report(forecasts, records, context, leads=(1, 3, 5, 10)):
+    """Calibrate five forecast failure types against evaluator-only RGB truth.
+
+    Additive diagnostic: does not modify the historical live/dead/insensitive
+    positive-control verdict. Requires distinct scenes for an interpretable
+    across-scene independence test; with one scene that flag is unavailable.
+    A diagnostic flag is a *screening heuristic*, not a statistical test.
+    """
+    from src import rgb_event_metrics as events
+    forecasts = np.asarray(forecasts, np.float32)
+    if (forecasts.ndim != 5 or len(records) != len(forecasts)
+            or forecasts.shape[-1] != 3 or context < 2):
+        raise ValueError("Need [episodes,horizon,H,W,RGB] and matched truth")
+    leads = _leads_in_range(forecasts, leads)
+    metrics = events.score(forecasts, records, context, leads)
+    rows = {}
+    for lead in leads:
+        key = str(lead)
+        pred = forecasts[:, lead - 1]
+        truth = np.stack([record["frames"][context + lead - 1]
+                          for record in records])
+        if pred.shape != truth.shape:
+            raise ValueError("Truth/prediction image mismatch")
+        brightness = float(pred.mean())
+        spatial_sd = float(np.mean(pred.std(axis=(1, 2))))
+        bright_pred = np.max(pred, axis=-1) > events.FOREGROUND_BRIGHTNESS
+        bright_true = np.max(truth, axis=-1) > events.FOREGROUND_BRIGHTNESS
+        pred_fraction = float(bright_pred.mean())
+        true_fraction = float(bright_true.mean())
+        across = (float(np.abs(pred - pred.mean(axis=0, keepdims=True)).mean())
+                  if len(pred) > 1 else None)
+        truth_spread = (float(np.abs(truth - truth.mean(axis=0, keepdims=True)).mean())
+                        if len(truth) > 1 else None)
+        can_check_independence = truth_spread is not None and truth_spread > 1e-3
+        event = metrics[key]
+        flags = []
+        if brightness < .07 and spatial_sd < .02 and true_fraction > 0:
+            flags.append("black")
+        if brightness > .30 and spatial_sd < .03 and pred_fraction > .8:
+            flags.append("bright")
+        if (pred_fraction > max(.4, 4 * true_fraction)
+                and event["foreground_precision"] is not None
+                and event["foreground_precision"] < .30):
+            flags.append("diffuse")
+        if (event["soft_centroid_mae_px"] is not None
+                and event["soft_centroid_mae_px"] > 3.0
+                and (event["predicted_mass_fraction"] or 0) >= .1):
+            flags.append("misplaced")
+        if can_check_independence and across <= 1e-5:
+            flags.append("input_independent")
+        if (event["visible_objects"] > 0
+                and event["missing_visible_predictions"] == event["visible_objects"]):
+            flags.append("all_objects_hard_missed")
+        mse = float(np.square(pred - truth).mean())
+        if mse <= 1e-9 and not flags:
+            flags.append("accurate")
+        rows[key] = {
+            "flags": flags, "pixel_mse": mse,
+            "mean_intensity": brightness,
+            "spatial_std": spatial_sd,
+            "across_scene_deviation": across,
+            "truth_across_scene_deviation": truth_spread,
+            "input_independence_testable": bool(can_check_independence),
+            "predicted_foreground_fraction": pred_fraction,
+            "true_foreground_fraction": true_fraction,
+            "foreground_precision": event["foreground_precision"],
+            "foreground_recall": event["foreground_recall"],
+            "hue_mass_ratio": event["predicted_mass_fraction"],
+            "soft_centroid_error_px": event["soft_centroid_mae_px"],
+            "hard_missing_objects": event["missing_visible_predictions"],
+            "visible_objects": event["visible_objects"],
+        }
+    return {"per_lead": rows,
+            "limits": "Heuristic thresholds for this synthetic RGB palette; "
+             "never infer object identity or promotion from one flag. "
+             "Hard missing-object counts incur the full-image-diagonal "
+             "penalty in the separate event score. Across-scene dependence "
+             "cannot be assessed with one scene or identical truth."}
