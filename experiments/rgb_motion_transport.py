@@ -6,7 +6,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from src import rgb_motion_transport as model,rgb_benchmark as bench
-from train import adamw
+from src import experiment_harness as harness
 
 
 def run(out="runs/rgb-motion-transport",seeds=(11,23,41),steps=80,
@@ -30,24 +30,17 @@ def run(out="runs/rgb-motion-transport",seeds=(11,23,41),steps=80,
             return float(np.mean((p-val[:,context:])**2))
         arms={mode:{"p":initial,"m":zero(),"v":zero(),"best":initial,
                     "step":0,"val":validation(initial,mode)} for mode in model.MODES}
-        def make_update(mode):
-            @jax.jit
-            def update(p,m,v,examples,index):
-                err,grads=jax.value_and_grad(
-                    lambda w:model.loss(w,examples,context,horizon,mode))(p)
-                norm=jnp.sqrt(sum((g*g).sum() for g in jax.tree.leaves(grads)))
-                grads=jax.tree.map(lambda g:g/jnp.maximum(norm,1.),grads)
-                p,m,v=adamw(p,grads,m,v,index)
-                return p,m,v,err
-            return update
-        updates={name:make_update(name) for name in model.MODES}
+        updates={name:harness.clipped_adamw_update(
+                     lambda w,examples,mode=name:model.loss(
+                         w,examples,context,horizon,mode))
+                 for name in model.MODES}
         rng=np.random.default_rng(int(seed)+770)
         for step in range(1,steps+1):
             ids=rng.integers(0,len(train),size=batch_size)
             example=jnp.asarray(train[ids])
             for name,arm in arms.items():
                 arm["p"],arm["m"],arm["v"],_=updates[name](
-                    arm["p"],arm["m"],arm["v"],example,step)
+                    arm["p"],arm["m"],arm["v"],(example,),step)
             if step==steps or step%max(1,steps//5)==0:
                 for name,arm in arms.items():
                     value=validation(arm["p"],name)

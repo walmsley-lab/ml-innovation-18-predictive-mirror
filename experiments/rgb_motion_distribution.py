@@ -14,7 +14,7 @@ import jax.numpy as jnp
 import numpy as np
 
 from src import predictive_rgb_nca as nca
-from train import adamw
+from src import experiment_harness as harness
 
 MODES = ("single", "distribution")
 SCENE_TYPES = ("straight", "bounce", "occlusion")
@@ -204,14 +204,8 @@ def run(output="runs/rgb-motion-distribution", seeds=(11, 23, 37), steps=100,
         "constant_velocity": measure(velocity, test, context, leads),
     }
 
-    @jax.jit
-    def update(params, first, second, batch, step):
-        error, gradients = jax.value_and_grad(
-            lambda p: nca.loss(p, batch, context, horizon, ticks))(params)
-        norm = jnp.sqrt(sum(jnp.square(g).sum() for g in jax.tree.leaves(gradients)))
-        gradients = jax.tree.map(lambda g: g / jnp.maximum(1.0, norm), gradients)
-        params, first, second = adamw(params, gradients, first, second, step)
-        return params, first, second, error
+    update = harness.clipped_adamw_update(
+        lambda p, batch: nca.loss(p, batch, context, horizon, ticks))
 
     folder = Path(output)
     folder.mkdir(parents=True, exist_ok=True)
@@ -234,7 +228,7 @@ def run(output="runs/rgb-motion-distribution", seeds=(11, 23, 37), steps=100,
                 state = states[mode]
                 state["params"], state["first"], state["second"], error = update(
                     state["params"], state["first"], state["second"],
-                    jnp.asarray(batch), step)
+                    (jnp.asarray(batch),), step)
             if step == steps or step % max(1, steps//5) == 0:
                 row = {"step": step}
                 for mode in MODES:
