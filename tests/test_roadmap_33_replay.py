@@ -10,7 +10,7 @@ class ReplayTests(unittest.TestCase):
             self.assertEqual(result["gradient_updates"],2*result["total_examples"])
             self.assertLess(result["max_replay_index"],result["total_examples"])
             self.assertEqual(len(result["stages"]),3)
-        self.assertGreater(m.learn(3,"replay",5,(5 if False else .08),
+        self.assertGreater(m.learn(3,"replay",capacity=5,lr=.08,
                                    stages=(5,7,4))["replayed_updates"],0)
 
     def test_seeded_reproducibility_and_capacity(self):
