@@ -10,7 +10,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from src import rgb_grounded_nca as nca
-from src import rgb_motion_distribution as world
+from experiments import rgb_motion_distribution as world
 from src import experiment_harness as harness
 
 
