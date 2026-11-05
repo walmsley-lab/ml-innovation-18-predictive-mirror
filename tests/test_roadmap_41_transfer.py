@@ -22,6 +22,8 @@ class SignalVisualTransferTests(unittest.TestCase):
             self.assertEqual(rows["scratch_finetune_only"]["total_updates"],1)
             self.assertEqual(rows["shuffled_signal_labels"]["target_rgb_updates"],1)
             self.assertIn("camera_motion",rows["signal_pretrained"]["heldout"])
+            self.assertIn("persistence",r["classical_baselines"]["occlusion"])
+            self.assertIn("constant_velocity",r["classical_baselines"]["interactions"])
 
 
 if __name__=="__main__":
