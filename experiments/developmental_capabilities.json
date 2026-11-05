@@ -1,0 +1,141 @@
+{
+  "schema": "predictive-mirror-capabilities-v1",
+  "status": "preregistered exploratory acceptance criteria, not observed results",
+  "unit_of_independence": "episode or recording session, never adjacent frames",
+  "splits": {
+    "development": "choose hypotheses, compute variability and sample sizes",
+    "test": "frozen before confirmatory evaluation"
+  },
+  "time_contract": "Every model feature must be available when the forecast is committed; no future label, visibility or position inputs",
+  "capabilities": [
+    {
+      "id": "motion",
+      "capability": "Predict visible motion",
+      "observations": [
+        "RGB history"
+      ],
+      "measures": [
+        "per_lead_centroid_mae_px",
+        "motion_region_mse"
+      ],
+      "controls": [
+        "persistence",
+        "constant_velocity",
+        "coasting"
+      ],
+      "failure": [
+        "motion",
+        "detection"
+      ],
+      "minimum_useful_effect": "At least 1 px median improvement at lead 5 on independently generated 32px scenes; exploratory threshold",
+      "species": "cross-species computational hypothesis",
+      "evidence": "Controlled motion extrapolation is a computation; no specific neural mechanism is claimed",
+      "falsifier": "No improvement against coasting across independent trajectories"
+    },
+    {
+      "id": "occlusion",
+      "capability": "Persist through complete sensory occlusion",
+      "observations": [
+        "RGB history"
+      ],
+      "measures": [
+        "reappearance_timing_error_frames",
+        "reappearance_centroid_error_px",
+        "premature_visible_frames"
+      ],
+      "controls": [
+        "last_velocity_coast",
+        "reset_history",
+        "shuffled_history"
+      ],
+      "failure": [
+        "identity",
+        "visibility",
+        "timing"
+      ],
+      "minimum_useful_effect": "At least 1 frame median reentry-timing improvement over coasting on guaranteed held-out events",
+      "species": "behavioral developmental analogy, not proof of biological identity",
+      "evidence": "History dependence test: matched last observation, differing earlier motion",
+      "falsifier": "Correct predictions unaffected by history reset or shuffle"
+    },
+    {
+      "id": "viewpoint",
+      "capability": "Separate observer from world motion",
+      "observations": [
+        "RGB history",
+        "commanded camera actions when known"
+      ],
+      "measures": [
+        "action_counterfactual_mse",
+        "heldout_view_mse"
+      ],
+      "controls": [
+        "zero_actions",
+        "shuffled_actions",
+        "persistence"
+      ],
+      "failure": [
+        "motion",
+        "rendering"
+      ],
+      "minimum_useful_effect": "Positive held-out action sensitivity with at least 5% error decrease over zero-action input",
+      "species": "general sensorimotor control analogy",
+      "evidence": "View prediction requires an explicit known-action contract",
+      "falsifier": "Predictions do not change when planned viewpoint changes"
+    },
+    {
+      "id": "uncertainty",
+      "capability": "Represent ambiguous futures",
+      "observations": [
+        "RGB history"
+      ],
+      "measures": [
+        "coverage_at_90",
+        "sharpness",
+        "mode_diversity",
+        "proper_score"
+      ],
+      "controls": [
+        "unimodal",
+        "climatology",
+        "constant_velocity"
+      ],
+      "failure": [
+        "calibration",
+        "timing"
+      ],
+      "minimum_useful_effect": "Coverage within ±0.05 of nominal .90 with sharper sets than unconditional baseline",
+      "species": "engineering hypothesis; no subjective-experience inference",
+      "evidence": "Ambiguous futures require distributional evaluation",
+      "falsifier": "Mode collapse or high best-of-many accuracy without calibration"
+    },
+    {
+      "id": "attention",
+      "capability": "Select informative computation or observations",
+      "observations": [
+        "RGB history",
+        "available actions"
+      ],
+      "measures": [
+        "forecast_gain",
+        "actual_operations",
+        "compute_latency_ms"
+      ],
+      "controls": [
+        "uniform",
+        "random",
+        "salience",
+        "shuffled_controller"
+      ],
+      "failure": [
+        "allocation",
+        "motion",
+        "visibility"
+      ],
+      "minimum_useful_effect": "At least 10% measured operations saved with no more than 2% foreground-error regression",
+      "species": "hypothesis inspired by selective attention, species mechanisms vary",
+      "evidence": "Allocation logs must verify that work was actually skipped",
+      "falsifier": "Controller changes visualization but not execution or forecast outcomes"
+    }
+  ]
+}
