@@ -82,6 +82,7 @@ class Tests(unittest.TestCase):
                 return 1
 
         def fake_launch(command, *, stdout, stderr, text, bufsize):
+            self.assertEqual(command[command.index("--ready-timeout") + 1], "10m")
             stderr.write(warning)
             stderr.flush()
             return FailedProcess()
