@@ -44,6 +44,7 @@ experiments and specialized inputs are intentionally retained.
 
 | Goal | Command / guide |
 |---|---|
+| Author reproducible audiovisual geometry sketches and paired light/dark synthetic clips | `demos/perceptual_atlas.html`, `python -m experiments.perceptual_atlas_dataset`; [scope and controls](PERCEPTUAL_ATLAS.md) — **stimulus generator, not a trained decoder** |
 | Inspect model forecasts, future truth, and activity | `python -m experiments.rgb_prediction_gallery --help`; [gallery](RGB_PREDICTION_GALLERY.md) |
 | Score a frozen RGB NCA on new synthetic seeds | `python -m experiments.rgb_benchmark --help`; [benchmark contract](RGB_BENCHMARK_CONTRACT.md) |
 | Localize objects (hard/segmentation/soft) and see why a model misses them | `python -m experiments.rgb_event_benchmark --help`, `python -m experiments.rgb_event_gallery --help`; [event benchmark](RGB_EVENT_BENCHMARK.md) |
