@@ -8,6 +8,9 @@ sweep. No performance or webcam success is asserted by deploying a container.
 ## What this campaign actually trains
 
 - `experiments/akash-rgb-smoke.json`: 2 short conditions, technical smoke.
+- `experiments/akash-rgb-pilot.json`: **6 conditions**: 3 seeds × CNN and
+  blend-head NCA, 300 steps each. Inspect whether foreground stays localized
+  before approving the larger paid matrix.
 - `experiments/akash-rgb-full.json`: **18 conditions**: 3 initializations ×
   [CNN, transport, plain NCA, blend-head NCA] on mixed-world training (1,200
   updates each), plus 3 × [CNN, blend NCA] on paired-history occlusions
@@ -54,7 +57,13 @@ python -m deploy.gpu_campaign run --approve-paid-deployment \
   --image "$IMAGE" --config experiments/akash-rgb-smoke.json \
   --out runs/akash-rgb-smoke --max-runs 2 --hours 2
 
-# Only after smoke artifact recovery and model validation:
+# Before full spend: an intermediate 6-condition pilot.
+python -m deploy.gpu_campaign plan \
+  --image "$IMAGE" --config experiments/akash-rgb-pilot.json \
+  --out runs/akash-rgb-pilot --max-runs 6 --hours 3
+# Use 'run --approve-paid-deployment' after review and a valid image digest.
+
+# Only after smoke + pilot recoveries and evaluation:
 python -m deploy.gpu_campaign plan \
   --image "$IMAGE" --config experiments/akash-rgb-full.json \
   --out runs/akash-rgb-full --max-runs 18 --hours 8
@@ -90,3 +99,15 @@ motion-region error vs observation-only constant velocity; repeatability
 over three seeds; viable GPU and local inference latency; independent camera
 recording before calling a live demo an accurate predictor. Longer training
 is *not* a cure for a dead gradient or an all-black/gray fixed point.
+
+## Durability and stop conditions
+
+The private export happens while the Akash lease is reachable. It does not
+currently stream checkpoints to durable object storage during training. A
+provider outage/lease expiration may lose unexported in-container outputs,
+even though the runner writes per-condition results incrementally. Confirm
+the provider runtime and recovery window are sufficient; recover promptly.
+A 3-step smoke proves wiring, not convergence. If the 300-step pilot exhibits
+all-black/gray output, missing objects, or no improvement against velocity
+on relevant motion, **do not simply scale to 1,200 steps without inspecting
+the failure mode first.** The full run is bounded research, not a guaranteed win.
