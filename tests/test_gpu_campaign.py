@@ -64,6 +64,48 @@ class Tests(unittest.TestCase):
         self.assertIsNone(campaign.dseq_from_event({"outputs":{"dseq":"no"}}))
         self.assertTrue(campaign.is_closed({"deployment":{"state":"closed"}}))
 
+    def test_cli_readiness_timeout_preserves_paid_deployment_id(self):
+        """akt can create a lease then fail readiness without JSON outputs.dseq."""
+        warning = (
+            "workflow deploy failed: deployment did not become ready within 2m0s\n"
+            "deployment DSEQ 1793960545862 with provider akash1provider remains open; "
+            "escrow may continue to be consumed.\n"
+        )
+        self.assertEqual(campaign.dseq_from_failure_output(warning), "1793960545862")
+        self.assertIsNone(campaign.dseq_from_failure_output("unrelated 1793960545862"))
+
+        class FailedProcess:
+            stdout = iter(['{"result": "failed"}\n'])
+            def wait(self, timeout=None):
+                return 1
+            def poll(self):
+                return 1
+
+        def fake_launch(command, *, stdout, stderr, text, bufsize):
+            stderr.write(warning)
+            stderr.flush()
+            return FailedProcess()
+
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(campaign.subprocess, "Popen", side_effect=fake_launch):
+            state = {"out": tmp, "state": "deploying"}
+            record = Path(tmp) / "state.json"
+            with self.assertRaises(RuntimeError):
+                campaign.deploy("deployment.yaml", state, record, None)
+            self.assertEqual(state["dseq"], "1793960545862")
+            self.assertEqual(json.loads(record.read_text())["dseq"], "1793960545862")
+
+    def test_recovered_deployment_can_be_closed(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(campaign, "cli", side_effect=[
+                 "{}", '{"deployment":{"state":"closed"}}'
+             ]) as cli:
+            state = {"out": tmp, "state": "deploying", "dseq": "1793960545862"}
+            self.assertTrue(campaign.close(state, None))
+            self.assertEqual(state["state"], "closed")
+            self.assertEqual(cli.call_count, 2)
+            self.assertIn("1793960545862", cli.call_args_list[0].args[0])
+
     def test_download_private(self):
         data=b"private-checkpoint"
         item={"path":"pilot/model.npz","bytes":len(data),
