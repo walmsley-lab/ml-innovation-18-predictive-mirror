@@ -26,7 +26,7 @@ description, **not** brain data or a recording of consciousness.
 
 Example sequence:
 
-\`\`\`json
+```json
 {
   "format": "perceptual-atlas-v1",
   "initial": {
@@ -36,19 +36,19 @@ Example sequence:
   "events": [],
   "duration": 4
 }
-\`\`\`
+```
 
 ## 2. Generate a CPU dataset for model experiments
 
 With the repository's NumPy environment:
 
-\`\`\`bash
+```bash
 python -m experiments.perceptual_atlas_dataset \
   --seed 41000 --episodes 8 --frames 16 --size 32 \
   --out runs/perceptual-atlas/dataset.npz
-\`\`\`
+```
 
-The companion \`dataset.json\` records the protocol, seed, geometry modes,
+The companion `dataset.json` records the protocol, seed, geometry modes,
 shape, exposure settings, and SHA-256 of the NPZ. Output paths are not
 overwritten. Each scene is rendered twice using **the same underlying
 geometric field** under simulated dark and bright presentation.
@@ -57,10 +57,10 @@ NPZ arrays:
 
 | Field | Shape | Role |
 |---|---|---|
-| \`frames_dark\` | (episodes, frames, H, W, 3) | RGB observation |
-| \`frames_bright\` | same | Paired RGB observation |
-| \`cue_hz\` | (episodes, frames) | Synchronized synthetic pitch cue |
-| \`latent_intensity\` | (episodes, frames, H, W) | Generator truth, evaluator-only |
+| `frames_dark` | (episodes, frames, H, W, 3) | RGB observation |
+| `frames_bright` | same | Paired RGB observation |
+| `cue_hz` | (episodes, frames) | Synchronized synthetic pitch cue |
+| `latent_intensity` | (episodes, frames, H, W) | Generator truth, evaluator-only |
 
 The optional pitch cue is an explicitly supplied, synchronized control and
 cannot be inferred from pixels by fiat. It modulates the field through a
@@ -74,10 +74,10 @@ dataset is a fixed-resolution research stimulus.
 
 ## 3. Regression checks
 
-\`\`\`bash
+```bash
 python -m unittest tests.test_perceptual_atlas_dataset -v
 node --test tests/test_perceptual_atlas.cjs
-\`\`\`
+```
 
 Python tests cover reproducibility, paired RGB changes with identical
 generator truth, pitch coupling, bounds, and artifact no-overwrite behavior.
