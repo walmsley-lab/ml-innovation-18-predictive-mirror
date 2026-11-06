@@ -32,7 +32,7 @@ class DevelopmentalSheet:
         self.sheet, self.channels = sheet, channels
         self.rate = float(plasticity)
         rng = np.random.default_rng(seed)
-        self.phase = rng.uniform(-np.pi, np.pi, (sheet, sheet))
+        self.phase = rng.uniform(-np.pi, np.pi, (sheet, sheet)).astype(np.float32)
         self.hidden = np.zeros((sheet, sheet, channels), np.float32)
         self.trace = np.zeros((sheet, sheet, channels), np.float32)
         self.homeostasis = np.zeros((channels,), np.float32)
