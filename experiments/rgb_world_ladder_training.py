@@ -170,6 +170,7 @@ def run(out="runs/rgb-world-ladder-training",models=MODELS,
                     "last_training_step":steps,"sampler_state":rng.bit_generator.state,
                 })
     manifest={"protocol":"paired-diverse-rgb-curriculum-v1",
+              "size":size,"width":width,
               "models":list(models),"curricula":list(curricula),
               "seeds":list(map(int,seeds)),"steps":steps,
               "context":context,"horizon":horizon,
