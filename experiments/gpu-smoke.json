@@ -1,0 +1,18 @@
+{
+  "seeds": [
+    31
+  ],
+  "architectures": [
+    "recurrent"
+  ],
+  "curricula": [
+    "baseline"
+  ],
+  "steps": 3,
+  "batch_size": 2,
+  "episodes": 2,
+  "checkpoint_every": 1,
+  "loss_mode": "plain",
+  "primary_metric": "reappearance_location_mae_px",
+  "replay_fraction": 0.1
+}

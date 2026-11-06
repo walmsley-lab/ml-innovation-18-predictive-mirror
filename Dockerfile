@@ -9,6 +9,7 @@ COPY src/ src/
 COPY train.py evaluate.py sweep.py campaign.py ./
 COPY experiments/ experiments/
 COPY tests/ tests/
+COPY deploy/ deploy/
 COPY deploy/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 EXPOSE 8080

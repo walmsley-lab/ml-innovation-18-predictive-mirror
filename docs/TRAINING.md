@@ -1,5 +1,10 @@
 # Optional GPU training matrix and Akash handoff
 
+> **Managed Akash Console GPU campaigns:** for a bounded, reviewed one-GPU run
+> with private artifact recovery and automatic close attempts, use
+> [GPU_CAMPAIGN.md](GPU_CAMPAIGN.md). The manual SDL steps below remain
+> background guidance, not a one-command paid launch.
+
 The optional GPU image contains all training models, the evaluator, lightweight experiments and `sweep.py`. It is still intentionally a Python/JAX executable experiment, not an experiment-management framework.
 
 Local smoke (also in CI):
