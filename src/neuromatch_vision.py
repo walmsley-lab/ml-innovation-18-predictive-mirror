@@ -96,9 +96,21 @@ def targeted_channel_lesions(params, context, truth, horizon=3, ticks=1,
     energy = np.square(np.asarray(state[0])).sum(axis=(0, 1, 2))
     channels = len(energy)
     n = max(1, round(channels * fraction))
+    if n >= channels:
+        raise ValueError("A distinct random lesion needs at least one spared channel")
     targeted = np.argsort(-energy, kind="stable")[:n]
     rng = np.random.default_rng(seed)
-    candidates = [rng.choice(channels, n, replace=False) for _ in range(64)]
+    # An identical group cannot be a null intervention. For tiny networks,
+    # enumerate all groups; random sample for larger channel counts.
+    from itertools import combinations
+    if channels <= 12:
+        candidates = [np.asarray(c, int) for c in combinations(range(channels), n)
+                      if set(c) != set(targeted)]
+    else:
+        candidates = [c for c in (rng.choice(channels, n, replace=False)
+                      for _ in range(512)) if set(c) != set(targeted)]
+    if not candidates:
+        raise ValueError("Could not construct a distinct lesion null")
     random_channels = min(candidates, key=lambda c: abs(energy[c].sum() - energy[targeted].sum()))
     def run(indices):
         hidden, image = state
