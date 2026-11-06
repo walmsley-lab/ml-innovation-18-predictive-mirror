@@ -27,7 +27,7 @@ def render(frames, forecast, activity, baselines, context, leads, output, scale=
             Image.Resampling.NEAREST)
 
     labels = ("Observed", "RGB NCA", "Persistence", "Velocity",
-              "Future truth", "Abs error", "NCA activity")
+              "Future truth", "Abs error", "NCA activity (relative)")
     height, width = frames.shape[1:3]
     tw, th = width * scale, height * scale
     canvas = Image.new("RGB", (56 + tw*len(labels),
@@ -38,7 +38,12 @@ def render(frames, forecast, activity, baselines, context, leads, output, scale=
     for row, lead in enumerate(leads):
         actual = frames[context+lead-1]
         forecast_rgb = forecast[lead-1]
-        signal = np.clip(activity[lead-1, ..., 0] * 12, 0, 1)
+        # One shared contrast scale per episode. The previous fixed *12 clip
+        # painted the entire map orange and concealed state variation.
+        values = activity[..., 0]
+        lo, hi = np.percentile(values, (5, 95))
+        signal = (np.clip((activity[lead-1, ..., 0]-lo)/(hi-lo), 0, 1)
+                  if hi-lo > 1e-7 else np.zeros_like(activity[lead-1, ..., 0]))
         colored_activity = np.stack((signal, .3*signal, 1-signal), axis=-1)
         images = (frames[context-1], forecast_rgb,
                   baselines["persistence"][lead-1],
@@ -76,7 +81,16 @@ def run(parameters, output="runs/rgb-prediction-gallery", seed=71000, episodes=3
                     {name: value[i] for name, value in controls.items()},
                     context, leads, folder/f"episode-{i:02d}.png", scale)
              for i in range(episodes)]
+    activity_stats = {
+        str(lead): {
+            "mean_abs_hidden_activity": float(np.mean(activity[:, lead-1])),
+            "spatial_std_activity": float(np.std(activity[:, lead-1])),
+            "p95_hidden_activity": float(np.percentile(activity[:, lead-1], 95)),
+        } for lead in leads
+    }
     report = {"experiment": "rgb_nca_frozen_prediction_gallery",
+              "activity_stats": activity_stats,
+              "activity_visualization": "Shared per-episode 5th/95th percentile contrast, not absolute magnitude",
               "checkpoint": str(checkpoint),
               "checkpoint_sha256": hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
               "test_seed_start": seed, "episodes": episodes, "context": context,

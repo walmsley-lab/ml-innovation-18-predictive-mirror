@@ -16,6 +16,8 @@ class NeuromatchVisionTests(unittest.TestCase):
         np.testing.assert_array_equal(result[0, 1], np.ones(3))
         np.testing.assert_array_equal(result[2, 2], np.zeros(3))
         self.assertEqual(cost["measured_energy_joules"], None)
+        self.assertEqual(cost["rgb_values_scanned_to_find_changes"], 96)
+        self.assertEqual(cost["rgb_values_written_for_selected_updates"], 3)
 
     def test_normalization_is_spatial_and_deterministic(self):
         frame = np.random.default_rng(9).uniform(0.1, 0.5, (6, 7, 3))
@@ -43,5 +45,9 @@ class NeuromatchVisionTests(unittest.TestCase):
         self.assertTrue(np.isfinite(first["intact_mse"]))
         self.assertEqual(len(first["targeted_channels"]), 1)
         self.assertNotEqual(set(first["targeted_channels"]), set(first["random_channels"]))
+        self.assertEqual(first["random_overlap_count"], len(
+            set(first["targeted_channels"]) & set(first["random_channels"])))
+        self.assertTrue(set(first["targeted_channels"]).isdisjoint(first["disjoint_channels"]))
+        self.assertFalse(first["matched_random_is_uniform_null"])
         with self.assertRaises(ValueError):
             m.targeted_channel_lesions(params, context, truth, horizon=2, fraction=1.)

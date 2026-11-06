@@ -25,6 +25,9 @@ def sparse_observe(previous, observed, threshold=0.02, max_fraction=0.25):
         "updated_pixels": int(len(chosen)), "total_pixels": int(surprise.size),
         "observed_rgb_reads": int(3 * len(chosen)),
         "measured_energy_joules": None,
+        "rgb_values_scanned_to_find_changes": int(a.size+b.size),
+        "rgb_values_written_for_selected_updates": int(3*len(chosen)),
+        "note": "Detection scans both full frames; sparse writes alone are not a measured FLOP/energy saving.",
     }
 
 
@@ -112,6 +115,13 @@ def targeted_channel_lesions(params, context, truth, horizon=3, ticks=1,
     if not candidates:
         raise ValueError("Could not construct a distinct lesion null")
     random_channels = min(candidates, key=lambda c: abs(energy[c].sum() - energy[targeted].sum()))
+    # Closest-energy alternative may overlap the target. Add a truly
+    # nonoverlapping control rather than mislabeling this as independent.
+    spared = [c for c in range(channels) if c not in set(targeted)]
+    disjoint_channels = (np.asarray(min(
+        combinations(spared, n),
+        key=lambda c: abs(energy[list(c)].sum() - energy[targeted].sum())), int)
+        if len(spared) >= n else None)
     def run(indices):
         hidden, image = state
         if len(indices):
@@ -127,8 +137,15 @@ def targeted_channel_lesions(params, context, truth, horizon=3, ticks=1,
         "intact_mse": run([]),
         "targeted_mse": run(targeted),
         "matched_random_mse": run(random_channels),
+        "disjoint_mse": run(disjoint_channels) if disjoint_channels is not None else None,
         "targeted_channels": targeted.tolist(),
         "random_channels": random_channels.tolist(),
+        "random_overlap_count": len(set(targeted) & set(random_channels)),
+        "disjoint_channels": disjoint_channels.tolist() if disjoint_channels is not None else None,
+        "disjoint_removed_energy": (float(energy[disjoint_channels].sum())
+                                    if disjoint_channels is not None else None),
+        "matched_random_is_uniform_null": False,
+        "matching_note": "Closest-energy alternative can overlap targeted channels; disjoint control is not energy matched.",
         "targeted_removed_energy": float(energy[targeted].sum()),
         "random_removed_energy": float(energy[random_channels].sum()),
         "selection_uses_future_truth": False,
