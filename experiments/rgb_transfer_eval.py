@@ -37,13 +37,16 @@ def evaluate(checkpoint, recordings, output="runs/rgb-transfer/metrics.json",
         raise ValueError("Provide at least one independent RGB recording")
     with np.load(checkpoint,allow_pickle=False) as archive:
         params={k:jnp.asarray(archive[k]) for k in archive.files}
-    predictor.validate(params, model)
+    # Reject known training recordings before trying to interpret model weights.
+    # This check must remain first even for a corrupt/mismatched checkpoint.
     excluded=set(excluded_training_hashes)
-    rows=[]
-    for path in recordings:
-        digest=sha(path)
+    digests=[sha(path) for path in recordings]
+    for path,digest in zip(recordings,digests):
         if digest in excluded:
             raise ValueError(f"Training recording reused for evaluation: {path}")
+    predictor.validate(params, model)
+    rows=[]
+    for path,digest in zip(recordings,digests):
         frames,stamps=read_recording(path)
         clips,anchors=replay_windows(frames,context,horizon,stride,cap)
         # Predict in bounded batches to avoid large CPU allocations.
