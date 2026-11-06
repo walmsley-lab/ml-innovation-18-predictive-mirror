@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Perceptual Atlas — interactive scene sketch</title>
+<style>
+  :root{color-scheme:dark;font:14px/1.4 system-ui,sans-serif}
+  *{box-sizing:border-box} body{margin:0;overflow:hidden;background:#070b17;color:#e9efff}
+  canvas{display:block;width:100vw;height:100vh;object-fit:fill}
+  .panel{position:fixed;top:16px;left:16px;width:min(330px,calc(100vw - 32px));
+    max-height:calc(100vh - 32px);overflow-y:auto;background:#101828dc;
+    border:1px solid #68799762;border-radius:15px;padding:16px;backdrop-filter:blur(12px)}
+  h1{margin:0 0 5px;font-size:19px;letter-spacing:.02em}
+  .sub{margin:0 0 13px;color:#b1bfd7;font-size:12px}
+  label{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 4px}
+  input[type=range]{width:100%;accent-color:#85bff6}
+  select,input[type=number]{background:#1d2a3e;border:1px solid #64758c;color:inherit;
+    padding:6px;border-radius:7px;min-width:95px}
+  .buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:15px}
+  button,.upload{background:#24354d;border:1px solid #60728c;border-radius:8px;
+    color:#eff5ff;font:inherit;padding:7px 5px;text-align:center;cursor:pointer}
+  button:hover,.upload:hover{background:#344962}
+  button.active{background:#26636a;border-color:#53c7ba}
+  .upload input{display:none}
+  .note{font-size:11px;line-height:1.5;color:#aabbd4;margin:12px 0 0}
+  #status{display:block;color:#a7e0d7;margin-top:8px;font-size:12px;min-height:16px}
+  .panel summary{cursor:pointer;color:#f1f6ff;font-weight:650;font-size:15px}
+  .header{position:fixed;bottom:16px;right:20px;text-align:right;color:#d5e2f2b3;
+    font-size:12px;text-shadow:0 1px 4px #000;pointer-events:none}
+  @media(max-width:560px){.panel{top:10px;left:10px;max-height:65vh;padding:11px}
+    .header{font-size:10px;bottom:8px;right:9px}}
+  @media(prefers-reduced-motion:reduce){canvas{filter:none}}
+</style>
+</head>
+<body>
+<canvas id="view" role="img" aria-label="Generated abstract geometric scene"></canvas>
+<details class="panel" open>
+  <summary>Perceptual Atlas</summary>
+  <p class="sub">Author and share an audiovisual scene. No camera, microphone, or network connection.</p>
+  <label for="mode">Geometry</label>
+  <select id="mode">
+    <option value="spiral">Spiral</option><option value="fold">Folded</option>
+    <option value="lattice">Lattice</option><option value="chamber">Chamber</option>
+  </select>
+  <label for="light">Illumination <output id="light-value"></output></label>
+  <input id="light" type="range" min="0" max="1" step="0.01">
+  <label for="detail">Complexity <output id="detail-value"></output></label>
+  <input id="detail" type="range" min="0" max="1" step="0.01">
+  <label for="flow">Temporal flow <output id="flow-value"></output></label>
+  <input id="flow" type="range" min="0" max="1" step="0.01">
+  <label for="pitch">Tone pitch <output id="pitch-value"></output></label>
+  <input id="pitch" type="range" min="0" max="1" step="0.01">
+  <label for="coupling">Audio–geometry coupling <output id="coupling-value"></output></label>
+  <input id="coupling" type="range" min="0" max="1" step="0.01">
+  <label for="seed">Scene seed</label>
+  <input id="seed" type="number" min="0" max="999999" step="1">
+  <div class="buttons">
+    <button id="pause">Pause</button><button id="tone">Tone off</button>
+    <button id="fullscreen">Full screen</button>
+    <button id="record">Record</button><button id="replay">Replay</button>
+    <button id="save">Save JSON</button>
+    <label class="upload" for="load">Load JSON<input id="load" type="file" accept=".json,application/json"></label>
+  </div>
+  <output id="status" aria-live="polite"></output>
+  <p class="note">Record parameter changes, then save a reproducible sequence to share voluntarily.
+    Playback is a constructed visual sketch, not a measurement or decoding of thought.
+    Motion is intentionally gradual; sound is off by default.</p>
+</details>
+<div class="header">Synthetic geometric field · <span id="clock">0.0</span>s</div>
+<script src="perceptual_atlas.js"></script>
+<script>
+(() => {
+  "use strict";
+  const atlas = PerceptualAtlas;
+  const canvas = document.getElementById("view");
+  const context = canvas.getContext("2d", {alpha:false});
+  const buffer = document.createElement("canvas");
+  const bufferContext = buffer.getContext("2d", {alpha:false});
+  const keys = ["mode", "light", "detail", "flow", "pitch", "coupling", "seed"];
+  const $ = id => document.getElementById(id);
+  let current = atlas.normalizeScene(atlas.DEFAULT);
+  let sketch = atlas.normalizeSketch({initial:current});
+  let phase = "live", paused = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let seconds = 0, lastTick = performance.now(), audio = null, oscillator = null, gain = null;
+  let lastDraw = 0;
+  const label = message => { $("status").textContent = message; };
+  function setControls(scene) {
+    for (const name of keys) $(name).value = scene[name];
+    for (const name of ["light","detail","flow","pitch","coupling"])
+      $(name+"-value").textContent = Number(scene[name]).toFixed(2);
+  }
+  function readControls() {
+    return atlas.normalizeScene(Object.fromEntries(keys.map(key=>[key,$(key).value])));
+  }
+  setControls(current);
+  function updateScene() {
+    current = readControls();
+    setControls(current);
+    if (phase === "replay") phase = "live";
+    if (phase === "record") {
+      sketch.events.push({t:Number(seconds.toFixed(3)),scene:current});
+    } else {
+      sketch = atlas.normalizeSketch({initial:current});
+    }
+  }
+  for (const name of keys) $(name).addEventListener("input", updateScene);
+  $("pause").onclick = () => {
+    paused = !paused; $("pause").textContent = paused?"Resume":"Pause";
+  };
+  $("record").onclick = () => {
+    if (phase === "record") {
+      sketch.duration = seconds;
+      phase = "live"; $("record").classList.remove("active");
+      label("Sequence captured. Export JSON or replay.");
+    } else {
+      phase = "record"; paused = false; seconds = 0;
+      sketch = atlas.normalizeSketch({initial:current});
+      $("record").classList.add("active"); $("pause").textContent = "Pause";
+      label("Recording changes to scene controls.");
+    }
+  };
+  $("replay").onclick = () => {
+    if (phase === "record") {
+      sketch.duration = seconds; $("record").classList.remove("active");
+    }
+    phase = "replay"; seconds = 0; paused = false;
+    current = sketch.initial; setControls(current);
+    $("pause").textContent = "Pause";
+    label("Replaying the saved synthetic sequence.");
+  };
+  $("save").onclick = () => {
+    if (phase === "record") sketch.duration = seconds;
+    const content = JSON.stringify(atlas.normalizeSketch(sketch),null,2)+"\n";
+    const url = URL.createObjectURL(new Blob([content],{type:"application/json"}));
+    const anchor = document.createElement("a");
+    anchor.href = url; anchor.download = "perceptual-scene.json";
+    anchor.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+    label("Scene JSON exported locally.");
+  };
+  $("load").onchange = async event => {
+    const file = event.target.files[0]; if (!file) return;
+    if (file.size > 500000) {label("Scene file is too large.");return;}
+    try {
+      const parsed = JSON.parse(await file.text());
+      sketch = atlas.normalizeSketch(parsed);
+      current = sketch.initial; setControls(current);
+      phase = "replay"; seconds = 0; paused = false;
+      $("record").classList.remove("active"); $("pause").textContent = "Pause";
+      label("Scene loaded; replaying locally.");
+    } catch (error) {label("Cannot load this scene: "+error.message);}
+    event.target.value = "";
+  };
+  $("fullscreen").onclick = () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen().catch(()=>label("Full screen unavailable."));
+  };
+  $("tone").onclick = async () => {
+    if (audio) {
+      oscillator.stop(); await audio.close();
+      audio = null; oscillator = null; gain = null; $("tone").textContent = "Tone off";
+      return;
+    }
+    try {
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) throw Error("Web Audio is not available");
+      audio = new Audio();
+      oscillator = audio.createOscillator(); gain = audio.createGain();
+      oscillator.type = "sine"; gain.gain.value = 0.008;
+      oscillator.connect(gain).connect(audio.destination);
+      oscillator.frequency.value = atlas.toneHz(current); oscillator.start();
+      await audio.resume(); $("tone").textContent = "Tone on";
+    } catch(error) {label(error.message);audio=null;}
+  };
+  function resize() {
+    const width = Math.max(1, window.innerWidth), height = Math.max(1, window.innerHeight);
+    canvas.width = width; canvas.height = height;
+    buffer.width = Math.max(160,Math.min(360,Math.round(width*0.42)));
+    buffer.height = Math.max(90,Math.round(buffer.width*height/width));
+    context.imageSmoothingEnabled = true;
+  }
+  window.addEventListener("resize",resize); resize();
+  function paint() {
+    const w = buffer.width, h = buffer.height;
+    const data = bufferContext.createImageData(w,h);
+    const pixels = data.data, aspect = canvas.width / canvas.height;
+    for (let j=0;j<h;j++) {
+      const y = (2*(j+0.5)/h-1);
+      for (let i=0;i<w;i++) {
+        const x = (2*(i+0.5)/w-1)*aspect;
+        const rgb = atlas.rgb(x,y,seconds,current);
+        const index = (j*w+i)*4;
+        pixels[index]=rgb[0];pixels[index+1]=rgb[1];pixels[index+2]=rgb[2];pixels[index+3]=255;
+      }
+    }
+    bufferContext.putImageData(data,0,0);
+    context.drawImage(buffer,0,0,canvas.width,canvas.height);
+    $("clock").textContent=seconds.toFixed(1);
+  }
+  function tick(now) {
+    const dt = Math.min(0.1, Math.max(0,(now-lastTick)/1000));lastTick=now;
+    if (!paused) {
+      seconds += dt;
+      if (phase === "replay") {
+        current = atlas.sceneAt(sketch,seconds);
+        setControls(current);
+        if (seconds >= sketch.duration) {
+          if (sketch.duration > 0) seconds = sketch.duration;
+          phase = "live"; paused = sketch.duration > 0;
+          if (paused) $("pause").textContent = "Resume";
+        }
+      }
+    }
+    if (oscillator && audio) oscillator.frequency.setTargetAtTime(
+      atlas.toneHz(current),audio.currentTime,0.08);
+    if (now-lastDraw >= 65 || !lastDraw) {paint();lastDraw=now;}
+    requestAnimationFrame(tick);
+  }
+  label("Scene ready. Try switching illumination while keeping the same seed.");
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
