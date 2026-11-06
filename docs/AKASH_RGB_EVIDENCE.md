@@ -111,3 +111,32 @@ A 3-step smoke proves wiring, not convergence. If the 300-step pilot exhibits
 all-black/gray output, missing objects, or no improvement against velocity
 on relevant motion, **do not simply scale to 1,200 steps without inspecting
 the failure mode first.** The full run is bounded research, not a guaranteed win.
+
+## Expanded architecture, world-exposure and resolution sequence
+
+All v1 configs remain frozen. The v2 configs change **one scientific axis per stage**:
+
+| Manifest | Conditions | Question |
+|---|---:|---|
+| `akash-rgb-architectures.json` | 12 | Six RGB models, 2 seeds, original five training worlds, 32px |
+| `akash-rgb-physics.json` | 18 | Six models, 3 seeds, all eight existing world domains, 32px |
+| `akash-rgb-occlusion-all.json` | 18 | Six models on paired-history occlusion, fixed 32px |
+| `akash-rgb-48px.json` | 9 | Three models at 48px, all eight domains |
+| `akash-rgb-64px.json` | 6 | CNN and transport at 64px, all eight domains |
+
+This expands **exposure to existing worlds**, not the realism of their physics engine. The current engine has constant acceleration, simple equal-mass collisions, boundary reflections, camera pan, occlusion and appearance changes. It does not model gravity, deformable bodies, lighting physics or real optics. Additional genuine physics should be a separately versioned world with a controlled train/held-out evaluation split.
+
+The 48px and 64px conditions use the existing world ladder, which supports those sizes; the *paired occlusion* harness is locked at 32px. Train and validation seed namespaces remain separated from test. Once a domain is included in mixed training, it is **not** an unseen-domain test, even though test episodes remain unseen by seed. A model selected after looking at test results is exploratory; reserve an untouched external test for final claims.
+
+GPU time scales with scene area (64px is four times the pixels of 32px) and unroll length, and may be dominated by compilation or model-specific kernels. Do not extrapolate the three-step smoke timing into a full run. These manifests are **not automatically launched**, and no performance/speed is claimed.
+
+Plan the 12-condition architecture screening stage, first (no cloud spend):
+
+```bash
+python -m deploy.gpu_campaign plan \
+  --image "$IMAGE" \
+  --config experiments/akash-rgb-architectures.json \
+  --out runs/akash-rgb-architectures-001 --max-runs 12 --hours 6
+```
+
+Before approving a paid run, review estimated provider cost and TTL. Inspect selected-step-zero frequency, +1/+3/+5/+10 foreground MSE, object localization, predicted mass, velocity controls and event coverage. If a model remains uniform/empty/step-zero, pause that family for output/loss debugging rather than buying more steps.

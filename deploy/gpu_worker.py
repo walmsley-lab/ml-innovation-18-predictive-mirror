@@ -97,7 +97,7 @@ def run_campaign(config, output, max_runs, expected_sha, hold_seconds):
         state["status"] = "running"
         atomic_json(status, state)
         kind = json.loads(config.read_text()).get("kind")
-        if kind == "rgb_evidence_v1":
+        if kind in ("rgb_evidence_v1", "rgb_evidence_v2"):
             command = [sys.executable, "-m", "experiments.akash_rgb_evidence",
                        "--config", str(config), "--out", str(out),
                        "--max-runs", str(max_runs), "--require-gpu"]

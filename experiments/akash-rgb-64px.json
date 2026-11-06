@@ -1,0 +1,32 @@
+{
+  "kind": "rgb_evidence_v2",
+  "seeds": [
+    11,
+    23,
+    41
+  ],
+  "models": [
+    "cnn",
+    "transport"
+  ],
+  "curricula": [
+    "mixed"
+  ],
+  "steps": 300,
+  "occlusion_models": [],
+  "occlusion_steps": 1,
+  "context": 8,
+  "horizon": 10,
+  "size": 64,
+  "width": 8,
+  "train_domains": [
+    "linear",
+    "accelerating",
+    "collision",
+    "occlusion_short",
+    "occlusion_long",
+    "camera_pan",
+    "appearance",
+    "combined"
+  ]
+}

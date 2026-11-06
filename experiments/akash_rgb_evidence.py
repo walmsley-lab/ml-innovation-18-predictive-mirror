@@ -14,6 +14,9 @@ import sys
 import time
 
 KIND = "rgb_evidence_v1"
+EXPANDED_KIND = "rgb_evidence_v2"
+WORLD_DOMAINS = {"linear", "accelerating", "collision", "occlusion_short",
+                 "occlusion_long", "camera_pan", "appearance", "combined"}
 MODELS = {"cnn", "transport", "nca", "nca_blend", "routing", "hierarchical"}
 CURRICULA = {"linear", "mixed"}
 OCCLUSION_MODELS = MODELS
@@ -23,9 +26,18 @@ FIELDS = {"kind", "seeds", "models", "curricula", "steps",
 
 
 def validate(config):
-    if not isinstance(config, dict) or set(config) != FIELDS or config["kind"] != KIND:
-        raise ValueError("Unexpected RGB evidence manifest fields or kind")
-    for key, allowed, empty in (("models", MODELS, False),
+    if not isinstance(config, dict) or config.get("kind") not in (KIND, EXPANDED_KIND):
+        raise ValueError("Unexpected RGB evidence manifest kind")
+    expanded = config["kind"] == EXPANDED_KIND
+    if set(config) != FIELDS | ({"train_domains"} if expanded else set()):
+        raise ValueError("Unexpected RGB evidence manifest fields")
+    if expanded:
+        domains = config["train_domains"]
+        if (not isinstance(domains, list) or not domains
+                or len(domains) != len(set(domains))
+                or not set(domains) <= WORLD_DOMAINS):
+            raise ValueError("Invalid training-world domains")
+    for key, allowed, empty in (("models", MODELS, expanded),
                                 ("curricula", CURRICULA, False),
                                 ("occlusion_models", OCCLUSION_MODELS, True)):
         values = config[key]
@@ -40,9 +52,14 @@ def validate(config):
     for name in ("steps", "occlusion_steps", "context", "horizon", "size", "width"):
         if type(config[name]) is not int or config[name] < 1:
             raise ValueError("Invalid " + name)
-    # Existing occlusion CLI fixes 8 history, 10 future, and 32-pixel scenes.
-    if config["context"] != 8 or config["horizon"] != 10 or config["size"] != 32:
-        raise ValueError("Existing paired-occlusion study requires 8/10/32")
+    # The paired-occlusion CLI still fixes 8 history, 10 future, 32-pixel scenes.
+    if (config["context"] != 8 or config["horizon"] != 10
+            or config["size"] not in ((32, 48, 64) if expanded else (32,))):
+        raise ValueError("Unsupported 8/10 RGB scene resolution")
+    if config["occlusion_models"] and config["size"] != 32:
+        raise ValueError("Paired occlusion requires 32px")
+    if not config["models"] and not config["occlusion_models"]:
+        raise ValueError("Empty RGB experiment matrix")
     if config["width"] < 1 or config["steps"] > 10000 or config["occlusion_steps"] > 10000:
         raise ValueError("Unsafe resource budget")
     count = len(seeds) * (len(config["models"]) * len(config["curricula"])
@@ -64,7 +81,8 @@ def jobs(config):
                     "--steps", str(config["steps"]), "--context", str(config["context"]),
                     "--horizon", str(config["horizon"]), "--size", str(config["size"]),
                     "--width", str(config["width"]),
-                ]
+                ] + (["--train-domains", *config["train_domains"]]
+                     if config["kind"] == EXPANDED_KIND else [])
         for model in config["occlusion_models"]:
             name = f"occlusion-{model}-s{seed}"
             yield name, [
@@ -89,6 +107,8 @@ def summarize_one(name, metrics):
         selected = row["test"]
         return {
             "model": row["model"], "selected_step": row["selected_step"],
+            "scene_size": metrics.get("size"),
+            "train_domains": metrics["train_domains"],
             "validation_metric": row["validation_metric"],
             "occlusion_long_lead10": selected["occlusion_long"]["10"],
             "combined_lead10": selected["combined"]["10"],
@@ -108,16 +128,16 @@ def summarize_one(name, metrics):
     }
 
 
-def observation_only_baselines():
+def observation_only_baselines(size=32, context=8, horizon=10):
     """Exact held-out world seeds from the ladder, with no simulator-state input."""
     from experiments import rgb_world_ladder_training as ladder
     from src import rgb_benchmark as bench, rgb_event_metrics as events
     baseline = {}
     for domain in ("linear", "occlusion_long", "camera_pan", "combined"):
-        records, frames = ladder.pool("test", (domain,), 4, 8, 10, 32, 2)
-        forecasts = bench.controls(frames[:, :8], horizon=10)
+        records, frames = ladder.pool("test", (domain,), 4, context, horizon, size, 2)
+        forecasts = bench.controls(frames[:, :context], horizon=horizon)
         baseline[domain] = {
-            name: events.score(predicted, records, 8, (10,))["10"]
+            name: events.score(predicted, records, context, (horizon,))[str(horizon)]
             for name, predicted in forecasts.items()
         }
     return baseline
@@ -139,6 +159,8 @@ def run(config_path, output, max_runs, require_gpu=True):
         "kind": KIND, "config_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
         "source_revision": os.environ.get("SOURCE_REVISION", "unknown"),
         "condition_count": count, "status": "running", "conditions": [],
+        "size": config["size"],
+        "train_domains": config.get("train_domains", []),
         "caveat": "Synthetic experiments only. No webcam generalization or calibrated uncertainty is implied.",
     }
     summary = out / "evidence.json"
@@ -162,7 +184,8 @@ def run(config_path, output, max_runs, require_gpu=True):
         if result.returncode == 0:
             try:
                 if "observation_only_baselines" not in report:
-                    report["observation_only_baselines"] = observation_only_baselines()
+                    report["observation_only_baselines"] = observation_only_baselines(
+                        config["size"], config["context"], config["horizon"])
                 item["evidence"] = summarize_one(
                     name, json.loads((folder / "metrics.json").read_text()))
             except (OSError, ValueError, KeyError, IndexError, TypeError) as error:
