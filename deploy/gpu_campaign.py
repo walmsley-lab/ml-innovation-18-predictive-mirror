@@ -48,6 +48,9 @@ def load_manifest(path):
         raise ValueError("Manifest must be an embedded experiments/*.json path")
     manifest = Path(relative)
     payload = json.loads(manifest.read_text())
+    if payload.get("kind") == "rgb_evidence_v1":
+        from experiments.akash_rgb_evidence import validate
+        return validate(payload), hash_file(manifest)
     required = {"seeds", "architectures", "curricula", "steps", "batch_size",
                 "episodes", "checkpoint_every", "loss_mode", "primary_metric",
                 "replay_fraction"}
