@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import tempfile
 import sys
 import time
 
@@ -137,32 +138,69 @@ def dseq_from_event(event):
     return None
 
 
+# akt may report the DSEQ only on stderr if a leased deployment times out
+# during readiness. Capturing that ID is essential for the finally cleanup.
+_FAILED_DEPLOY_DSEQ = re.compile(
+    r"deployment DSEQ\s+([1-9][0-9]*)\s+with provider\b"
+)
+
+
+def dseq_from_failure_output(message):
+    match = _FAILED_DEPLOY_DSEQ.search(message)
+    return match.group(1) if match else None
+
+
 def deploy(sdl, state, state_file, context):
     cmd = ["akt"] + (["--context", context] if context else []) + [
-        "deploy", str(sdl), "--bid-select", "cheapest", "--yes", "-o", "jsonl"]
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True, bufsize=1)
-    assert proc.stdout is not None
-    try:
-        for line in proc.stdout:
-            try:
-                event = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            found = dseq_from_event(event)
+        "deploy", str(sdl), "--bid-select", "cheapest", "--ready-timeout", "10m",
+        "--yes", "-o", "jsonl"]
+    # A file rather than stderr=PIPE avoids deadlock while iterating stdout
+    # from a CLI that may emit many progress/warning lines on stderr.
+    with tempfile.TemporaryFile(mode="w+t") as error_log:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=error_log,
+                                text=True, bufsize=1)
+        assert proc.stdout is not None
+        failed_event = False
+        try:
+            for line in proc.stdout:
+                try:
+                    event = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                found = dseq_from_event(event)
+                if found:
+                    if state.get("dseq") and state["dseq"] != found:
+                        raise RuntimeError("Conflicting Akash deployment IDs")
+                    state["dseq"] = found
+                    atomic_json(state_file, state)
+                if event.get("result") == "failed":
+                    failed_event = True
+            code = proc.wait()
+            error_log.seek(0)
+            errors = error_log.read()
+            # The CLI can create a paid lease before it reports a readiness
+            # failure. Store the DSEQ from its explicit cleanup warning.
+            found = dseq_from_failure_output(errors)
             if found:
+                if state.get("dseq") and state["dseq"] != found:
+                    raise RuntimeError("Conflicting Akash deployment IDs")
                 state["dseq"] = found
-                atomic_json(state_file, state)  # persist before waiting for readiness
-            if event.get("result") == "failed":
-                raise RuntimeError("Akash deployment workflow reported failure")
-        if proc.wait() != 0:
-            raise RuntimeError("Akash deployment failed; inspect console deployment list")
-        if not state.get("dseq"):
-            raise RuntimeError("Missing dseq; inspect active deployments manually")
-        return state["dseq"]
-    finally:
-        if proc.poll() is None:
-            proc.terminate()
-            proc.wait(timeout=10)
+                atomic_json(state_file, state)
+            if errors:
+                print(errors, file=sys.stderr, end="" if errors.endswith("\n") else "\n")
+            if code != 0 or failed_event:
+                raise RuntimeError(
+                    "Akash deployment workflow failed; captured DSEQ will be closed"
+                    if state.get("dseq") else
+                    "Akash deployment failed with unknown DSEQ; check active leases"
+                )
+            if not state.get("dseq"):
+                raise RuntimeError("Missing dseq; inspect active deployments manually")
+            return state["dseq"]
+        finally:
+            if proc.poll() is None:
+                proc.terminate()
+                proc.wait(timeout=10)
 
 
 def remote(dseq, command, context):
