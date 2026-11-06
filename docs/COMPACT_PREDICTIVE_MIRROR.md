@@ -131,6 +131,28 @@ or transfer to an independently recorded camera scene.
 
 ## Validation
 
+A local 30-update pilot ran all five learned arms with seeds 11, 23 and 41,
+four validation scenes, six test scenes (18 clips), and nine timing repeats per
+clip on an Intel Core i7-8750H CPU. The [checked-in measurement summary](compact_mirror_pilot.json)
+includes the exact command, source-file hashes, verified source commit,
+per-seed/per-scene results and artifact hashes. Full arrays, checkpoints and
+galleries remain in the local `runs/compact-mirror-pr-pilot/` directory; they
+are not included in the summary or the repository.
+
+| Model | Mean RGB MSE across model seeds | Mean of per-seed median latency | State payload per inference |
+|---|---:|---:|---:|
+| Compact hybrid | 0.002677 | 5.35 ms | 20 KiB |
+| Same hybrid, full-resolution state | 0.002699 | 14.72 ms | 44 KiB |
+| Classical RGB history-linear control | 0.001780 | 1.93 ms | Not reported |
+
+The compact hybrid took about 2.75× less time than its full-resolution control
+in this pilot, with similar RGB error. Neither hybrid, nor any other learned
+arm, passed the reappearance criterion at this budget; the history-linear
+control passed all six scene pairs. This supports investigating the compact
+representation's cost, **not** a claim that it outperforms competent classical
+forecasting or has learned object permanence. The small training and test
+budgets do not establish optimization sufficiency or statistical superiority.
+
 ```bash
 python -m unittest tests.test_compact_predictive_mirror \
   tests.test_compact_mirror_comparison -v
