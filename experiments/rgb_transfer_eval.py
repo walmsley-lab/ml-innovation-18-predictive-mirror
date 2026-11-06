@@ -10,7 +10,7 @@ from pathlib import Path
 import jax.numpy as jnp
 import numpy as np
 from experiments.rgb_nca import read_recording
-from src import predictive_rgb_nca as nca, rgb_benchmark as benchmark
+from src import rgb_checkpoint_predictor as predictor, rgb_benchmark as benchmark
 
 
 def sha(path):
@@ -32,11 +32,12 @@ def replay_windows(frames, context=8, horizon=10, stride=5, cap=48):
 
 def evaluate(checkpoint, recordings, output="runs/rgb-transfer/metrics.json",
              context=8, horizon=10, ticks=2, stride=5, cap=48,
-             excluded_training_hashes=()):
+             excluded_training_hashes=(), model="nca"):
     if not recordings:
         raise ValueError("Provide at least one independent RGB recording")
     with np.load(checkpoint,allow_pickle=False) as archive:
         params={k:jnp.asarray(archive[k]) for k in archive.files}
+    predictor.validate(params, model)
     excluded=set(excluded_training_hashes)
     rows=[]
     for path in recordings:
@@ -48,11 +49,13 @@ def evaluate(checkpoint, recordings, output="runs/rgb-transfer/metrics.json",
         # Predict in bounded batches to avoid large CPU allocations.
         predictions=[]
         for block in np.array_split(clips,max(1,int(np.ceil(len(clips)/4)))):
-            predictions.append(np.asarray(nca.rollout(
-                params,jnp.asarray(block[:,:context]),horizon,ticks)))
+            predictions.append(np.asarray(predictor.rollout(
+                params,jnp.asarray(block[:,:context]),horizon,ticks,model)))
         predicted=np.concatenate(predictions)
         leads=tuple(h for h in benchmark.LEADS if h<=horizon)
-        metrics=benchmark.compare(predicted,clips,context,leads)
+        controls=benchmark.controls(clips[:,:context],horizon)
+        metrics={name:benchmark.score(values,clips,context,leads)
+                 for name,values in {model:predicted,**controls}.items()}
         observed_ms=float(np.median(np.diff(stamps).astype(np.float64))/1e6) if (
             stamps is not None and len(stamps)>1) else None
         rows.append({"recording":str(path),"sha256":digest,
@@ -61,6 +64,7 @@ def evaluate(checkpoint, recordings, output="runs/rgb-transfer/metrics.json",
                      "nominal_horizon_ms":horizon*observed_ms if observed_ms else None,
                      "scores":metrics})
     report={"experiment":"independent_rgb_webcam_transfer","checkpoint":str(checkpoint),
+            "model":model,
             "context":context,"horizon_frames":horizon,
             "records":rows,"caveat":"Checkpoints must not have seen any evaluation "
                 "recording or overlapping scene; explicit hashes guard only known "
@@ -74,6 +78,7 @@ def evaluate(checkpoint, recordings, output="runs/rgb-transfer/metrics.json",
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--checkpoint",required=True)
+    p.add_argument("--model", choices=predictor.MODELS, default="nca")
     p.add_argument("--recordings",nargs="+",required=True)
     p.add_argument("--exclude-training",nargs="*",default=[])
     p.add_argument("--out",default="runs/rgb-transfer/metrics.json")
@@ -85,7 +90,7 @@ def main():
     a=p.parse_args()
     blocked=[sha(path) for path in a.exclude_training]
     report=evaluate(a.checkpoint,a.recordings,a.out,a.context,a.horizon,a.ticks,
-                    a.stride,a.max_windows,blocked)
+                    a.stride,a.max_windows,blocked,a.model)
     print(json.dumps(report,indent=2))
 
 

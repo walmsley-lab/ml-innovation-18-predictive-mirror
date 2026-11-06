@@ -8,7 +8,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from experiments.rgb_nca import preprocess_color
-from src import predictive_rgb_nca as nca, rgb_delayed_scoring as delayed
+from src import rgb_checkpoint_predictor as predictor, rgb_delayed_scoring as delayed
 
 
 def panel(pair, cv2, size=224):
@@ -29,13 +29,14 @@ def panel(pair, cv2, size=224):
 
 def run(parameters, output="runs/rgb-live-verified/metrics.json", camera=0,
         fps=10, size=32, context=8, lead=10, ticks=2,
-        max_frames=0, no_display=False):
+        max_frames=0, no_display=False, model="nca"):
     if fps<=0 or context<2 or lead<1 or ticks<1:
         raise ValueError("Invalid camera settings")
     import cv2
     with np.load(parameters,allow_pickle=False) as archive:
         params={key:jnp.asarray(archive[key]) for key in archive.files}
-    predict=jax.jit(lambda x:nca.rollout(params,x,lead,ticks))
+    predictor.validate(params, model)
+    predict=jax.jit(lambda x:predictor.rollout(params,x,lead,ticks,model))
     cap=cv2.VideoCapture(camera,cv2.CAP_V4L2)
     if not cap.isOpened():
         raise RuntimeError(f"Cannot open RGB webcam {camera}")
@@ -79,7 +80,7 @@ def run(parameters, output="runs/rgb-live-verified/metrics.json", camera=0,
         if not no_display:
             cv2.destroyAllWindows()
     report=delayed.metrics(paired)
-    report.update({"lead_frames":lead,"frames_captured":index+1,
+    report.update({"model":model,"lead_frames":lead,"frames_captured":index+1,
                    "median_inference_ms":float(np.median(inference_ms))
                                          if inference_ms else None,
                    "caveat":"Only paired predictions issued before target observation "
@@ -93,6 +94,7 @@ def run(parameters, output="runs/rgb-live-verified/metrics.json", camera=0,
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--parameters",required=True)
+    p.add_argument("--model", choices=predictor.MODELS, default="nca")
     p.add_argument("--out",default="runs/rgb-live-verified/metrics.json")
     p.add_argument("--camera",type=int,default=0)
     p.add_argument("--fps",type=float,default=10)
@@ -105,7 +107,7 @@ def main():
     a=p.parse_args()
     print(json.dumps(run(a.parameters,a.out,a.camera,a.fps,a.size,
                          a.context,a.lead,a.ticks,a.max_frames,
-                         a.no_display),indent=2))
+                         a.no_display,a.model),indent=2))
 
 
 if __name__=="__main__":
