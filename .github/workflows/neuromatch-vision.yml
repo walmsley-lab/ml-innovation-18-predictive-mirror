@@ -1,0 +1,17 @@
+name: neuromatch vision smoke
+on:
+  pull_request:
+  push:
+    branches:
+      - research/neuromatch-*
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'jax==0.9.0.1' 'numpy==2.3.5'
+      - run: python -m unittest discover -s tests -p 'test_neuromatch_vision.py' -v
+      - run: python -m experiments.neuromatch_vision --size 16 --horizon 2 --out runs/neuromatch-vision/ci.json
