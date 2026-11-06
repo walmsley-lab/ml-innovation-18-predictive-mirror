@@ -42,3 +42,6 @@ class NeuromatchVisionTests(unittest.TestCase):
         self.assertFalse(first["selection_uses_future_truth"])
         self.assertTrue(np.isfinite(first["intact_mse"]))
         self.assertEqual(len(first["targeted_channels"]), 1)
+        self.assertNotEqual(set(first["targeted_channels"]), set(first["random_channels"]))
+        with self.assertRaises(ValueError):
+            m.targeted_channel_lesions(params, context, truth, horizon=2, fraction=1.)
