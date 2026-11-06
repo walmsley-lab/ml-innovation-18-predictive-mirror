@@ -19,7 +19,7 @@ Four small additions to the frozen RGB NCA research workflow:
 Run from the repository root:
 
 ```bash
-python -m unittest tests.test_neuromatch_vision -v
+python -m unittest discover -s tests -p 'test_neuromatch_vision.py' -v
 python -m experiments.neuromatch_vision --out runs/neuromatch-vision/metrics.json
 python -m experiments.neuromatch_vision --parameters runs/my-trained-model.npz
 ```
