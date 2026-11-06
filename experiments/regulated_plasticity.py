@@ -47,29 +47,35 @@ def world(seed=11, size=32, segment_frames=40):
 
 
 def initial_regulator():
-    return {"mode": "stable", "baseline": None, "streak": 0, "remaining": 0}
+    return {"mode": "stable", "baseline": None, "streak": 0,
+            "remaining": 0, "startup_frames": 2}
 
 
 def regulate(state, observed_error, base_rate):
-    """Causal surprise gate: no future frames, no trainable parameters.
+    """Causal surprise gate calibrated after the initial untrained forecasts.
 
-    Require two high-error observations before exploration; return to lower
-    plasticity for consolidation. Error is from the previously issued forecast.
+    The first two blank-forecast errors are startup transients, not a useful
+    novelty reference. Calibrate on the next frame; detect two consecutive
+    errors exceeding twice the stable baseline before raising plasticity.
+    This diagnostic heuristic was revised AFTER the first three-seed pilot.
     """
     if not np.isfinite(observed_error) or observed_error < 0:
         raise ValueError("Prediction error must be finite and nonnegative")
     if not 0 < base_rate <= .08:
         raise ValueError("Base plasticity must lie in (0, .08]")
     state = dict(state)
-    if state["baseline"] is None:
-        state["baseline"] = float(observed_error)
-    threshold = max(.0005, 1.6 * state["baseline"])
     if state["mode"] == "stable":
-        state["streak"] = state["streak"] + 1 if observed_error > threshold else 0
-        if state["streak"] >= 2:
-            state.update(mode="explore", remaining=8, streak=0)
+        if state["startup_frames"] > 0:
+            state["startup_frames"] -= 1
+        elif state["baseline"] is None:
+            state["baseline"] = float(observed_error)
+        elif observed_error > max(.0002, 2.0 * state["baseline"]):
+            state["streak"] += 1
+            if state["streak"] >= 2:
+                state.update(mode="explore", remaining=8, streak=0)
         else:
-            state["baseline"] = .96 * state["baseline"] + .04 * observed_error
+            state["streak"] = 0
+            state["baseline"] = .90 * state["baseline"] + .10 * observed_error
     else:
         state["remaining"] -= 1
         if state["remaining"] <= 0:

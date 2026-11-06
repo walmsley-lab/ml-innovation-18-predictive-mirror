@@ -14,9 +14,12 @@ from experiments.regulated_plasticity import (
 class RegulatedPlasticityTests(unittest.TestCase):
     def test_regulator_explores_then_consolidates(self):
         state = initial_regulator()
-        state, _ = regulate(state, .001, .04)
+        # Large untrained forecast errors must not poison the baseline.
+        for error in (.009, .009, .0003):
+            state, rate = regulate(state, error, .04)
+            self.assertEqual(rate, .04)
         for _ in range(2):
-            state, rate = regulate(state, .03, .04)
+            state, rate = regulate(state, .001, .04)
         self.assertEqual(state["mode"], "explore")
         self.assertGreater(rate, .04)
         for _ in range(8):
@@ -26,6 +29,24 @@ class RegulatedPlasticityTests(unittest.TestCase):
         self.assertLess(rate, .04)
         with self.assertRaises(ValueError):
             regulate(state, float("nan"), .04)
+
+    def test_motion_change_actuates_gate(self):
+        # Mechanism check on the diagnostic seed. This is not held-out
+        # evidence that the adaptive model predicts any better.
+        frames = world(4011, size=32, segment_frames=40)
+        adaptive = play(frames, seed=11, sheet_size=8)
+        explore = [i for i, mode in enumerate(adaptive["modes"])
+                   if mode == "explore"]
+        self.assertTrue(explore, "Changed world must exercise adaptive gate")
+        self.assertGreaterEqual(explore[0], 40)
+        self.assertLess(explore[0], 80)
+        self.assertIn("consolidate", adaptive["modes"])
+        self.assertGreater(adaptive["rates"].max(), .04)
+        self.assertLess(adaptive["rates"].min(), .04)
+        fixed = play(frames, seed=11, sheet_size=8,
+                     schedule=np.full(len(frames), .04))
+        self.assertGreater(np.max(np.abs(adaptive["final_weights"] -
+                                         fixed["final_weights"])), 0.)
 
     def test_prequential_score_and_replay(self):
         frames = world(12, 16, 8)

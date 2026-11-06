@@ -22,6 +22,14 @@ scoring `forecast[t]` against `frame[t]`, its resulting error may set the
 plasticity rate for the **subsequent learning update**. All models see the same
 frames, in the same order, from the same initial parameters.
 
+The regulator first **excludes the two untrained forecast startup errors**
+from its surprise baseline. It calibrates on the next observation and then
+uses two successive errors above twice its moving stable baseline to enter
+exploration. This is a heuristic, not a statistically calibrated change-point
+detector. The startup exclusion and threshold were revised after inspecting
+the initial three-seed pilot; those seeds are therefore *development data*,
+not independent proof of improved performance.
+
 The regulator has three bounded modes:
 
 - **Stabilize**: baseline local plasticity, tracking a slowly moving error
@@ -75,3 +83,20 @@ connections before adding complexity.
 Only after a reproducible effect, repeat the same protocol on held-out scene
 families and the existing 3D/camera world. No paid Akash deployment is needed
 for this experiment.
+
+## Diagnostic result and next gate
+
+The first three-seed run (11, 23, 41) completed with all four arms exactly
+identical, because the adaptive controller never left *stable* mode. Its first
+forecast errors were about 0.009 versus steady-state errors near 0.0003; the
+initial version incorrectly initialized the slow surprise baseline from those
+startup outliers. The revised gate excludes that startup transient and now has
+a direct test that a motion reversal actuates explore/consolidate.
+
+Actuating a controller is only a **mechanism check**. The previous identical
+outcomes are **inconclusive**, not evidence for or against regulated learning.
+Because the revised threshold was informed by the original seeds, evaluate
+fresh, untouched seeds (for example `--seeds 67 71 83 97 101`) before any
+predictive benefit claim. Report whether the connection pathway causally
+changes forecasts, and compare actual errors against fixed and matched-rate
+controls. Do not buy Akash time for this tiny CPU experiment.
