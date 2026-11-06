@@ -108,6 +108,21 @@ def summarize_one(name, metrics):
     }
 
 
+def observation_only_baselines():
+    """Exact held-out world seeds from the ladder, with no simulator-state input."""
+    from experiments import rgb_world_ladder_training as ladder
+    from src import rgb_benchmark as bench, rgb_event_metrics as events
+    baseline = {}
+    for domain in ("linear", "occlusion_long", "camera_pan", "combined"):
+        records, frames = ladder.pool("test", (domain,), 4, 8, 10, 32, 2)
+        forecasts = bench.controls(frames[:, :8], horizon=10)
+        baseline[domain] = {
+            name: events.score(predicted, records, 8, (10,))["10"]
+            for name, predicted in forecasts.items()
+        }
+    return baseline
+
+
 def run(config_path, output, max_runs, require_gpu=True):
     source = Path(config_path)
     config = json.loads(source.read_text())
@@ -146,6 +161,8 @@ def run(config_path, output, max_runs, require_gpu=True):
         }
         if result.returncode == 0:
             try:
+                if "observation_only_baselines" not in report:
+                    report["observation_only_baselines"] = observation_only_baselines()
                 item["evidence"] = summarize_one(
                     name, json.loads((folder / "metrics.json").read_text()))
             except (OSError, ValueError, KeyError, IndexError, TypeError) as error:
