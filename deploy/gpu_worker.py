@@ -96,9 +96,15 @@ def run_campaign(config, output, max_runs, expected_sha, hold_seconds):
             raise RuntimeError("JAX GPU device unavailable; refusing CPU fallback")
         state["status"] = "running"
         atomic_json(status, state)
-        command = [sys.executable, "-m", "campaign", "--config", str(config),
-                   "--output", str(out), "--execute", "--max-runs", str(max_runs),
-                   "--require-gpu"]
+        kind = json.loads(config.read_text()).get("kind")
+        if kind == "rgb_evidence_v1":
+            command = [sys.executable, "-m", "experiments.akash_rgb_evidence",
+                       "--config", str(config), "--out", str(out),
+                       "--max-runs", str(max_runs), "--require-gpu"]
+        else:
+            command = [sys.executable, "-m", "campaign", "--config", str(config),
+                       "--output", str(out), "--execute", "--max-runs", str(max_runs),
+                       "--require-gpu"]
         subprocess.run(command, check=True, cwd="/app")
         state["status"] = "completed"
     except Exception as exc:

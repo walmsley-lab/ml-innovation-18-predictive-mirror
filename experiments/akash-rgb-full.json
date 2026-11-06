@@ -1,0 +1,27 @@
+{
+  "kind": "rgb_evidence_v1",
+  "seeds": [
+    11,
+    23,
+    41
+  ],
+  "models": [
+    "cnn",
+    "transport",
+    "nca",
+    "nca_blend"
+  ],
+  "curricula": [
+    "mixed"
+  ],
+  "steps": 1200,
+  "occlusion_models": [
+    "cnn",
+    "nca_blend"
+  ],
+  "occlusion_steps": 800,
+  "context": 8,
+  "horizon": 10,
+  "size": 32,
+  "width": 8
+}
