@@ -9,7 +9,7 @@ biologically faithful neuromodulator.
 
 ## Smallest useful test
 
-Reuse the NumPy \`DevelopmentalSheet\` and its existing spatially local
+Reuse the NumPy `DevelopmentalSheet` and its existing spatially local
 experience-dependent connections. Generate one continuous RGB scene with a
 moving object and static landmark:
 
@@ -18,7 +18,7 @@ moving object and static landmark:
 3. **Return:** restore the original motion and test retention/adaptation.
 
 The observed frame is never used to score its own issued prediction. After
-scoring \`forecast[t]\` against \`frame[t]\`, its resulting error may set the
+scoring `forecast[t]` against `frame[t]`, its resulting error may set the
 plasticity rate for the **subsequent learning update**. All models see the same
 frames, in the same order, from the same initial parameters.
 
@@ -41,19 +41,19 @@ because the existing local rule also scales by surprise.
 
 ## Run
 
-\`\`\`bash
+```bash
 python -m unittest tests.test_regulated_plasticity -v
 python -m experiments.regulated_plasticity \
   --seeds 11 23 41 --segment-frames 40 \
   --size 32 --sheet-size 8 \
   --out runs/regulated-plasticity
-\`\`\`
+```
 
-Inspect \`runs/regulated-plasticity/metrics.json\` and the per-seed connection
+Inspect `runs/regulated-plasticity/metrics.json` and the per-seed connection
 checkpoints. Each regime records mean, early-third and late-third prequential
-MSE. Lower is better; \`shift_recovery_delta\` and
-\`return_recovery_delta\` quantify early-to-late improvements, and
-\`retention_gap\` compares the first part of the returned regime with the last
+MSE. Lower is better; `shift_recovery_delta` and
+`return_recovery_delta` quantify early-to-late improvements, and
+`retention_gap` compares the first part of the returned regime with the last
 part of the familiar regime. Per-frame error and rate curves, mode occupancy,
 and connection change are retained. Report all seeds, not just the best run.
 
