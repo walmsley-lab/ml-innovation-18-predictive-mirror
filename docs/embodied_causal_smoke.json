@@ -1,0 +1,58 @@
+{
+  "status": "fresh local smoke run; validates execution, not efficacy or a general causal-mechanism claim",
+  "source_commit": "83baf7e3c968dc841e655a57927309428f65e04d",
+  "command": "source .venv-jax-gpu/bin/activate && python -m experiments.embodied_causal_curriculum --seeds 11 --spring-steps 10 --touch-steps 20 --train-count 12 --val-count 4 --test-count 4 --out runs/embodied-causal-smoke",
+  "environment_note": "The GPU-enabled JAX environment reported CUDA_ERROR_NO_DEVICE and completed on CPU. This is not GPU validation.",
+  "focused_tests": {
+    "command": "source .venv-jax-gpu/bin/activate && python -m unittest discover -s tests -p 'test_embodied_causal_curriculum.py' -v",
+    "result": "5 passed"
+  },
+  "run_configuration": {
+    "seeds": [11],
+    "spring_updates": 10,
+    "mixed_updates": 20,
+    "train_episodes_per_stage": 12,
+    "validation_episodes_per_stage": 4,
+    "test_episodes_per_case": 4,
+    "sequence_length": 24,
+    "size": 8,
+    "width": 24,
+    "batch_size": 4
+  },
+  "local_artifacts": {
+    "directory": "runs/embodied-causal-smoke",
+    "metrics": {
+      "file": "metrics.json",
+      "sha256": "42af2ee2973b510c3202c23137a303ac605e250c082aa304a5a3b6ce5c23a2c3"
+    },
+    "checkpoints": {
+      "paired": "7c65eefa52e0ed7705d20ec151e23251bfd09b389bd8452ad2ab8a8d984c2a16",
+      "desynchronized_touch": "7a503bfe57c94b8b958a23875acc5afecee1d4db8e8ae6631b337aaac79486de"
+    }
+  },
+  "selection": {
+    "paired": {
+      "selected_step": 30,
+      "validation_loss": 0.13965119570493698
+    },
+    "desynchronized_touch": {
+      "selected_step": 30,
+      "validation_loss": 0.13974210023880004
+    }
+  },
+  "blind_touch_unprobed_shape_mse": {
+    "paired": {
+      "available": 0.20009967684745789,
+      "no_touch": 0.20854632556438446,
+      "touch_time_shifted": 0.20066407322883606,
+      "mean_shape_prior": 0.021108360961079597
+    },
+    "desynchronized_touch": {
+      "available": 0.2030707597732544,
+      "no_touch": 0.21057887375354767,
+      "touch_time_shifted": 0.20344571769237518,
+      "mean_shape_prior": 0.021108360961079597
+    }
+  },
+  "interpretation": "Both arms trained for the full 30 updates. On this tiny one-seed smoke run, removing touch worsened unprobed contour MSE for both arms; the paired arm had slightly lower available-touch error than the desynchronized control. Both neural contour errors remain much worse than the train-set mean-shape prior. This output validates the runner and does not establish blind-touch reconstruction, a shared causal representation, or a causal advantage from alignment."
+}
