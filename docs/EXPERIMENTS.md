@@ -38,6 +38,7 @@ experiments and specialized inputs are intentionally retained.
 |---|---|---|
 | Do graph messages help with articulated motion? | `src/graph_skeleton_nca.py`, `experiments/graph_skeleton_horizons.py` | **Given 2D joints and known skeleton edges**, not detected RGB poses; [protocol](GRAPH_SKELETON_HORIZONS.md) |
 | Can moving cells interact predictively? | `src/particle_nca.py`, `experiments/particle_nca_motion.py` | **Given tracked 2D positions and identities**, not extracted objects; [protocol](PARTICLE_NCA_MOTION.md) |
+| Can action-dependent touch reveal fit constraints? | `experiments/embodied_organization.py` | Given noisy shape/dimension measurements; paired no-probe, random-probe, active-probe and oracle chain-planning controls. **Symbolic world, not an RGB robot**; [protocol](EMBODIED_ORGANIZATION.md) |
 | Does choosing where to look change predictions? | `src/active_gaze_dynamics.py`, `experiments/active_gaze_dynamics.py` | Controlled 1D moving target, known belief dynamics; **not a trained neural gaze policy**; [protocol](ACTIVE_GAZE_DYNAMICS.md) |
 
 ## Observe and evaluate
