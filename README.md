@@ -64,6 +64,11 @@ live viewer. No cloud GPU is required for the entry-level demos.
 
 ## Find an experiment
 
+For a shared comparison of compact recurrent state, full-resolution recurrence,
+ConvLSTM and motion predictors, see the **[compact predictive mirror pilot](docs/COMPACT_PREDICTIVE_MIRROR.md)**.
+It trains on matched RGB clips and saves held-out forecasts, CPU timings and
+optional galleries; the protocol distinguishes measured results from hypotheses.
+
 **[Experiment map](docs/EXPERIMENTS.md)** — start with a question, then open
 one model, one runner, its evidence, and its tests. The models remain independent:
 
