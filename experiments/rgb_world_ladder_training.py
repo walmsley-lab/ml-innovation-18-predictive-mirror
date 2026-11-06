@@ -79,11 +79,14 @@ def report(p,predictor,records,frames,context,horizon):
 def run(out="runs/rgb-world-ladder-training",models=MODELS,
         curricula=CURRICULA,seeds=(11,23,41),steps=150,context=8,horizon=10,
         size=32,width=8,ticks=2,batch_size=2,train_per_domain=8,
-        val_per_domain=3,test_per_domain=4):
+        val_per_domain=3,test_per_domain=4,train_domains=TRAIN_DOMAINS):
     if (not models or not curricula or not seeds or steps<1 or context<2
             or horizon<1 or size<20 or width<1 or ticks<1 or batch_size<1
             or min(train_per_domain,val_per_domain,test_per_domain)<1):
         raise ValueError("Invalid paired training configuration")
+    if (not train_domains or len(set(train_domains)) != len(train_domains)
+            or any(domain not in world.DOMAINS for domain in train_domains)):
+        raise ValueError("Training domains must be nonempty, distinct and known")
     train_datasets={}
     # Both curricula select checkpoints on identical varied validation
     # scenes; different selection distributions would confound comparison.
@@ -91,7 +94,7 @@ def run(out="runs/rgb-world-ladder-training",models=MODELS,
                            context,horizon,size,2)
     val_datasets={}
     for curriculum in curricula:
-        domains=("linear",) if curriculum=="linear" else TRAIN_DOMAINS
+        domains=("linear",) if curriculum=="linear" else tuple(train_domains)
         train_datasets[curriculum]=pool("train",domains,train_per_domain,
                                        context,horizon,size,2)
         val_datasets[curriculum]=common_validation
@@ -170,7 +173,11 @@ def run(out="runs/rgb-world-ladder-training",models=MODELS,
               "models":list(models),"curricula":list(curricula),
               "seeds":list(map(int,seeds)),"steps":steps,
               "context":context,"horizon":horizon,
-              "train_domains":list(TRAIN_DOMAINS),"test_domains":list(TEST_DOMAINS),
+              "train_domains":list(train_domains),
+              "actual_curriculum_domains":{curriculum: (["linear"] if curriculum=="linear"
+                                         else list(train_domains)) for curriculum in curricula},
+              "test_domain_seen_in_mixed_training":{domain: domain in train_domains for domain in TEST_DOMAINS},
+              "test_domains":list(TEST_DOMAINS),
               "train_seed_root":31000,"validation_seed_root":61000,
               "test_seed_root":91000,"train_per_domain":train_per_domain,
               "validation_per_domain":val_per_domain,
@@ -197,9 +204,12 @@ def main():
     p.add_argument("--context",type=int,default=8)
     p.add_argument("--horizon",type=int,default=10)
     p.add_argument("--width",type=int,default=8)
+    p.add_argument("--train-domains",nargs="+",choices=world.DOMAINS,
+                   default=list(TRAIN_DOMAINS))
     a=p.parse_args()
     result=run(a.out,a.models,a.curricula,a.seeds,a.steps,
-               a.context,a.horizon,a.size,a.width)
+               a.context,a.horizon,a.size,a.width,
+               train_domains=tuple(a.train_domains))
     print(json.dumps({"experiment":result["protocol"],
                       "runs":len(result["results"])},indent=2))
 

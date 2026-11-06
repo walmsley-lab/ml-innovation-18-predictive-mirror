@@ -20,6 +20,29 @@ class TestAkashRGBEvidence(unittest.TestCase):
         self.assertEqual(len(list(evidence.jobs(full))), 18)
         self.assertEqual(gpu_campaign.load_manifest("experiments/akash-rgb-full.json")[0], 18)
 
+    def test_expanded_world_and_resolution_manifests(self):
+        for name,expected in (
+                ("akash-rgb-architectures.json", 12),
+                ("akash-rgb-physics.json", 18),
+                ("akash-rgb-48px.json", 9),
+                ("akash-rgb-64px.json", 6),
+                ("akash-rgb-occlusion-all.json", 18)):
+            path = "experiments/" + name
+            cfg = json.loads(Path(path).read_text())
+            with self.subTest(name=name):
+                self.assertEqual(evidence.validate(cfg), expected)
+                self.assertEqual(len(list(evidence.jobs(cfg))), expected)
+                self.assertEqual(gpu_campaign.load_manifest(path)[0], expected)
+        scale = json.loads(Path("experiments/akash-rgb-64px.json").read_text())
+        self.assertIn("--train-domains", next(iter(evidence.jobs(scale)))[1])
+        scale["occlusion_models"] = ["cnn"]
+        with self.assertRaises(ValueError):
+            evidence.validate(scale)
+        scale["occlusion_models"] = []
+        scale["train_domains"].append("alien-physics")
+        with self.assertRaises(ValueError):
+            evidence.validate(scale)
+
     def test_rejects_bad_configuration(self):
         for key, value in (("size", 64), ("kind", "legacy"),
                            ("steps", 0), ("models", ["not_a_model"]),
