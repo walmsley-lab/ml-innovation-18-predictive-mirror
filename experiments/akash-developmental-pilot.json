@@ -1,0 +1,14 @@
+{
+  "kind": "developmental_evidence_v1",
+  "seeds": [11, 23, 41, 47, 53],
+  "arms": ["coherent", "shuffled", "uncorrelated", "no_wave"],
+  "pretrain_updates": 120,
+  "visual_updates": 120,
+  "active_3d_updates": 120,
+  "size": 16,
+  "sheet_size": 4,
+  "checkpoint_every": 40,
+  "plasticity": 0.04,
+  "freeze_wave_comparison": true,
+  "shuffle_action_comparison": true
+}

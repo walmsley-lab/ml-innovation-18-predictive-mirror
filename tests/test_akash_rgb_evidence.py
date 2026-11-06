@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from experiments import akash_rgb_evidence as evidence
+from experiments import developmental_evidence
 from deploy import gpu_campaign
 
 
@@ -19,6 +20,10 @@ class TestAkashRGBEvidence(unittest.TestCase):
         self.assertEqual(evidence.validate(full), 18)
         self.assertEqual(len(list(evidence.jobs(full))), 18)
         self.assertEqual(gpu_campaign.load_manifest("experiments/akash-rgb-full.json")[0], 18)
+        developmental = json.loads(Path("experiments/akash-developmental-pilot.json").read_text())
+        self.assertEqual(developmental_evidence.validate(developmental), 20)
+        self.assertEqual(len(list(developmental_evidence.jobs(developmental))), 20)
+        self.assertEqual(gpu_campaign.load_manifest("experiments/akash-developmental-pilot.json")[0], 20)
 
     def test_expanded_world_and_resolution_manifests(self):
         for name,expected in (

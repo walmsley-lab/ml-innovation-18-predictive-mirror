@@ -12,6 +12,7 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+import shutil
 
 DEFAULT_OUTPUT = "/app/runs/campaign"
 CHUNK_MAX = 96 * 1024
@@ -79,6 +80,29 @@ def gpu_available():
     return any(d.platform == "gpu" for d in devices)
 
 
+def gpu_telemetry():
+    """Capture host GPU utilization without weakening the GPU requirement."""
+    nvidia = shutil.which("nvidia-smi")
+    if not nvidia:
+        return {"available": False, "reason": "nvidia-smi unavailable"}
+    try:
+        result = subprocess.run(
+            [nvidia, "--query-gpu=index,name,utilization.gpu,memory.used,memory.total",
+             "--format=csv,noheader,nounits"], text=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, timeout=10)
+        rows = []
+        for line in result.stdout.splitlines():
+            fields = [part.strip() for part in line.split(",")]
+            if len(fields) == 5:
+                rows.append({"index": fields[0], "name": fields[1],
+                             "utilization_percent": fields[2],
+                             "memory_used_mib": fields[3],
+                             "memory_total_mib": fields[4]})
+        return {"available": True, "gpus": rows}
+    except (OSError, subprocess.SubprocessError) as error:
+        return {"available": False, "reason": f"telemetry failed: {error}"}
+
+
 def run_campaign(config, output, max_runs, expected_sha, hold_seconds):
     """Run the repo's existing campaign.py and remain available to akt exec."""
     config = Path(config).resolve()
@@ -97,19 +121,28 @@ def run_campaign(config, output, max_runs, expected_sha, hold_seconds):
         state["status"] = "running"
         atomic_json(status, state)
         kind = json.loads(config.read_text()).get("kind")
+        state["gpu_telemetry_start"] = gpu_telemetry()
+        atomic_json(status, state)
         if kind in ("rgb_evidence_v1", "rgb_evidence_v2"):
             command = [sys.executable, "-m", "experiments.akash_rgb_evidence",
                        "--config", str(config), "--out", str(out),
                        "--max-runs", str(max_runs), "--require-gpu"]
-        else:
+        elif kind == "developmental_evidence_v1":
+            command = [sys.executable, "-m", "experiments.developmental_evidence",
+                       "--config", str(config), "--out", str(out),
+                       "--max-runs", str(max_runs), "--require-gpu"]
+        elif kind is None:
             command = [sys.executable, "-m", "campaign", "--config", str(config),
                        "--output", str(out), "--execute", "--max-runs", str(max_runs),
                        "--require-gpu"]
+        else:
+            raise ValueError(f"Unknown campaign kind: {kind}")
         subprocess.run(command, check=True, cwd="/app")
         state["status"] = "completed"
     except Exception as exc:
         state.update(status="failed", error=f"{type(exc).__name__}: {exc}")
     finally:
+        state["gpu_telemetry_end"] = gpu_telemetry()
         atomic_json(status, state)
         print(json.dumps(state), flush=True)
     # Keep the lease reachable for private download. The client closes it

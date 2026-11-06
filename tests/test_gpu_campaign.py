@@ -59,6 +59,13 @@ class Tests(unittest.TestCase):
             campaign.render_sdl(template,IMAGE.replace("@sha256:",":tag-"),
                                 "experiments/gpu-smoke.json","b"*64,1,60)
 
+    def test_unknown_campaign_kind_fails_closed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "unknown.json"
+            path.write_text(json.dumps({"kind": "future_campaign_v9"}))
+            with self.assertRaises(ValueError):
+                campaign.load_manifest(path)
+
     def test_dseq_and_close_state(self):
         self.assertEqual(campaign.dseq_from_event({"outputs":{"dseq":"1234"}}),"1234")
         self.assertIsNone(campaign.dseq_from_event({"outputs":{"dseq":"no"}}))

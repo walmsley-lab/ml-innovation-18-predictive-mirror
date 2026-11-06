@@ -49,9 +49,15 @@ def load_manifest(path):
         raise ValueError("Manifest must be an embedded experiments/*.json path")
     manifest = Path(relative)
     payload = json.loads(manifest.read_text())
-    if payload.get("kind") in ("rgb_evidence_v1", "rgb_evidence_v2"):
+    kind = payload.get("kind")
+    if kind in ("rgb_evidence_v1", "rgb_evidence_v2"):
         from experiments.akash_rgb_evidence import validate
         return validate(payload), hash_file(manifest)
+    if kind == "developmental_evidence_v1":
+        from experiments.developmental_evidence import validate
+        return validate(payload), hash_file(manifest)
+    if kind is not None:
+        raise ValueError(f"Unknown campaign kind: {kind}")
     required = {"seeds", "architectures", "curricula", "steps", "batch_size",
                 "episodes", "checkpoint_every", "loss_mode", "primary_metric",
                 "replay_fraction"}
@@ -220,13 +226,13 @@ def safe_rel(name):
     return path
 
 
-def download(state, context, max_bytes):
+def download(state, context, max_bytes, destination=None):
     dseq = state["dseq"]
     listing = remote(dseq, ["inventory"], context)
     files = listing["files"]
     if not isinstance(files, list) or sum(item["bytes"] for item in files) > max_bytes:
         raise ValueError("Artifact size exceeds approved download budget")
-    dest = Path(state["out"]) / "artifacts"
+    dest = Path(destination) if destination else Path(state["out"]) / "artifacts"
     for item in files:
         name = item["path"]
         rel = safe_rel(name)
@@ -283,20 +289,26 @@ def close(state, context):
     except subprocess.CalledProcessError:
         # Already closed is an expected recovery case. Verify before accepting it.
         pass
-    try:
-        data = json.loads(cli(["console", "deployment", "get", str(dseq),
-                               "-o", "json"], context=context))
-        verified = is_closed(data)
-    except Exception:
-        verified = False
+    verified = False
+    for _ in range(3):
+        try:
+            data = json.loads(cli(["console", "deployment", "get", str(dseq),
+                                   "-o", "json"], context=context))
+            if is_closed(data):
+                verified = True
+                break
+        except Exception:
+            pass
+        time.sleep(1)
     state["state"] = "closed" if verified else "closure_unverified"
     atomic_json(state_file, state)
     return verified
 
 
-def await_and_export(state, context, poll_seconds, max_bytes):
+def await_and_export(state, context, poll_seconds, max_bytes, recovery_seconds=120):
     deadline = state["created_at"] + state["max_hours"] * 3600
     failures = 0
+    last_recovery = 0.0
     while time.time() < deadline:
         try:
             result = remote(state["dseq"], ["status"], context)
@@ -315,6 +327,18 @@ def await_and_export(state, context, poll_seconds, max_bytes):
             if result["status"] != "completed":
                 raise RuntimeError("Remote training failed; recovered available artifacts")
             return
+        if recovery_seconds and time.time() - last_recovery >= recovery_seconds:
+            snapshot = Path(state["out"]) / "recovery" / str(int(time.time()))
+            try:
+                count = download(state, context, max_bytes, snapshot)
+                state.setdefault("recovery_snapshots", []).append({
+                    "path": str(snapshot), "files": count,
+                    "verified_at": time.time()})
+                atomic_json(Path(state["out"]) / "state.json", state)
+            except (OSError, ValueError, RuntimeError):
+                # A stage may be writing an artifact; the next interval retries.
+                pass
+            last_recovery = time.time()
         time.sleep(poll_seconds)
     raise TimeoutError("Campaign exceeded approved lease lifetime")
 
@@ -332,6 +356,7 @@ def main(argv=None):
         p.add_argument("--context")
         p.add_argument("--max-artifact-mib", type=int, default=256)
         p.add_argument("--poll-seconds", type=int, default=20)
+        p.add_argument("--recovery-seconds", type=int, default=120)
         if name == "run":
             p.add_argument("--approve-paid-deployment", action="store_true")
     for name in ("recover", "close"):
@@ -339,9 +364,10 @@ def main(argv=None):
         p.add_argument("--out", required=True)
         p.add_argument("--context")
         p.add_argument("--poll-seconds", type=int, default=20)
+        p.add_argument("--recovery-seconds", type=int, default=120)
         p.add_argument("--max-artifact-mib", type=int, default=256)
     args = parser.parse_args(argv)
-    if args.poll_seconds < 1 or args.max_artifact_mib < 1:
+    if args.poll_seconds < 1 or args.max_artifact_mib < 1 or args.recovery_seconds < 0:
         parser.error("Invalid poll interval / artifact budget")
     if args.command in ("plan", "run"):
         sdl, state = prepare(args)
@@ -366,7 +392,8 @@ def main(argv=None):
             state["state"] = "running"
             atomic_json(Path(args.out) / "state.json", state)
             await_and_export(state, args.context, args.poll_seconds,
-                             args.max_artifact_mib * 1024 * 1024)
+                             args.max_artifact_mib * 1024 * 1024,
+                             args.recovery_seconds)
         finally:
             if not close(state, args.context):
                 print("CLOSURE NOT VERIFIED. Check: akt console deployment list active",
@@ -380,7 +407,8 @@ def main(argv=None):
         try:
             if args.command == "recover" and state["state"] != "closed":
                 await_and_export(state, args.context, args.poll_seconds,
-                                 args.max_artifact_mib * 1024 * 1024)
+                                 args.max_artifact_mib * 1024 * 1024,
+                                 args.recovery_seconds)
         finally:
             if not close(state, args.context):
                 print("CLOSURE NOT VERIFIED. Inspect Akash Console.", file=sys.stderr)
