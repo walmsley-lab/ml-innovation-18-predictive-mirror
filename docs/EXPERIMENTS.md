@@ -9,7 +9,9 @@ experiments and specialized inputs are intentionally retained.
 > (world / training-study / probe / baseline / evaluation / calibration / audit /
 > demo) — see [`EXPERIMENT_LEDGER.md`](EXPERIMENT_LEDGER.md).
 
-**[Neuromatch-inspired experiment matrix](NEUROMATCH_EXPERIMENTS.md)** — twelve new reference hypotheses across Mirror, NCA, and Learned Dynamics, including commands, controls and evidence limits.\n\n## Pixel-based predictive models
+**[Neuromatch-inspired experiment matrix](NEUROMATCH_EXPERIMENTS.md)** — twelve new reference hypotheses across Mirror, NCA, and Learned Dynamics, including commands, controls and evidence limits.
+
+## Pixel-based predictive models
 
 | Question | Model / runner | Input and output |
 |---|---|---|
