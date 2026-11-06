@@ -15,14 +15,19 @@ import jax.numpy as jnp
 import numpy as np
 
 from src import geometry_automata as world
+from src import geometry_harmonics as harmonics
 from src import geometry_perceiver as model
 from train import adamw
 
 ARMS = ("messages", "no_messages")
 
 
-def data(seed, nodes, kind):
-    return world.episode(seed, nodes=nodes, kind=kind, steps=18)
+def data(seed, nodes, kind, medium="spring"):
+    if medium == "spring":
+        return world.episode(seed, nodes=nodes, kind=kind, steps=18)
+    if medium == "harmonic":
+        return harmonics.sensor_record(seed, nodes=nodes, kind=kind, steps=18)
+    raise ValueError("Unknown geometry medium")
 
 
 def test_score(params, sample, use_messages, stress="normal"):
@@ -57,20 +62,21 @@ def test_score(params, sample, use_messages, stress="normal"):
 
 
 def run(out="runs/geometry-automata", seeds=(11, 23, 41),
-        steps=50, channels=12):
-    if (not seeds or len(set(seeds)) != len(seeds) or steps < 1 or channels < 2):
+        steps=50, channels=12, medium="spring"):
+    if (not seeds or len(set(seeds)) != len(seeds) or steps < 1 or
+            channels < 2 or medium not in ("spring", "harmonic")):
         raise ValueError("Invalid experiment settings")
     destination = Path(out)
     destination.mkdir(parents=True, exist_ok=True)
     # Entire generated worlds are disjoint, not just randomly split time slices.
     train = [data(31000+i, (10, 13, 16)[i % 3],
-                  ("irregular", "branch", "ring")[i % 3]) for i in range(30)]
+                  ("irregular", "branch", "ring")[i % 3], medium) for i in range(30)]
     valid = [data(61000+i, (10, 13, 16)[i % 3],
-                  ("ring", "irregular", "branch")[i % 3]) for i in range(6)]
+                  ("ring", "irregular", "branch")[i % 3], medium) for i in range(6)]
     test = {
-        "new_irregular_21": data(91011, 21, "irregular"),
-        "new_branch_19": data(91023, 19, "branch"),
-        "new_ring_23": data(91041, 23, "ring"),
+        "new_irregular_21": data(91011, 21, "irregular", medium),
+        "new_branch_19": data(91023, 19, "branch", medium),
+        "new_ring_23": data(91041, 23, "ring", medium),
     }
 
     def tensors(sample):
@@ -132,6 +138,7 @@ def run(out="runs/geometry-automata", seeds=(11, 23, 41),
     result = {
         "experiment": "arbitrary_geometry_to_local_perception_v1",
         "seeds": list(map(int, seeds)), "steps": steps, "channels": channels,
+        "medium": medium,
         "train_seed_range": [31000, 31029], "validation_seed_range": [61000, 61005],
         "test_worlds": {name: {"seed": record["seed"],
                                "kind": record["geometry_kind"],
@@ -158,8 +165,10 @@ def main():
     parser.add_argument("--seeds", nargs="+", type=int, default=[11, 23, 41])
     parser.add_argument("--steps", type=int, default=50)
     parser.add_argument("--channels", type=int, default=12)
+    parser.add_argument("--medium", choices=("spring", "harmonic"), default="spring")
     args = parser.parse_args()
-    report = run(args.out, tuple(args.seeds), args.steps, args.channels)
+    report = run(args.out, tuple(args.seeds), args.steps, args.channels,
+                 args.medium)
     print(json.dumps({"seeds": report["seeds"],
                       "test_worlds": report["test_worlds"], "out": args.out}, indent=2))
 
