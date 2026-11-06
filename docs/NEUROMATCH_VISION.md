@@ -31,3 +31,20 @@ that a learned circuit is causally useful. This bridge complements the existing
 
 Reference material: Neuromatch Academy NeuroAI microcircuits, comparing
 networks, and computational neuroscience causal inference tutorials.
+
+## November evidence safeguards
+
+- Sparse-change selection currently reads two *entire* RGB frames to find
+  changes. Report the full scan alongside selected writes; do not claim actual
+  GPU computation or energy savings.
+- The closest-energy alternative lesion is not uniformly random and can overlap
+  the targeted group. Report the overlap and a separate explicitly *disjoint*
+  comparison; different removed-energy totals prevent a causal ranking claim.
+- Use `--size 32 --horizon 10 --ticks 2` to match the synthetic RGB task;
+  a 16-pixel/3-frame diagnostic cannot explain 32-pixel/10-frame failure.
+- Contrast-normalized sensitivity is not a trained predictor improvement.
+  Self-CKA is a sanity check; add trained-vs-random-initialized trajectory CKA
+  and many independent episodes before interpreting similarity.
+- The PNG activity heatmap is now per-episode percentile-scaled and the JSON
+  includes absolute activity statistics. A uniform display color is no longer
+  mistaken for evidence of uniformly maximal hidden activity.
