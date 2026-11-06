@@ -1,0 +1,32 @@
+name: akash RGB evidence smoke
+
+on:
+  pull_request:
+    paths:
+      - 'experiments/akash_rgb_evidence.py'
+      - 'experiments/akash-rgb-*.json'
+      - 'deploy/gpu_worker.py'
+      - 'deploy/gpu_campaign.py'
+      - 'tests/test_akash_rgb_evidence.py'
+      - '.github/workflows/akash-rgb-evidence.yml'
+  push:
+    paths:
+      - 'experiments/akash_rgb_evidence.py'
+      - 'experiments/akash-rgb-*.json'
+      - 'deploy/gpu_worker.py'
+      - 'deploy/gpu_campaign.py'
+      - 'tests/test_akash_rgb_evidence.py'
+      - '.github/workflows/akash-rgb-evidence.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate manifests and recovery paths without GPU or Akash
+        run: python -m unittest tests.test_akash_rgb_evidence tests.test_gpu_campaign -v
+      - name: Compile cloud entry points
+        run: python -m compileall -q deploy experiments/akash_rgb_evidence.py
