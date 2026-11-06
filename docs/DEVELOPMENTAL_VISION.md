@@ -30,6 +30,7 @@ python -m experiments.retinal_waves --frames 8 --size 16
 python -m experiments.spatial_plasticity --frames 8 --size 16 --sheet 4
 python -m experiments.developmental_vision --frames 8 --size 16 --sheet 4
 python -m experiments.active_3d_learning --frames 8 --size 16 --sheet 4
+python -m experiments.developmental_training --size 16 --sheet-size 4 --stage-frames 8
 ```
 
 Each command writes a small `metrics.json` (and the wave stage writes
@@ -41,3 +42,30 @@ The shared `DevelopmentalSheet` remains in the existing interaction experiment
 because it is the one reusable model needed to connect the stages. Existing
 experiments are not imported into or modified by these new stages except for
 that explicitly shared learner and the existing checked world generators.
+
+## Matched developmental training
+
+`developmental_training.py` saves `*.npz` checkpoints after waves, visual 3D,
+and active-camera 3D stages. The `developmental` arm carries one sheet through
+all three stages. The `no_wave` arm starts with the same initial state and sees
+the same number of updates, but replaces the wave stage with visual experience.
+Both are scored on held-out `ood_depth` retinal RGB. Checkpoints contain phase,
+hidden activity, surprise trace, homeostatic drive, local connections, the
+previous retina, and the issued forecast.
+
+The plasticity surprise is strictly `current_retina - issued_forecast`.
+Connections are `[cell_y, cell_x, feature, output]`, so updates are local;
+within-cell competition subtracts the feature-population mean, and per-cell
+normalization plus homeostatic drive prevent unbounded growth.
+
+## Developmental transfer study
+
+`developmental_transfer.py` compares coherent waves, spatially shuffled waves,
+uncorrelated activity, and a matched no-wave control across five seeds. Every
+arm then receives identical visual and 3D sequences. It records visual learning
+speed, foreground localization, persistence at occluded projected object
+centers, and unseen-camera error. Arm A also has a frozen-connection branch;
+its pretraining checkpoint is handed off unchanged before visual learning.
+
+The small study is intentionally a gate, not a campaign: wave coherence is not
+evidence unless it improves downstream transfer across seeds.

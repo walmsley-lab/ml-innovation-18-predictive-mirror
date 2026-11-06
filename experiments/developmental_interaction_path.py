@@ -39,8 +39,10 @@ class DevelopmentalSheet:
         # Connections are experience-dependent: rows are presynaptic features,
         # columns are RGB prediction channels.  Start near zero so learning is
         # carried by observations rather than a pre-trained visual kernel.
-        self.connections = .01 * rng.standard_normal((channels, 3)).astype(np.float32)
+        self.connections = .01 * rng.standard_normal(
+            (sheet, sheet, channels, 3)).astype(np.float32)
         self.previous = np.zeros((sheet, sheet, 3), np.float32)
+        self.forecast = np.zeros((sheet, sheet, 3), np.float32)
 
     def _features(self, frame):
         fast = _pool(frame, self.sheet)
@@ -55,27 +57,29 @@ class DevelopmentalSheet:
         """Absorb one retinal observation and return the next-frame forecast."""
         x = self._features(frame)
         retinal = _pool(frame, self.sheet)
-        surprise = np.mean(np.abs(retinal - self.previous))
+        surprise = np.mean(np.abs(retinal - self.forecast))
         action_signal = .02 * float(action[0]) + .01 * float(action[1])
         self.trace = .82 * self.trace + .18 * np.tanh(x * surprise)
         pre = np.tanh(x + .25 * self.hidden + .08 * self.trace +
                       self.homeostasis + action_signal)
         post = np.tanh(pre + .05 * np.roll(pre, 1, axis=0) + .05 * np.roll(pre, 1, axis=1))
         # Activity-dependent refinement, normalized to avoid runaway weights.
-        correlation = np.mean(pre[..., :, None] * post[..., None, :], axis=(0, 1))
-        correlation = correlation - correlation.mean(axis=0, keepdims=True)
-        self.connections += self.rate * float(np.clip(surprise, 0., 1.)) * correlation[:, :3]
+        correlation = pre[..., :, None] * post[..., None, :3]
+        correlation = correlation - correlation.mean(axis=2, keepdims=True)
+        self.connections += self.rate * float(np.clip(surprise, 0., 1.)) * correlation
         self.connections *= np.float32(1. - self.rate * .02)
         activity = np.mean(np.abs(post), axis=(0, 1))
         self.homeostasis += .02 * (.12 - activity)
         self.homeostasis = np.clip(self.homeostasis, -.25, .25)
-        self.connections /= np.maximum(1., np.linalg.norm(self.connections, axis=0, keepdims=True))
+        norms = np.linalg.norm(self.connections, axis=2, keepdims=True)
+        self.connections /= np.maximum(1., norms)
         self.hidden = post
         self.phase += .25 + .08 * np.roll(self.phase, 1, axis=0) - .08 * self.phase
         self.phase += .01 * float(action[0]) + .005 * float(action[1])
-        delta = np.tanh(np.einsum("hwc,cr->hwr", self.hidden, self.connections))
+        delta = np.tanh(np.einsum("hwc,hwcr->hwr", self.hidden, self.connections))
         prediction = np.clip(self.previous + .18 * delta, 0., 1.)
         self.previous = retinal
+        self.forecast = prediction
         return prediction
 
     def metrics(self):
