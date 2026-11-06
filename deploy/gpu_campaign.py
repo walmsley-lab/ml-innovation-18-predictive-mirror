@@ -152,7 +152,8 @@ def dseq_from_failure_output(message):
 
 def deploy(sdl, state, state_file, context):
     cmd = ["akt"] + (["--context", context] if context else []) + [
-        "deploy", str(sdl), "--bid-select", "cheapest", "--yes", "-o", "jsonl"]
+        "deploy", str(sdl), "--bid-select", "cheapest", "--ready-timeout", "10m",
+        "--yes", "-o", "jsonl"]
     # A file rather than stderr=PIPE avoids deadlock while iterating stdout
     # from a CLI that may emit many progress/warning lines on stderr.
     with tempfile.TemporaryFile(mode="w+t") as error_log:
