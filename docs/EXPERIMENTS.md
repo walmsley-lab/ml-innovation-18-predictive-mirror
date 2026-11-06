@@ -19,6 +19,7 @@ experiments and specialized inputs are intentionally retained.
 | Does training on diverse motion help? | `experiments/rgb_curriculum.py`, `experiments/rgb_motion_distribution.py` | Fixed synthetic train/validation/test scenes; compare to persistence and velocity |
 | Does emphasizing the distant future matter? | `experiments/rgb_horizon_objective.py` | Same RGB NCA; alternative loss targets |
 | Do cell neighborhoods or remote references matter? | `src/selectable_rgb_nca.py`, `experiments/rgb_selector_benchmark.py` | Local, relative, fixed-reference arms; [protocol](RGB_SELECTOR_BENCHMARK.md) |
+| Can a two-tower scorer recognize a supplied visual continuation? | `experiments/contrastive_future_recognition.py` | 8 observed RGB frames, four given future options; InfoNCE vs supervised MLP and velocity; **not** future generation; [protocol](CONTRASTIVE_FUTURE_RECOGNITION.md) |
 | Can cells learn which offset to read? | `src/rgb_soft_references.py`, `experiments/rgb_soft_references.py` | Soft learned spatial offset routing; [protocol](RGB_SOFT_REFERENCES.md) |
 | Does local recovery stabilize and improve a cellular predictor? | `src/rgb_homeostatic_nca.py`, `experiments/rgb_homeostatic_recovery.py` | Plain vs local vs shuffled nontrainable activity regulation; [protocol](RGB_HOMEOSTATIC_RECOVERY.md) |
 | Do fast and slow sheets help? | `src/rgb_multiscale_sheets.py`, `experiments/rgb_multiscale_sheets.py` | Dual-rate recurrent state; [protocol](RGB_MULTISCALE_SHEETS.md) |
