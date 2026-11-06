@@ -26,6 +26,8 @@ coarse RGB residuals that are added to the full-resolution image. The final
 observation anchors lead zero; the first forecast is lead one.
 
 Latent width is representational dimension, not inferred physical dimension.
+The complete forecast carry also includes the RGB image used by the residual
+decoder; the latent vector is not the entire prediction state.
 This first model is a deterministic point predictor. It does not approximate a
 posterior over explanations or sample calibrated alternative futures. Actions,
 multimodal observations and stochastic belief states are future experiments.
@@ -139,6 +141,29 @@ Tests check 4D topology and distance preservation, prefix-invariant generation,
 isolated held-out factors, image bounds, latent dimensions, gradient flow,
 causal forecasting, equal curriculum sizes, frozen probe fitting, disjoint
 splits, checkpoint selection and a complete artifact-checked smoke.
+
+### Local pilot: learnability is not yet established
+
+A 30-update, three-seed pilot used latent dimension 64, 32 training clips per
+curriculum, four validation episodes per domain, six test episodes per case,
+and 24 probe-training episodes. The [measurement summary](circus_hypergeometry_pilot.json)
+contains the command, source commit/hashes, episode IDs, selected checkpoints,
+per-episode scores and artifact hashes. Full local outputs are in
+`runs/circus-pr-pilot/`; they are not included in the summary.
+
+All ordinary-only and mixed runs selected step zero. Their mixed-minus-ordinary
+test MSE was exactly zero because they produced identical persistence forecasts.
+**That is not evidence of learned robustness, useful transfer, or a scientific
+null for the curriculum hypothesis.** Geometry-only runs selected step one;
+the probes did not demonstrate a learned geometric representation. The next
+research gate is successful learning/overfitting on a small fixed training
+set, followed by validation-only optimization and a newly frozen final test.
+
+![Actual pilot: last observation, forecast, true future and error for unseen rotation planes](circus_hypergeometry_pilot.png)
+
+This panel is from geometry-only seed 11, the first test episode, lead +6,
+checkpoint step one. Its nearly unchanged forecast is a visible failure to
+anticipate the rotating projection, not an illustrative success image.
 
 ## Later worlds: deliberately not implemented in this first study
 

@@ -18,7 +18,6 @@ experiments and specialized inputs are intentionally retained.
 | Can a recurrent sheet forecast changes? | `src/model.py`, `train.py` | Synthetic grayscale; early minimal baseline |
 | Does a residual video model anticipate a webcam? | `src/video_residual.py`, `video_train.py` | Recorded grayscale video, held-out forecast |
 | Can local cells predict RGB motion? | `src/predictive_rgb_nca.py`, `experiments/rgb_motion_distribution.py` | 32×32 synthetic RGB, +1 to +10 frames; [protocol](RGB_MOTION_DISTRIBUTION.md) |
-| Does unusual geometry improve ordinary forecasting or just geometric imagery? | `python -m experiments.circus_curriculum` | RGB-only rotating 4D projections; matched ordinary/geometric/mixed training, isolated rotation/object/view holdouts and frozen latent probes; [protocol and roadmap](CIRCUS_CURRICULUM.md) |
 | Does training on diverse motion help? | `experiments/rgb_curriculum.py`, `experiments/rgb_motion_distribution.py` | Fixed synthetic train/validation/test scenes; compare to persistence and velocity |
 | Does emphasizing the distant future matter? | `experiments/rgb_horizon_objective.py` | Same RGB NCA; alternative loss targets |
 | Do cell neighborhoods or remote references matter? | `src/selectable_rgb_nca.py`, `experiments/rgb_selector_benchmark.py` | Local, relative, fixed-reference arms; [protocol](RGB_SELECTOR_BENCHMARK.md) |
@@ -68,6 +67,13 @@ Independent webcam transfer and robust one-second anticipation remain open.
 The [Gaussian-state roadmap](RESEARCH_TIMELINE.md) has **implemented** rendering, oracle-state dynamics, RGB-inferred dynamics and active-view comparison runners. These are not yet demonstrated perception improvements. See the [operator-reported campaign findings](PERSISTENCE_VS_SIMPLE_FINDINGS.md) and [metric/provenance audit](CAMPAIGN_FINDINGS_20261104.md) before interpreting performance claims. Gaussian splatting is a representation and rendering method, not a predictor by itself.
 
 ## Where to read next
+
+**[Circus Curriculum](CIRCUS_CURRICULUM.md)** adds an independent first experiment:
+`python -m experiments.circus_curriculum` trains an RGB latent predictor on
+ordinary scenes, rotating 4D projections, or a matched mixture. It separates
+rotation/object/view holdouts, ordinary-scene transfer, and frozen latent probes.
+The initial pilot has not demonstrated learned transfer or a recovered 4D
+representation; the other proposed Circus worlds remain future work.
 
 - [Training and demos](GETTING_STARTED.md) — minimal CPU run, visualization,
   full comparison, and optional live webcam.
