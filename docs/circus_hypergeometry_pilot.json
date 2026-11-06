@@ -1,0 +1,1331 @@
+{
+  "status": "local integration pilot; no demonstrated learned transfer or 4D representation",
+  "command": "python -m experiments.circus_curriculum --steps 30 --seeds 11 23 41 --latent-dim 64 --train-episodes 32 --validation-episodes 4 --test-episodes 6 --probe-episodes 24 --gallery --out runs/circus-pr-pilot",
+  "protocol": {
+    "experiment": "circus-hypergeometry-v1",
+    "model_seeds": [
+      11,
+      23,
+      41
+    ],
+    "split_episode_ids": {
+      "train": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "validation": [
+        10000,
+        10001,
+        10002,
+        10003
+      ],
+      "probe_train": [
+        20000,
+        20001,
+        20002,
+        20003,
+        20004,
+        20005,
+        20006,
+        20007,
+        20008,
+        20009,
+        20010,
+        20011,
+        20012,
+        20013,
+        20014,
+        20015,
+        20016,
+        20017,
+        20018,
+        20019,
+        20020,
+        20021,
+        20022,
+        20023
+      ],
+      "test": [
+        30000,
+        30001,
+        30002,
+        30003,
+        30004,
+        30005
+      ]
+    },
+    "steps": 30,
+    "batch_size": 4,
+    "context": 8,
+    "horizon": 6,
+    "size": 32,
+    "latent_dim": 64,
+    "curricula": [
+      "ordinary",
+      "hypergeometry",
+      "mixed"
+    ],
+    "training_schedule": [
+      [
+        11,
+        13,
+        20,
+        21
+      ],
+      [
+        1,
+        2,
+        29,
+        31
+      ],
+      [
+        7,
+        8,
+        28,
+        25
+      ],
+      [
+        12,
+        5,
+        28,
+        19
+      ],
+      [
+        0,
+        3,
+        18,
+        26
+      ],
+      [
+        7,
+        6,
+        19,
+        26
+      ],
+      [
+        14,
+        6,
+        19,
+        24
+      ],
+      [
+        10,
+        9,
+        29,
+        20
+      ],
+      [
+        1,
+        11,
+        24,
+        26
+      ],
+      [
+        0,
+        0,
+        19,
+        23
+      ],
+      [
+        9,
+        4,
+        27,
+        26
+      ],
+      [
+        5,
+        9,
+        26,
+        24
+      ],
+      [
+        2,
+        1,
+        30,
+        17
+      ],
+      [
+        11,
+        15,
+        24,
+        30
+      ],
+      [
+        10,
+        13,
+        22,
+        16
+      ],
+      [
+        6,
+        0,
+        31,
+        20
+      ],
+      [
+        10,
+        9,
+        16,
+        18
+      ],
+      [
+        11,
+        9,
+        31,
+        21
+      ],
+      [
+        7,
+        0,
+        16,
+        25
+      ],
+      [
+        11,
+        2,
+        16,
+        24
+      ],
+      [
+        7,
+        2,
+        25,
+        27
+      ],
+      [
+        9,
+        7,
+        17,
+        23
+      ],
+      [
+        6,
+        9,
+        24,
+        29
+      ],
+      [
+        2,
+        7,
+        16,
+        21
+      ],
+      [
+        11,
+        14,
+        22,
+        24
+      ],
+      [
+        3,
+        13,
+        28,
+        24
+      ],
+      [
+        5,
+        6,
+        28,
+        16
+      ],
+      [
+        12,
+        3,
+        20,
+        19
+      ],
+      [
+        3,
+        5,
+        25,
+        17
+      ],
+      [
+        10,
+        13,
+        21,
+        19
+      ]
+    ],
+    "selection": "lowest RGB MSE on common 50/50 ordinary/hypergeometry validation; step zero eligible, earliest tie; never OOD test selection",
+    "budget": "same initial weights, updates, total RGB clips and optimizer across curricula; mixed replaces half the ordinary exposure, not extra compute",
+    "loss": "mean((1+8*mean_channel(abs(future-last)))*squared_error)",
+    "optimizer": "shared clipped AdamW at 0.002",
+    "source_revision": "b78a6ae2e2d87fab259be9dd45de381bda52cfc5",
+    "source_revision_note": "HEAD at launch; file hashes identify uncommitted source too",
+    "source_sha256": {
+      "experiments/circus_curriculum/__main__.py": "fe8ac23f706b8901d88ff8d8ad58e168700751a754ec0ecb8e1e4c4d5c218139",
+      "experiments/circus_curriculum/world.py": "6b6818039a2ae467c3cd04d0df34afcc37da5d225d2fcf11c3abd965fef47a2b",
+      "experiments/circus_curriculum/model.py": "a782685b20115c8b22334abc6d259e3286ee2c11d55f3aa975cf0cbb91abbba9",
+      "experiments/circus_curriculum/probes.py": "b3a445f0281d23ebce31033633e909cbc5953741a46bb82cd83ac560b2c9e448",
+      "src/model.py": "e35bf5e68db29f79f80d83dd71a755c67bff8ad6865b26c5553f6cbbe194ebf6",
+      "src/experiment_harness.py": "fb1d04a7050d87899c3ca506d03923c7004472fd6afe552b464bc4b9a9c3d8cf",
+      "train.py": "ee64e513cec093d46e68fa6172099c1088c959601686f07dbbcbcc9c8a80d141",
+      "src/rgb_motion_world.py": "67e6c2c6395cb8c0c1a49297e3a9e37c59ede8faf47e6c9dba3178700d25f839",
+      "src/baselines.py": "fc802f3bd8d9cd1a6ff074090ce75558c192d6da1fc5ae4e58d2b310c38bbdf0",
+      "experiments/accuracy_cost_audit.py": "9147dedd04e23e044f394094739f129e03e1782c440f51244440f76cb6bd8d43",
+      "experiments/verified_replay_gallery.py": "d6feeef92aa208c091a7c738c78bd0bf24089dceee4327c86c6206a466dde6ef"
+    },
+    "environment": {
+      "python": "3.14.8",
+      "numpy": "2.3.5",
+      "jax": "0.9.0.1",
+      "device": "TFRT_CPU_0"
+    },
+    "cases": {
+      "iid": "new seeds, trained shape/plane/view families",
+      "rotation": "unseen rotation planes, same speed range",
+      "object": "16-cell instead of tesseract",
+      "viewpoint": "camera angle magnitudes [.9,1.2] instead of [0,.3]",
+      "combined": "all three interventions",
+      "ordinary": "new physical moving-disc scenes"
+    },
+    "training_data": {
+      "file": "training-scenes.npz",
+      "sha256": "ee5ad8d5d171e0d010e14af9ace829445793bad42ee2e089eede7a4903df8bfa"
+    },
+    "validation_data": {
+      "file": "validation-scenes.npz",
+      "sha256": "03d4d41759c1e34ecf7ecdb43655c0830f21e04ae0320eba0d3c194d911d0d6e"
+    }
+  },
+  "protocol_sha256": "1a07c5ff573a9adcfb5c115f73158a68a7ec3a289628b956b8f9d4e3dedcf180",
+  "selection_sha256": "1260336cc2bd3528e052fe181121177e9138c920b96c0c6256a6e249bf9a9c33",
+  "metrics_sha256": "3bf5723587d732e4af9a696c38611ebc0fef7884995ea8720b0293a6cfa6544c",
+  "local_artifact_directory": "runs/circus-pr-pilot",
+  "ordinary_transfer": [
+    {
+      "seed": 11,
+      "mixed_minus_ordinary_mse": 0.0,
+      "paired_episode_differences": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "seed": 23,
+      "mixed_minus_ordinary_mse": 0.0,
+      "paired_episode_differences": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "seed": 41,
+      "mixed_minus_ordinary_mse": 0.0,
+      "paired_episode_differences": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "interpretation": "Ordinary and mixed arms selected initialization for all seeds. Zero transfer difference is identical persistence output, not learned robustness or evidence that the curriculum cannot help. Hypergeometry arms selected one update. The learnability/optimization gate remains unmet.",
+  "results": {
+    "ordinary-seed-11": {
+      "selected_step": 0,
+      "checkpoint": {
+        "file": "ordinary-seed-11.npz",
+        "sha256": "ba02132d69a101c6003adfaaae0336447a990becf2deacdffce773140fec79a0"
+      },
+      "cases": {
+        "iid": {
+          "rgb_mse": 0.019473394379019737,
+          "episode_mse": [
+            0.016874710097908974,
+            0.015332107432186604,
+            0.022594064474105835,
+            0.021444305777549744,
+            0.019227348268032074,
+            0.021367831155657768
+          ],
+          "predictions": {
+            "file": "ordinary-seed-11-iid.npz",
+            "sha256": "32b75ee1e361befc5c83d80dc9444982bf5b5ac88e49e637d2a00806e491a4de"
+          }
+        },
+        "rotation": {
+          "rgb_mse": 0.01994355022907257,
+          "episode_mse": [
+            0.02130100503563881,
+            0.013845065608620644,
+            0.01900693029165268,
+            0.021937690675258636,
+            0.01722082681953907,
+            0.026349790394306183
+          ],
+          "predictions": {
+            "file": "ordinary-seed-11-rotation.npz",
+            "sha256": "536f77a17657b0ad98deaa22eedad43871c2dc2704509aa6f19161b02ea3b219"
+          }
+        },
+        "object": {
+          "rgb_mse": 0.013973254710435867,
+          "episode_mse": [
+            0.022417671978473663,
+            0.004851995501667261,
+            0.006836909335106611,
+            0.01590680703520775,
+            0.014336069114506245,
+            0.019490081816911697
+          ],
+          "predictions": {
+            "file": "ordinary-seed-11-object.npz",
+            "sha256": "6a8289ac24cad3b9306b58d922719fb402c5314cf2eef31b0f4d3d80741fb713"
+          }
+        },
+        "viewpoint": {
+          "rgb_mse": 0.011937982402741909,
+          "episode_mse": [
+            0.014858398586511612,
+            0.006706510204821825,
+            0.012976096011698246,
+            0.01462160237133503,
+            0.010721743106842041,
+            0.011743546463549137
+          ],
+          "predictions": {
+            "file": "ordinary-seed-11-viewpoint.npz",
+            "sha256": "ad974963f4547091de44ce51c0a26c8382e168a73e39d0b53eeabf3955d05dbe"
+          }
+        },
+        "combined": {
+          "rgb_mse": 0.00830572284758091,
+          "episode_mse": [
+            0.008240452967584133,
+            0.006289544515311718,
+            0.005972060840576887,
+            0.011424637399613857,
+            0.009681224822998047,
+            0.00822641421109438
+          ],
+          "predictions": {
+            "file": "ordinary-seed-11-combined.npz",
+            "sha256": "9019be802e39d663d67d31401c20dd760340c40709cd46ac9957eea8f659d9b3"
+          }
+        },
+        "ordinary": {
+          "rgb_mse": 0.00606502266600728,
+          "episode_mse": [
+            0.005352871958166361,
+            0.006667612120509148,
+            0.006010242272168398,
+            0.006432836875319481,
+            0.0067145670764148235,
+            0.005212007090449333
+          ],
+          "predictions": {
+            "file": "ordinary-seed-11-ordinary.npz",
+            "sha256": "a4a8f46fcbb0637be37cf8bb13a8db6dba7352797890068466b0dbaf13b43a27"
+          }
+        }
+      },
+      "phase_probe_iid_mse": {
+        "trained_latent": 1.517319806681653,
+        "random_latent": 1.517319806681653,
+        "last_image": 1.042282983660246,
+        "image_history": 0.915755629990858
+      }
+    },
+    "hypergeometry-seed-11": {
+      "selected_step": 1,
+      "checkpoint": {
+        "file": "hypergeometry-seed-11.npz",
+        "sha256": "3d1b2220846fea476ec5846a86fc4613ba84bcab1bf2928c65fe5f25a8fdf01a"
+      },
+      "cases": {
+        "iid": {
+          "rgb_mse": 0.01946866512298584,
+          "episode_mse": [
+            0.01695575937628746,
+            0.01535515021532774,
+            0.022589031606912613,
+            0.02134542353451252,
+            0.01911121979355812,
+            0.021455414593219757
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-11-iid.npz",
+            "sha256": "7060af687daf87e599407d2b5475a9edc134604e78a069f0e63b80c72f500b39"
+          }
+        },
+        "rotation": {
+          "rgb_mse": 0.019961345940828323,
+          "episode_mse": [
+            0.02131507359445095,
+            0.01389235258102417,
+            0.01899838075041771,
+            0.021967126056551933,
+            0.017208926379680634,
+            0.02638622373342514
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-11-rotation.npz",
+            "sha256": "e92b6a59e18657b8bd9073620996d782e6a46710a1b0ebcfdaad1369f83968f9"
+          }
+        },
+        "object": {
+          "rgb_mse": 0.013999893330037594,
+          "episode_mse": [
+            0.022314108908176422,
+            0.004864615388214588,
+            0.006860532332211733,
+            0.01604747399687767,
+            0.014438127167522907,
+            0.01947450451552868
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-11-object.npz",
+            "sha256": "c8900705f6645579439db0f21e32b3f6924c7903c68208d9b91dedf2ddb053a3"
+          }
+        },
+        "viewpoint": {
+          "rgb_mse": 0.011952470988035202,
+          "episode_mse": [
+            0.014855191111564636,
+            0.006726437248289585,
+            0.012958291918039322,
+            0.014649063348770142,
+            0.010714449919760227,
+            0.011811393313109875
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-11-viewpoint.npz",
+            "sha256": "8342e4bb797a45a4e874350b51a974d4b47ba20cf4ac8b2e77eb9237965127ab"
+          }
+        },
+        "combined": {
+          "rgb_mse": 0.008327044546604156,
+          "episode_mse": [
+            0.0082981176674366,
+            0.006337576545774937,
+            0.005960459355264902,
+            0.011410912498831749,
+            0.009713979437947273,
+            0.008241222240030766
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-11-combined.npz",
+            "sha256": "0d6a4a68962d617ccf380fdc7f3168be734d7afc6c1f092274f9269245a79263"
+          }
+        },
+        "ordinary": {
+          "rgb_mse": 0.006067782174795866,
+          "episode_mse": [
+            0.005369521211832762,
+            0.006655593402683735,
+            0.006026877090334892,
+            0.006450772285461426,
+            0.006698375567793846,
+            0.005205551628023386
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-11-ordinary.npz",
+            "sha256": "fdb5085f93c19534fd7e4e2d3476e6a2988be9a4809c21dc0fa0f46212bffd47"
+          }
+        }
+      },
+      "phase_probe_iid_mse": {
+        "trained_latent": 1.517319355261884,
+        "random_latent": 1.517319806681653,
+        "last_image": 1.042282983660246,
+        "image_history": 0.915755629990858
+      }
+    },
+    "mixed-seed-11": {
+      "selected_step": 0,
+      "checkpoint": {
+        "file": "mixed-seed-11.npz",
+        "sha256": "ba02132d69a101c6003adfaaae0336447a990becf2deacdffce773140fec79a0"
+      },
+      "cases": {
+        "iid": {
+          "rgb_mse": 0.019473394379019737,
+          "episode_mse": [
+            0.016874710097908974,
+            0.015332107432186604,
+            0.022594064474105835,
+            0.021444305777549744,
+            0.019227348268032074,
+            0.021367831155657768
+          ],
+          "predictions": {
+            "file": "mixed-seed-11-iid.npz",
+            "sha256": "32b75ee1e361befc5c83d80dc9444982bf5b5ac88e49e637d2a00806e491a4de"
+          }
+        },
+        "rotation": {
+          "rgb_mse": 0.01994355022907257,
+          "episode_mse": [
+            0.02130100503563881,
+            0.013845065608620644,
+            0.01900693029165268,
+            0.021937690675258636,
+            0.01722082681953907,
+            0.026349790394306183
+          ],
+          "predictions": {
+            "file": "mixed-seed-11-rotation.npz",
+            "sha256": "536f77a17657b0ad98deaa22eedad43871c2dc2704509aa6f19161b02ea3b219"
+          }
+        },
+        "object": {
+          "rgb_mse": 0.013973254710435867,
+          "episode_mse": [
+            0.022417671978473663,
+            0.004851995501667261,
+            0.006836909335106611,
+            0.01590680703520775,
+            0.014336069114506245,
+            0.019490081816911697
+          ],
+          "predictions": {
+            "file": "mixed-seed-11-object.npz",
+            "sha256": "6a8289ac24cad3b9306b58d922719fb402c5314cf2eef31b0f4d3d80741fb713"
+          }
+        },
+        "viewpoint": {
+          "rgb_mse": 0.011937982402741909,
+          "episode_mse": [
+            0.014858398586511612,
+            0.006706510204821825,
+            0.012976096011698246,
+            0.01462160237133503,
+            0.010721743106842041,
+            0.011743546463549137
+          ],
+          "predictions": {
+            "file": "mixed-seed-11-viewpoint.npz",
+            "sha256": "ad974963f4547091de44ce51c0a26c8382e168a73e39d0b53eeabf3955d05dbe"
+          }
+        },
+        "combined": {
+          "rgb_mse": 0.00830572284758091,
+          "episode_mse": [
+            0.008240452967584133,
+            0.006289544515311718,
+            0.005972060840576887,
+            0.011424637399613857,
+            0.009681224822998047,
+            0.00822641421109438
+          ],
+          "predictions": {
+            "file": "mixed-seed-11-combined.npz",
+            "sha256": "9019be802e39d663d67d31401c20dd760340c40709cd46ac9957eea8f659d9b3"
+          }
+        },
+        "ordinary": {
+          "rgb_mse": 0.00606502266600728,
+          "episode_mse": [
+            0.005352871958166361,
+            0.006667612120509148,
+            0.006010242272168398,
+            0.006432836875319481,
+            0.0067145670764148235,
+            0.005212007090449333
+          ],
+          "predictions": {
+            "file": "mixed-seed-11-ordinary.npz",
+            "sha256": "a4a8f46fcbb0637be37cf8bb13a8db6dba7352797890068466b0dbaf13b43a27"
+          }
+        }
+      },
+      "phase_probe_iid_mse": {
+        "trained_latent": 1.517319806681653,
+        "random_latent": 1.517319806681653,
+        "last_image": 1.042282983660246,
+        "image_history": 0.915755629990858
+      }
+    },
+    "ordinary-seed-23": {
+      "selected_step": 0,
+      "checkpoint": {
+        "file": "ordinary-seed-23.npz",
+        "sha256": "80bdcd149b09297922fbe1ab3db010f1c2e872709b6b9727817670da5ab9d032"
+      },
+      "cases": {
+        "iid": {
+          "rgb_mse": 0.019473394379019737,
+          "episode_mse": [
+            0.016874710097908974,
+            0.015332107432186604,
+            0.022594064474105835,
+            0.021444305777549744,
+            0.019227348268032074,
+            0.021367831155657768
+          ],
+          "predictions": {
+            "file": "ordinary-seed-23-iid.npz",
+            "sha256": "32b75ee1e361befc5c83d80dc9444982bf5b5ac88e49e637d2a00806e491a4de"
+          }
+        },
+        "rotation": {
+          "rgb_mse": 0.01994355022907257,
+          "episode_mse": [
+            0.02130100503563881,
+            0.013845065608620644,
+            0.01900693029165268,
+            0.021937690675258636,
+            0.01722082681953907,
+            0.026349790394306183
+          ],
+          "predictions": {
+            "file": "ordinary-seed-23-rotation.npz",
+            "sha256": "536f77a17657b0ad98deaa22eedad43871c2dc2704509aa6f19161b02ea3b219"
+          }
+        },
+        "object": {
+          "rgb_mse": 0.013973254710435867,
+          "episode_mse": [
+            0.022417671978473663,
+            0.004851995501667261,
+            0.006836909335106611,
+            0.01590680703520775,
+            0.014336069114506245,
+            0.019490081816911697
+          ],
+          "predictions": {
+            "file": "ordinary-seed-23-object.npz",
+            "sha256": "6a8289ac24cad3b9306b58d922719fb402c5314cf2eef31b0f4d3d80741fb713"
+          }
+        },
+        "viewpoint": {
+          "rgb_mse": 0.011937982402741909,
+          "episode_mse": [
+            0.014858398586511612,
+            0.006706510204821825,
+            0.012976096011698246,
+            0.01462160237133503,
+            0.010721743106842041,
+            0.011743546463549137
+          ],
+          "predictions": {
+            "file": "ordinary-seed-23-viewpoint.npz",
+            "sha256": "ad974963f4547091de44ce51c0a26c8382e168a73e39d0b53eeabf3955d05dbe"
+          }
+        },
+        "combined": {
+          "rgb_mse": 0.00830572284758091,
+          "episode_mse": [
+            0.008240452967584133,
+            0.006289544515311718,
+            0.005972060840576887,
+            0.011424637399613857,
+            0.009681224822998047,
+            0.00822641421109438
+          ],
+          "predictions": {
+            "file": "ordinary-seed-23-combined.npz",
+            "sha256": "9019be802e39d663d67d31401c20dd760340c40709cd46ac9957eea8f659d9b3"
+          }
+        },
+        "ordinary": {
+          "rgb_mse": 0.00606502266600728,
+          "episode_mse": [
+            0.005352871958166361,
+            0.006667612120509148,
+            0.006010242272168398,
+            0.006432836875319481,
+            0.0067145670764148235,
+            0.005212007090449333
+          ],
+          "predictions": {
+            "file": "ordinary-seed-23-ordinary.npz",
+            "sha256": "a4a8f46fcbb0637be37cf8bb13a8db6dba7352797890068466b0dbaf13b43a27"
+          }
+        }
+      },
+      "phase_probe_iid_mse": {
+        "trained_latent": 0.7222387715607721,
+        "random_latent": 0.7222387715607721,
+        "last_image": 1.042282983660246,
+        "image_history": 0.915755629990858
+      }
+    },
+    "hypergeometry-seed-23": {
+      "selected_step": 1,
+      "checkpoint": {
+        "file": "hypergeometry-seed-23.npz",
+        "sha256": "9a7cb6120dc715f6e5c9c6dbf3d1aded98fe05cec1e1d233f3ace1047ebae086"
+      },
+      "cases": {
+        "iid": {
+          "rgb_mse": 0.019470106810331345,
+          "episode_mse": [
+            0.016933415085077286,
+            0.015349270775914192,
+            0.02258717641234398,
+            0.021369213238358498,
+            0.01914992928504944,
+            0.021431630477309227
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-23-iid.npz",
+            "sha256": "53cc3947e1945c8ab49c4ae58917b1dc8da90b190e65c0e86cd730db34305614"
+          }
+        },
+        "rotation": {
+          "rgb_mse": 0.019955679774284363,
+          "episode_mse": [
+            0.02130865678191185,
+            0.013881168328225613,
+            0.018999721854925156,
+            0.021957723423838615,
+            0.01720917969942093,
+            0.026377610862255096
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-23-rotation.npz",
+            "sha256": "59e57ae92bf97d4ff7160716dc24d710a5ae5fb0b385d28b62e23cbae6188ca7"
+          }
+        },
+        "object": {
+          "rgb_mse": 0.01399153657257557,
+          "episode_mse": [
+            0.02234473265707493,
+            0.004858327563852072,
+            0.006850691046565771,
+            0.016009695827960968,
+            0.014410214498639107,
+            0.019475562497973442
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-23-object.npz",
+            "sha256": "c45880719fe19cd800dacee00a4a1290c601a6269604927015f3e7ad63643832"
+          }
+        },
+        "viewpoint": {
+          "rgb_mse": 0.011945139616727829,
+          "episode_mse": [
+            0.014853239059448242,
+            0.006718452554196119,
+            0.01295993197709322,
+            0.014639089815318584,
+            0.01071236189454794,
+            0.011787757277488708
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-23-viewpoint.npz",
+            "sha256": "9b6cc5660d53a89e5427199d1febc66b7e41429ef5e729d14e8daf995dbbb11f"
+          }
+        },
+        "combined": {
+          "rgb_mse": 0.008319287560880184,
+          "episode_mse": [
+            0.008282158523797989,
+            0.006322433240711689,
+            0.005960975307971239,
+            0.011410589329898357,
+            0.009703532792627811,
+            0.008236031979322433
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-23-combined.npz",
+            "sha256": "cded8bc513128eae7b32ead616cbd12f2ed3ebda44721edad71484bd6fb6970d"
+          }
+        },
+        "ordinary": {
+          "rgb_mse": 0.006066767033189535,
+          "episode_mse": [
+            0.0053655896335840225,
+            0.0066572134383022785,
+            0.006023417226970196,
+            0.006446493789553642,
+            0.006700899451971054,
+            0.005206989590078592
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-23-ordinary.npz",
+            "sha256": "10b3604e5e7deb3cb5f928472cb64bf7a30c3211c91b1bf450b3421647934b62"
+          }
+        }
+      },
+      "phase_probe_iid_mse": {
+        "trained_latent": 0.7222401405263824,
+        "random_latent": 0.7222387715607721,
+        "last_image": 1.042282983660246,
+        "image_history": 0.915755629990858
+      }
+    },
+    "mixed-seed-23": {
+      "selected_step": 0,
+      "checkpoint": {
+        "file": "mixed-seed-23.npz",
+        "sha256": "80bdcd149b09297922fbe1ab3db010f1c2e872709b6b9727817670da5ab9d032"
+      },
+      "cases": {
+        "iid": {
+          "rgb_mse": 0.019473394379019737,
+          "episode_mse": [
+            0.016874710097908974,
+            0.015332107432186604,
+            0.022594064474105835,
+            0.021444305777549744,
+            0.019227348268032074,
+            0.021367831155657768
+          ],
+          "predictions": {
+            "file": "mixed-seed-23-iid.npz",
+            "sha256": "32b75ee1e361befc5c83d80dc9444982bf5b5ac88e49e637d2a00806e491a4de"
+          }
+        },
+        "rotation": {
+          "rgb_mse": 0.01994355022907257,
+          "episode_mse": [
+            0.02130100503563881,
+            0.013845065608620644,
+            0.01900693029165268,
+            0.021937690675258636,
+            0.01722082681953907,
+            0.026349790394306183
+          ],
+          "predictions": {
+            "file": "mixed-seed-23-rotation.npz",
+            "sha256": "536f77a17657b0ad98deaa22eedad43871c2dc2704509aa6f19161b02ea3b219"
+          }
+        },
+        "object": {
+          "rgb_mse": 0.013973254710435867,
+          "episode_mse": [
+            0.022417671978473663,
+            0.004851995501667261,
+            0.006836909335106611,
+            0.01590680703520775,
+            0.014336069114506245,
+            0.019490081816911697
+          ],
+          "predictions": {
+            "file": "mixed-seed-23-object.npz",
+            "sha256": "6a8289ac24cad3b9306b58d922719fb402c5314cf2eef31b0f4d3d80741fb713"
+          }
+        },
+        "viewpoint": {
+          "rgb_mse": 0.011937982402741909,
+          "episode_mse": [
+            0.014858398586511612,
+            0.006706510204821825,
+            0.012976096011698246,
+            0.01462160237133503,
+            0.010721743106842041,
+            0.011743546463549137
+          ],
+          "predictions": {
+            "file": "mixed-seed-23-viewpoint.npz",
+            "sha256": "ad974963f4547091de44ce51c0a26c8382e168a73e39d0b53eeabf3955d05dbe"
+          }
+        },
+        "combined": {
+          "rgb_mse": 0.00830572284758091,
+          "episode_mse": [
+            0.008240452967584133,
+            0.006289544515311718,
+            0.005972060840576887,
+            0.011424637399613857,
+            0.009681224822998047,
+            0.00822641421109438
+          ],
+          "predictions": {
+            "file": "mixed-seed-23-combined.npz",
+            "sha256": "9019be802e39d663d67d31401c20dd760340c40709cd46ac9957eea8f659d9b3"
+          }
+        },
+        "ordinary": {
+          "rgb_mse": 0.00606502266600728,
+          "episode_mse": [
+            0.005352871958166361,
+            0.006667612120509148,
+            0.006010242272168398,
+            0.006432836875319481,
+            0.0067145670764148235,
+            0.005212007090449333
+          ],
+          "predictions": {
+            "file": "mixed-seed-23-ordinary.npz",
+            "sha256": "a4a8f46fcbb0637be37cf8bb13a8db6dba7352797890068466b0dbaf13b43a27"
+          }
+        }
+      },
+      "phase_probe_iid_mse": {
+        "trained_latent": 0.7222387715607721,
+        "random_latent": 0.7222387715607721,
+        "last_image": 1.042282983660246,
+        "image_history": 0.915755629990858
+      }
+    },
+    "ordinary-seed-41": {
+      "selected_step": 0,
+      "checkpoint": {
+        "file": "ordinary-seed-41.npz",
+        "sha256": "63ce9b1c9bfc204287fb11d1dd429b66d17c1f37e8601448f453c514b705acbf"
+      },
+      "cases": {
+        "iid": {
+          "rgb_mse": 0.019473394379019737,
+          "episode_mse": [
+            0.016874710097908974,
+            0.015332107432186604,
+            0.022594064474105835,
+            0.021444305777549744,
+            0.019227348268032074,
+            0.021367831155657768
+          ],
+          "predictions": {
+            "file": "ordinary-seed-41-iid.npz",
+            "sha256": "32b75ee1e361befc5c83d80dc9444982bf5b5ac88e49e637d2a00806e491a4de"
+          }
+        },
+        "rotation": {
+          "rgb_mse": 0.01994355022907257,
+          "episode_mse": [
+            0.02130100503563881,
+            0.013845065608620644,
+            0.01900693029165268,
+            0.021937690675258636,
+            0.01722082681953907,
+            0.026349790394306183
+          ],
+          "predictions": {
+            "file": "ordinary-seed-41-rotation.npz",
+            "sha256": "536f77a17657b0ad98deaa22eedad43871c2dc2704509aa6f19161b02ea3b219"
+          }
+        },
+        "object": {
+          "rgb_mse": 0.013973254710435867,
+          "episode_mse": [
+            0.022417671978473663,
+            0.004851995501667261,
+            0.006836909335106611,
+            0.01590680703520775,
+            0.014336069114506245,
+            0.019490081816911697
+          ],
+          "predictions": {
+            "file": "ordinary-seed-41-object.npz",
+            "sha256": "6a8289ac24cad3b9306b58d922719fb402c5314cf2eef31b0f4d3d80741fb713"
+          }
+        },
+        "viewpoint": {
+          "rgb_mse": 0.011937982402741909,
+          "episode_mse": [
+            0.014858398586511612,
+            0.006706510204821825,
+            0.012976096011698246,
+            0.01462160237133503,
+            0.010721743106842041,
+            0.011743546463549137
+          ],
+          "predictions": {
+            "file": "ordinary-seed-41-viewpoint.npz",
+            "sha256": "ad974963f4547091de44ce51c0a26c8382e168a73e39d0b53eeabf3955d05dbe"
+          }
+        },
+        "combined": {
+          "rgb_mse": 0.00830572284758091,
+          "episode_mse": [
+            0.008240452967584133,
+            0.006289544515311718,
+            0.005972060840576887,
+            0.011424637399613857,
+            0.009681224822998047,
+            0.00822641421109438
+          ],
+          "predictions": {
+            "file": "ordinary-seed-41-combined.npz",
+            "sha256": "9019be802e39d663d67d31401c20dd760340c40709cd46ac9957eea8f659d9b3"
+          }
+        },
+        "ordinary": {
+          "rgb_mse": 0.00606502266600728,
+          "episode_mse": [
+            0.005352871958166361,
+            0.006667612120509148,
+            0.006010242272168398,
+            0.006432836875319481,
+            0.0067145670764148235,
+            0.005212007090449333
+          ],
+          "predictions": {
+            "file": "ordinary-seed-41-ordinary.npz",
+            "sha256": "a4a8f46fcbb0637be37cf8bb13a8db6dba7352797890068466b0dbaf13b43a27"
+          }
+        }
+      },
+      "phase_probe_iid_mse": {
+        "trained_latent": 1.343485252766166,
+        "random_latent": 1.343485252766166,
+        "last_image": 1.042282983660246,
+        "image_history": 0.915755629990858
+      }
+    },
+    "hypergeometry-seed-41": {
+      "selected_step": 1,
+      "checkpoint": {
+        "file": "hypergeometry-seed-41.npz",
+        "sha256": "96c77d90c0318603a98c92214446adc24a8e83491a38663564043d8668947453"
+      },
+      "cases": {
+        "iid": {
+          "rgb_mse": 0.01946675404906273,
+          "episode_mse": [
+            0.016929522156715393,
+            0.015343938022851944,
+            0.022587791085243225,
+            0.02136620320379734,
+            0.019154246896505356,
+            0.02141880989074707
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-41-iid.npz",
+            "sha256": "789147c71abb4bec13f61417933f93400cb7f2fdf57851a4313106c0fb67c3a5"
+          }
+        },
+        "rotation": {
+          "rgb_mse": 0.019952945411205292,
+          "episode_mse": [
+            0.021306652575731277,
+            0.013877063989639282,
+            0.019000086933374405,
+            0.02195526473224163,
+            0.01720917597413063,
+            0.026369433850049973
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-41-rotation.npz",
+            "sha256": "23f910978f04ed0ee7ca44a7c3c883630814b91b4e0e652d7c060bd6427c8545"
+          }
+        },
+        "object": {
+          "rgb_mse": 0.013985847122967243,
+          "episode_mse": [
+            0.022347819060087204,
+            0.004856785759329796,
+            0.006849739234894514,
+            0.015982547774910927,
+            0.014396618120372295,
+            0.01948157139122486
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-41-object.npz",
+            "sha256": "6ac9bb261a1a87580cd048024012116efd4ef7f0eaeb11a511568d8d839b86fe"
+          }
+        },
+        "viewpoint": {
+          "rgb_mse": 0.011943629942834377,
+          "episode_mse": [
+            0.014853383414447308,
+            0.006716805975884199,
+            0.012961285188794136,
+            0.014634475111961365,
+            0.010713686235249043,
+            0.011782146990299225
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-41-viewpoint.npz",
+            "sha256": "43b965981b0afacc1fe00e00ca8605be9725e403dd909e5d4b47fd137a2408eb"
+          }
+        },
+        "combined": {
+          "rgb_mse": 0.008317253552377224,
+          "episode_mse": [
+            0.008273436687886715,
+            0.0063188523054122925,
+            0.005963768344372511,
+            0.01141390297561884,
+            0.009699525311589241,
+            0.008234032429754734
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-41-combined.npz",
+            "sha256": "a5bc74ea90be1f3995485041256b041e208f4a0ab411baa30b48cb9105752ea9"
+          }
+        },
+        "ordinary": {
+          "rgb_mse": 0.006066563073545694,
+          "episode_mse": [
+            0.005366541910916567,
+            0.006654875818639994,
+            0.00602562865242362,
+            0.006446578539907932,
+            0.006699251011013985,
+            0.005206501577049494
+          ],
+          "predictions": {
+            "file": "hypergeometry-seed-41-ordinary.npz",
+            "sha256": "839e50723b8b153d6cb46252b2201c477212a0b72a6a6c98a452dc3b2170e348"
+          }
+        }
+      },
+      "phase_probe_iid_mse": {
+        "trained_latent": 1.3434855808086494,
+        "random_latent": 1.343485252766166,
+        "last_image": 1.042282983660246,
+        "image_history": 0.915755629990858
+      }
+    },
+    "mixed-seed-41": {
+      "selected_step": 0,
+      "checkpoint": {
+        "file": "mixed-seed-41.npz",
+        "sha256": "63ce9b1c9bfc204287fb11d1dd429b66d17c1f37e8601448f453c514b705acbf"
+      },
+      "cases": {
+        "iid": {
+          "rgb_mse": 0.019473394379019737,
+          "episode_mse": [
+            0.016874710097908974,
+            0.015332107432186604,
+            0.022594064474105835,
+            0.021444305777549744,
+            0.019227348268032074,
+            0.021367831155657768
+          ],
+          "predictions": {
+            "file": "mixed-seed-41-iid.npz",
+            "sha256": "32b75ee1e361befc5c83d80dc9444982bf5b5ac88e49e637d2a00806e491a4de"
+          }
+        },
+        "rotation": {
+          "rgb_mse": 0.01994355022907257,
+          "episode_mse": [
+            0.02130100503563881,
+            0.013845065608620644,
+            0.01900693029165268,
+            0.021937690675258636,
+            0.01722082681953907,
+            0.026349790394306183
+          ],
+          "predictions": {
+            "file": "mixed-seed-41-rotation.npz",
+            "sha256": "536f77a17657b0ad98deaa22eedad43871c2dc2704509aa6f19161b02ea3b219"
+          }
+        },
+        "object": {
+          "rgb_mse": 0.013973254710435867,
+          "episode_mse": [
+            0.022417671978473663,
+            0.004851995501667261,
+            0.006836909335106611,
+            0.01590680703520775,
+            0.014336069114506245,
+            0.019490081816911697
+          ],
+          "predictions": {
+            "file": "mixed-seed-41-object.npz",
+            "sha256": "6a8289ac24cad3b9306b58d922719fb402c5314cf2eef31b0f4d3d80741fb713"
+          }
+        },
+        "viewpoint": {
+          "rgb_mse": 0.011937982402741909,
+          "episode_mse": [
+            0.014858398586511612,
+            0.006706510204821825,
+            0.012976096011698246,
+            0.01462160237133503,
+            0.010721743106842041,
+            0.011743546463549137
+          ],
+          "predictions": {
+            "file": "mixed-seed-41-viewpoint.npz",
+            "sha256": "ad974963f4547091de44ce51c0a26c8382e168a73e39d0b53eeabf3955d05dbe"
+          }
+        },
+        "combined": {
+          "rgb_mse": 0.00830572284758091,
+          "episode_mse": [
+            0.008240452967584133,
+            0.006289544515311718,
+            0.005972060840576887,
+            0.011424637399613857,
+            0.009681224822998047,
+            0.00822641421109438
+          ],
+          "predictions": {
+            "file": "mixed-seed-41-combined.npz",
+            "sha256": "9019be802e39d663d67d31401c20dd760340c40709cd46ac9957eea8f659d9b3"
+          }
+        },
+        "ordinary": {
+          "rgb_mse": 0.00606502266600728,
+          "episode_mse": [
+            0.005352871958166361,
+            0.006667612120509148,
+            0.006010242272168398,
+            0.006432836875319481,
+            0.0067145670764148235,
+            0.005212007090449333
+          ],
+          "predictions": {
+            "file": "mixed-seed-41-ordinary.npz",
+            "sha256": "a4a8f46fcbb0637be37cf8bb13a8db6dba7352797890068466b0dbaf13b43a27"
+          }
+        }
+      },
+      "phase_probe_iid_mse": {
+        "trained_latent": 1.343485252766166,
+        "random_latent": 1.343485252766166,
+        "last_image": 1.042282983660246,
+        "image_history": 0.915755629990858
+      }
+    }
+  },
+  "limits": [
+    "Latent dimension is representational, not inferred physical dimension.",
+    "Phase probes are coordinate-dependent diagnostics, not identification of 4D structure.",
+    "Deterministic model: no learned posterior, calibrated uncertainty or multiple futures.",
+    "History-ridge references use a closed-form fit on the same clip pools; their compute and capacity are not matched to SGD.",
+    "Timing is warmed-up CPU context-to-horizon for one IID clip, excluding capture; latent_state_bytes excludes RGB buffers and all other memory.",
+    "Worlds B/C/D, action conditioning and cross-modal transfer are not implemented here.",
+    "Small seed/episode counts and update budgets cannot establish generalization superiority."
+  ],
+  "example_gallery": {
+    "source": "hypergeometry-seed-11-rotation-lead-6.png",
+    "file": "circus_hypergeometry_pilot.png",
+    "sha256": "740307a0f01c46db780fb50a9e2e1f17e746637c2bc3073c1d969f730ad55221",
+    "seed": 11,
+    "case": "rotation",
+    "anchor_frame": 7,
+    "target_frame": 13,
+    "selected_step": 1
+  }
+}

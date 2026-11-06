@@ -68,6 +68,13 @@ The [Gaussian-state roadmap](RESEARCH_TIMELINE.md) has **implemented** rendering
 
 ## Where to read next
 
+**[Circus Curriculum](CIRCUS_CURRICULUM.md)** adds an independent first experiment:
+`python -m experiments.circus_curriculum` trains an RGB latent predictor on
+ordinary scenes, rotating 4D projections, or a matched mixture. It separates
+rotation/object/view holdouts, ordinary-scene transfer, and frozen latent probes.
+The initial pilot has not demonstrated learned transfer or a recovered 4D
+representation; the other proposed Circus worlds remain future work.
+
 - [Training and demos](GETTING_STARTED.md) — minimal CPU run, visualization,
   full comparison, and optional live webcam.
 - [Original charter](PLAN.md) — historical research hypotheses and design
