@@ -1,0 +1,731 @@
+{
+  "status": "local synthetic pilot; summary only, full artifacts remain in gitignored runs/",
+  "source_commit_verified_against_executed_file_hashes": "58fbf4e9b6496459be16d15f62ad6bb3803629e5",
+  "command": ".venv/bin/python -m experiments.compact_mirror_comparison --steps 30 --seeds 11 23 41 --batch-scenes 1 --validation-scenes 4 --test-scenes 6 --width 8 --ticks 2 --repeats 9 --gallery --out runs/compact-mirror-pr-pilot",
+  "local_artifact_directory": "runs/compact-mirror-pr-pilot",
+  "protocol_sha256": "7fa6d75a5d516dc3d0f4f3a5e015f4d0d00feee3b7c818536497089529775875",
+  "selection_sha256": "516fbba3458713973a8d244ce9ad560bbfdcd29a90d4b02246f50f4373d40daa",
+  "metrics_sha256": "64d769cd98b8b17beff581b9d982fa3c3130ea2f6bdf367e483e13244b02a233",
+  "protocol": {
+    "protocol": "compact-mirror-pilot-v1",
+    "source_revision": "04106c74235d6dc51cdb7bb4c8f3f54ead981994",
+    "source_sha256": {
+      "experiments/compact_mirror_comparison.py": "35aa894e9746ea9501c4955ec3abc7499b5917b30ab7a4e2755602df58339c44",
+      "src/compact_predictive_mirror.py": "2a8df8ef151ad2213f02950a7d9fdfe08c8ea43e50da3ff367f716a4e01e23d7",
+      "src/predictive_rgb_nca.py": "645758408964a72984dfd1d601a7b011b377caad827c5ee08493bf1410c2a5a3",
+      "src/rgb_motion_transport.py": "0205859140bd9fc5949b192dcdf20ab1c89e2effabb9decf9d430beb8256a04b",
+      "src/convlstm_reference.py": "a7fe9a75323220bf2ed38185383be459548193060ec56d0c3af7658f77965060",
+      "src/rgb_motion_world.py": "67e6c2c6395cb8c0c1a49297e3a9e37c59ede8faf47e6c9dba3178700d25f839",
+      "src/paired_occlusion_histories.py": "ffd32c51c41831b9f81dff17df3a4d0da0ec83d7e707c14f75f3b7fe0f8291fa",
+      "src/baselines.py": "fc802f3bd8d9cd1a6ff074090ce75558c192d6da1fc5ae4e58d2b310c38bbdf0",
+      "src/history_baselines.py": "ea06ce8aa75db12b018bedcb0500a1bcc9accea266351e9cf6b6fa7c7a9ccb82",
+      "src/experiment_harness.py": "fb1d04a7050d87899c3ca506d03923c7004472fd6afe552b464bc4b9a9c3d8cf",
+      "src/rgb_benchmark.py": "2351379f6cad96316ed88742f6f3e71d3706ade4f71c40be2e972f782fc90030",
+      "src/model.py": "e35bf5e68db29f79f80d83dd71a755c67bff8ad6865b26c5553f6cbbe194ebf6",
+      "train.py": "ee64e513cec093d46e68fa6172099c1088c959601686f07dbbcbcc9c8a80d141",
+      "src/reappearance_scoring.py": "bffda6ddd88a0b6382d63d9ff3b0d876a8fbcf91145ca895c02df53c6d79dfc5",
+      "src/rgb_event_metrics.py": "1f6133d6a94bbfeac80e44a8043fef3f1c1112dc11d52d204aa60aebb446c667",
+      "src/accuracy_cost_frontier.py": "8e663e844fff8daf44bc9b60802d034dc8fc2dffa46cc853b0f7a590c8a8988e",
+      "experiments/paired_frozen_comparison.py": "16adc68a8dc80911e8b2d6820b2e47e03c3c6c2c1ec3da958266b01960a1f07b",
+      "experiments/accuracy_cost_audit.py": "9147dedd04e23e044f394094739f129e03e1782c440f51244440f76cb6bd8d43",
+      "experiments/verified_replay_gallery.py": "d6feeef92aa208c091a7c738c78bd0bf24089dceee4327c86c6206a466dde6ef"
+    },
+    "split_scene_ids": {
+      "train": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "validation": [
+        1000000,
+        1000001,
+        1000002,
+        1000003
+      ],
+      "test": [
+        2000000,
+        2000001,
+        2000002,
+        2000003,
+        2000004,
+        2000005
+      ]
+    },
+    "test_bounce_generator_seeds": [
+      256000001,
+      256000129,
+      256000256,
+      256000384,
+      256000512,
+      256000640
+    ],
+    "test_data": {
+      "file": "test-scenes.npz",
+      "sha256": "05f714c9ef49720de7c7791d3739f3ce1455192bbd031be66172616b4b31f0e6"
+    },
+    "validation_data": {
+      "file": "validation-scenes.npz",
+      "sha256": "bf0dda4e8d3b75e0cb90db81f26fe8ee7e8b3ba20163c46f7051364f52c350e8"
+    },
+    "model_seeds": [
+      11,
+      23,
+      41
+    ],
+    "models": [
+      "compact",
+      "full_resolution",
+      "nca",
+      "convlstm",
+      "transport"
+    ],
+    "steps": 30,
+    "batch_scenes": 1,
+    "clips_per_scene": 3,
+    "context": 8,
+    "horizon_frames": 10,
+    "size": 32,
+    "width": 8,
+    "ticks": 2,
+    "repeats": 9,
+    "selection": "lowest validation RGB MSE, including step zero; earliest tie",
+    "training_objective": "mean((1+8*mean_channel(abs(future-last)))*squared_error)",
+    "optimizer": "shared clipped AdamW, rate 0.002, same updates and RGB batches",
+    "selection_weighting": "one bounce and two occlusion clips per scene, equal clip weight",
+    "input": "past RGB only; simulator metadata used only for construction/scoring",
+    "budget": "matched updates/data/width; not matched parameters, FLOPs or training time",
+    "scene_family": "wall bounces plus the existing discrete paired-history motion templates; per-scene RGB gain/bias varies appearance, not held-out physical rules",
+    "controls": "history_linear assumes one saturated blob and static background; constant_velocity estimates global image translation from two frames",
+    "device": "TFRT_CPU_0",
+    "platform": "Linux-7.2.15-100.fc43.x86_64-x86_64-with-glibc2.42",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "python_version": "3.14.8",
+    "jax_version": "0.9.0.1",
+    "numpy_version": "2.3.5"
+  },
+  "results": {
+    "persistence": {
+      "rgb_mse": 0.003163976827636361,
+      "scene_mse": [
+        0.0028924187645316124,
+        0.002937605604529381,
+        0.0030709870625287294,
+        0.003126457566395402,
+        0.0034915090072900057,
+        0.003464882494881749
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 0.02742950073297834,
+      "p90_latency_ms": 0.03425670074648224,
+      "parameter_bytes": 0,
+      "state_payload_bytes": null,
+      "predictions": {
+        "file": "persistence-predictions.npz",
+        "sha256": "b24b275c5671fa2e14bbfbb021ac6e8424cd7994af808ad03ebb2aa064dfb29d"
+      },
+      "selected_step": null,
+      "checkpoint": null
+    },
+    "constant_velocity": {
+      "rgb_mse": 0.0026058079674839973,
+      "scene_mse": [
+        0.002553968457505107,
+        0.002402924234047532,
+        0.0025981415528804064,
+        0.0024238508194684982,
+        0.002993630478158593,
+        0.002662332495674491
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 2.918742499787186,
+      "p90_latency_ms": 4.475370999170991,
+      "parameter_bytes": 0,
+      "state_payload_bytes": null,
+      "predictions": {
+        "file": "constant_velocity-predictions.npz",
+        "sha256": "a0baef922bebca1232adfd1c9389776aab733717e3dde7be3f1f8baa8a672a67"
+      },
+      "selected_step": null,
+      "checkpoint": null
+    },
+    "history_linear": {
+      "rgb_mse": 0.0017799495253711939,
+      "scene_mse": [
+        0.0014117759419605136,
+        0.0012945380294695497,
+        0.0026195894461125135,
+        0.0021241961512714624,
+        0.0014176050899550319,
+        0.001811992027796805
+      ],
+      "reappearance_success_rate": 1.0,
+      "scene_pair_success": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "latency_ms": 1.932762999786064,
+      "p90_latency_ms": 2.3190850006358232,
+      "parameter_bytes": 0,
+      "state_payload_bytes": null,
+      "predictions": {
+        "file": "history_linear-predictions.npz",
+        "sha256": "6d3d726906e9d573fa006c533fd71e85c01ab81a9bb28e491bfd17f1f3dd2edd"
+      },
+      "selected_step": null,
+      "checkpoint": null
+    },
+    "compact-seed-11": {
+      "rgb_mse": 0.0026778921019285917,
+      "scene_mse": [
+        0.0024393287021666765,
+        0.0026359085459262133,
+        0.002624858869239688,
+        0.0025766079779714346,
+        0.002879057778045535,
+        0.002911589341238141
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 5.560669999795209,
+      "p90_latency_ms": 6.677796299481997,
+      "parameter_bytes": 9584,
+      "state_payload_bytes": 20480,
+      "predictions": {
+        "file": "compact-seed-11-predictions.npz",
+        "sha256": "f5ab1e57470302e6231eab0a94ed40c2c74aa0363f3d18b97d27106b8c8ae7bc"
+      },
+      "selected_step": 21,
+      "checkpoint": {
+        "file": "compact-seed-11-weights.npz",
+        "sha256": "5b4c9b07a755c0a5e39b608c0f21f34d45e5118e0a9747b90ce4fd3cbcf1f422"
+      }
+    },
+    "compact-seed-23": {
+      "rgb_mse": 0.0026700219605118036,
+      "scene_mse": [
+        0.0024318003561347723,
+        0.002598606748506427,
+        0.0026048028375953436,
+        0.002598196268081665,
+        0.002870650961995125,
+        0.0029160743579268456
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 5.368296000597184,
+      "p90_latency_ms": 6.4407529005620745,
+      "parameter_bytes": 9584,
+      "state_payload_bytes": 20480,
+      "predictions": {
+        "file": "compact-seed-23-predictions.npz",
+        "sha256": "e4563d6d025ee44ef9b8cffbc1b5b17a6cb74c30507cb59220c8172870e0288b"
+      },
+      "selected_step": 21,
+      "checkpoint": {
+        "file": "compact-seed-23-weights.npz",
+        "sha256": "d602c434e3d8e3ee24490c750dab4f2607a74c6dee1b8c30b217abe62e9766cc"
+      }
+    },
+    "compact-seed-41": {
+      "rgb_mse": 0.0026831042487174273,
+      "scene_mse": [
+        0.002445921301841736,
+        0.0026082706172019243,
+        0.002618371741846204,
+        0.0026092641055583954,
+        0.0028879151213914156,
+        0.002928883535787463
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 5.115205000038259,
+      "p90_latency_ms": 5.882220999228593,
+      "parameter_bytes": 9584,
+      "state_payload_bytes": 20480,
+      "predictions": {
+        "file": "compact-seed-41-predictions.npz",
+        "sha256": "9c6e36865eaf81317dffcafae2a3059ef87574abbb56d19d0cfadfd331d9cb29"
+      },
+      "selected_step": 14,
+      "checkpoint": {
+        "file": "compact-seed-41-weights.npz",
+        "sha256": "247b5f4429201ded112f55b30cbbd85cc8740d7f435e9d794276b21a1df8f549"
+      }
+    },
+    "full_resolution-seed-11": {
+      "rgb_mse": 0.0026823189109563828,
+      "scene_mse": [
+        0.002443872392177582,
+        0.0025944255758076906,
+        0.0026144657749682665,
+        0.0026118953246623278,
+        0.002899525687098503,
+        0.002929729176685214
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 14.960033499846759,
+      "p90_latency_ms": 16.033704599976772,
+      "parameter_bytes": 9584,
+      "state_payload_bytes": 45056,
+      "predictions": {
+        "file": "full_resolution-seed-11-predictions.npz",
+        "sha256": "ad28bb85b69154816a75d17c7924e3a1ffd7e350df105e3360f0625d74451535"
+      },
+      "selected_step": 14,
+      "checkpoint": {
+        "file": "full_resolution-seed-11-weights.npz",
+        "sha256": "6b7a7b57092043ee041397962b7f36a0fdf6f0398a4bfb289b5529caa96ce5c6"
+      }
+    },
+    "full_resolution-seed-23": {
+      "rgb_mse": 0.002688588574528694,
+      "scene_mse": [
+        0.002449430525302887,
+        0.0025922793429344893,
+        0.0026186692994087934,
+        0.0026209841016680002,
+        0.00291255209594965,
+        0.002937615616247058
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 13.763302000370459,
+      "p90_latency_ms": 14.03872659921035,
+      "parameter_bytes": 9584,
+      "state_payload_bytes": 45056,
+      "predictions": {
+        "file": "full_resolution-seed-23-predictions.npz",
+        "sha256": "4443e52d195594c2f95ca52f9aa0873ff8e8deba1ab6fe13de048a1ea0e4d6c2"
+      },
+      "selected_step": 14,
+      "checkpoint": {
+        "file": "full_resolution-seed-23-weights.npz",
+        "sha256": "12642b176a1c31356a9be75a7046386d75bfa9b26867c274687e9b3dd9b935d7"
+      }
+    },
+    "full_resolution-seed-41": {
+      "rgb_mse": 0.0027260484639555216,
+      "scene_mse": [
+        0.00248814863152802,
+        0.002606445923447609,
+        0.0026516802608966827,
+        0.002663964405655861,
+        0.002969299675896764,
+        0.0029767516534775496
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 15.440173499882803,
+      "p90_latency_ms": 16.55246109912696,
+      "parameter_bytes": 9584,
+      "state_payload_bytes": 45056,
+      "predictions": {
+        "file": "full_resolution-seed-41-predictions.npz",
+        "sha256": "2d8464cdba6c325b09667e3a2c4bcaceea6cf95a1a22d45908763b97e9b7783c"
+      },
+      "selected_step": 1,
+      "checkpoint": {
+        "file": "full_resolution-seed-41-weights.npz",
+        "sha256": "d1ab859cda2fd285ec9f6898011c8887b39a3da1400547d0c071c0bce9a1ba0e"
+      }
+    },
+    "nca-seed-11": {
+      "rgb_mse": 0.002957150572910905,
+      "scene_mse": [
+        0.0026401991490274668,
+        0.0029536804649978876,
+        0.0027944687753915787,
+        0.002918638288974762,
+        0.003183938330039382,
+        0.0032519784290343523
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 11.51507299982768,
+      "p90_latency_ms": 12.67791029986256,
+      "parameter_bytes": 9260,
+      "state_payload_bytes": 45056,
+      "predictions": {
+        "file": "nca-seed-11-predictions.npz",
+        "sha256": "02053f956cc5c9a1a8305729ed7507d8cae729bbf53c58583077b7111827c72b"
+      },
+      "selected_step": 30,
+      "checkpoint": {
+        "file": "nca-seed-11-weights.npz",
+        "sha256": "47ca2a1a288954205931a427b3a454bb7a6dc1e5205bde3f8a502aae6e59e848"
+      }
+    },
+    "nca-seed-23": {
+      "rgb_mse": 0.002930881455540657,
+      "scene_mse": [
+        0.0026317667216062546,
+        0.0029189034830778837,
+        0.0027689735870808363,
+        0.0028762815054506063,
+        0.0031857499852776527,
+        0.0032036136835813522
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 13.203580499066447,
+      "p90_latency_ms": 13.719883300836955,
+      "parameter_bytes": 9260,
+      "state_payload_bytes": 45056,
+      "predictions": {
+        "file": "nca-seed-23-predictions.npz",
+        "sha256": "77c7338bc379d6b11cb84e501c134b5959c6bc1e6b5796a7a792b008bb66448f"
+      },
+      "selected_step": 30,
+      "checkpoint": {
+        "file": "nca-seed-23-weights.npz",
+        "sha256": "969d0e3a0c03388ccadbbabc1daaac0ba70ac6d6ec3562fba2957883c80524bc"
+      }
+    },
+    "nca-seed-41": {
+      "rgb_mse": 0.0029638363048434258,
+      "scene_mse": [
+        0.0026429735589772463,
+        0.003016758942976594,
+        0.0027324205730110407,
+        0.00290659093298018,
+        0.003255449002608657,
+        0.0032288243528455496
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 11.579762500332436,
+      "p90_latency_ms": 11.943919799705327,
+      "parameter_bytes": 9260,
+      "state_payload_bytes": 45056,
+      "predictions": {
+        "file": "nca-seed-41-predictions.npz",
+        "sha256": "58bfc5a7a7889d8a345e465ef248550961f3a09510a14595404ff0f1501ed5f9"
+      },
+      "selected_step": 30,
+      "checkpoint": {
+        "file": "nca-seed-41-weights.npz",
+        "sha256": "ae9a8b94fc2d9522cfe6aba5570540a3641ab2ff58fed0105163b40f6424a80a"
+      }
+    },
+    "convlstm-seed-11": {
+      "rgb_mse": 0.003847049316391349,
+      "scene_mse": [
+        0.003480267710983753,
+        0.003830680623650551,
+        0.003963171038776636,
+        0.003613534616306424,
+        0.004102888982743025,
+        0.004091750830411911
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 4.098902500118129,
+      "p90_latency_ms": 4.4098625006881775,
+      "parameter_bytes": 12908,
+      "state_payload_bytes": 77824,
+      "predictions": {
+        "file": "convlstm-seed-11-predictions.npz",
+        "sha256": "960b61e6a9dfb35961b1ca75e6e67d34a1141c26a1f681cd800c9154a0750983"
+      },
+      "selected_step": 30,
+      "checkpoint": {
+        "file": "convlstm-seed-11-weights.npz",
+        "sha256": "f54e5545aee57e3c458e6c3e0a025a38ad7a4326c85159c286020888436f776e"
+      }
+    },
+    "convlstm-seed-23": {
+      "rgb_mse": 0.0038886426482349634,
+      "scene_mse": [
+        0.0035396793391555548,
+        0.0038612086791545153,
+        0.004002461675554514,
+        0.003694085404276848,
+        0.00410623149946332,
+        0.0041281902231276035
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 3.9391834998241393,
+      "p90_latency_ms": 4.30159630086564,
+      "parameter_bytes": 12908,
+      "state_payload_bytes": 77824,
+      "predictions": {
+        "file": "convlstm-seed-23-predictions.npz",
+        "sha256": "2bd3777d77d2108b6882ea3959f33af5342005716c3371a85019ab5aa8c418ba"
+      },
+      "selected_step": 30,
+      "checkpoint": {
+        "file": "convlstm-seed-23-weights.npz",
+        "sha256": "93588141516d5d1ce178426f9e536cc3149c94847aa94f65458b3fcede349eab"
+      }
+    },
+    "convlstm-seed-41": {
+      "rgb_mse": 0.0039021021220833063,
+      "scene_mse": [
+        0.0035495690535753965,
+        0.003903902368620038,
+        0.003957596141844988,
+        0.0037120545748621225,
+        0.004169654566794634,
+        0.0041198390536010265
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 3.6506275000647292,
+      "p90_latency_ms": 4.071332799139782,
+      "parameter_bytes": 12908,
+      "state_payload_bytes": 77824,
+      "predictions": {
+        "file": "convlstm-seed-41-predictions.npz",
+        "sha256": "3347cfd8245ea8e60eeb76c9b6167391b822817402ba9eadb15edf443f636ca1"
+      },
+      "selected_step": 30,
+      "checkpoint": {
+        "file": "convlstm-seed-41-weights.npz",
+        "sha256": "ceb9100d0c6f0a737f144c892fc64e677338bd58b479428d2bbbb2af24771b60"
+      }
+    },
+    "transport-seed-11": {
+      "rgb_mse": 0.002714076079428196,
+      "scene_mse": [
+        0.0024786510039120913,
+        0.002608342096209526,
+        0.0026418932247906923,
+        0.002646852983161807,
+        0.0029505782295018435,
+        0.0029581368435174227
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 2.6483280007596477,
+      "p90_latency_ms": 2.90783030068269,
+      "parameter_bytes": 2160,
+      "state_payload_bytes": 24576,
+      "predictions": {
+        "file": "transport-seed-11-predictions.npz",
+        "sha256": "a21c721b140e601ac441c421833cfb092e9545cd10a8443617f26b1119e9bf33"
+      },
+      "selected_step": 30,
+      "checkpoint": {
+        "file": "transport-seed-11-weights.npz",
+        "sha256": "071bae335c1e9b32e93bc146da24a2e64d7dac061a0bdc994f9c89e3c246e0d9"
+      }
+    },
+    "transport-seed-23": {
+      "rgb_mse": 0.002677737968042493,
+      "scene_mse": [
+        0.002445813035592437,
+        0.002584664151072502,
+        0.0026052698958665133,
+        0.002608831971883774,
+        0.002910737181082368,
+        0.0029111122712492943
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 2.652898500855372,
+      "p90_latency_ms": 2.8467996997278533,
+      "parameter_bytes": 2160,
+      "state_payload_bytes": 24576,
+      "predictions": {
+        "file": "transport-seed-23-predictions.npz",
+        "sha256": "1a231bf824c9e1dd0ace2a42f30903a976b59e97877690aaaaec103e1d8c4751"
+      },
+      "selected_step": 30,
+      "checkpoint": {
+        "file": "transport-seed-23-weights.npz",
+        "sha256": "d5516f5cf6218510d7cce18d879d51c4e3f8cda913433fd7fac231566c3e8b6d"
+      }
+    },
+    "transport-seed-41": {
+      "rgb_mse": 0.002674613380804658,
+      "scene_mse": [
+        0.002442528260871768,
+        0.002583071356639266,
+        0.002602166263386607,
+        0.0026050927117466927,
+        0.0029053993057459593,
+        0.002909421920776367
+      ],
+      "reappearance_success_rate": 0.0,
+      "scene_pair_success": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "latency_ms": 2.666706999661983,
+      "p90_latency_ms": 2.925863599011791,
+      "parameter_bytes": 2160,
+      "state_payload_bytes": 24576,
+      "predictions": {
+        "file": "transport-seed-41-predictions.npz",
+        "sha256": "f58935d08a88c6a05042e312387cc143cd246a410f74a3790929e16fe15927c3"
+      },
+      "selected_step": 30,
+      "checkpoint": {
+        "file": "transport-seed-41-weights.npz",
+        "sha256": "15d3804fef94032daa7615d0202bcde7961d65479e2fb31e4817818f9d0c3df6"
+      }
+    }
+  },
+  "interpretation": "Compact versus full-resolution hybrid has similar MSE and lower measured latency in this short pilot. No learned arm succeeds on reappearance. The RGB history-linear control succeeds and has lower overall MSE. This is not evidence of learned object permanence or general architecture superiority.",
+  "cost_scope": "CPU batch-one past-RGB context to complete future horizon; host input/output conversion included, compilation warmed up; capture, scoring and rendering excluded",
+  "memory_scope": "state_payload_bytes counts recurrent carry arrays including RGB buffers, excluding input context, outputs, temporaries and allocator overhead; it is not measured peak memory",
+  "limitations": [
+    "Equal updates and width do not establish baseline training sufficiency.",
+    "Scene pairs are correlated; raw per-scene metrics are retained, and seed results are not pooled as independent episodes.",
+    "The frontier describes this pilot only; no significance claim.",
+    "Reappearance success is not identity preservation or webcam transfer.",
+    "Compact recurrence still uses dense RGB transport; no sparse-compute claim.",
+    "Error maps are observed discrepancies, not calibrated uncertainty."
+  ]
+}
