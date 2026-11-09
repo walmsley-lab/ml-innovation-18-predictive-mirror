@@ -72,14 +72,10 @@ def dream(params, state, ticks=2):
     return (hidden, future), future
 
 
-def rollout_and_activity(params, observed_context, horizon, ticks=2):
-    """[B,C,H,W,3] -> predicted RGB + mean absolute cellular activity.
-
-    Only the context is seen; future target frames never enter dream(), at
-    training or evaluation time. No observed frame arrives during dreaming.
-    """
-    if horizon < 1 or ticks < 1 or observed_context.ndim != 5 or observed_context.shape[-1] != 3:
-        raise ValueError("Need RGB [B,C,H,W,3], positive horizon and ticks")
+def encode_context(params, observed_context, ticks=2):
+    """Return the recurrent state just after the final observation."""
+    if observed_context.ndim != 5 or observed_context.shape[-1] != 3:
+        raise ValueError("Need RGB [B,C,H,W,3]")
     batch, context, height, width, _ = observed_context.shape
     if context < 2:
         raise ValueError("Require at least two observed context frames")
@@ -95,7 +91,18 @@ def rollout_and_activity(params, observed_context, horizon, ticks=2):
     state, _ = jax.lax.scan(
         absorb_and_dream, state,
         jnp.swapaxes(observed_context[:, :-1], 0, 1))
-    state = observe(params, state, observed_context[:, -1], ticks)
+    return observe(params, state, observed_context[:, -1], ticks)
+
+
+def rollout_and_activity(params, observed_context, horizon, ticks=2):
+    """[B,C,H,W,3] -> predicted RGB + mean absolute cellular activity.
+
+    Only the context is seen; future target frames never enter dream(), at
+    training or evaluation time. No observed frame arrives during dreaming.
+    """
+    if horizon < 1 or ticks < 1:
+        raise ValueError("Need positive horizon and ticks")
+    state = encode_context(params, observed_context, ticks)
 
     def predict(s, _):
         s, frame = dream(params, s, ticks)
